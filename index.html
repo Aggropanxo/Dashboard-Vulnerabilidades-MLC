@@ -33,21 +33,18 @@
   .btn-lock { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; white-space: nowrap; }
   .btn-lock:hover { background: #1e293b; color: #fff; }
   
-  /* --- Contenedor del Mapa (Google Maps Embed) --- */
+  /* --- Contenedor del Mapa Interactivo --- */
   #map-view { display: none; margin-bottom: 30px; }
-  .map-frame-container {
+  .map-instruction { background: #1e293b; border: 1px solid #38bdf8; color: #38bdf8; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem; display: none; }
+  body.admin-mode .map-instruction { display: block; }
+  
+  #google-map {
     width: 100%;
     height: 500px;
     border-radius: 10px;
     border: 1px solid #334155;
-    overflow: hidden;
     box-shadow: 0 0 20px rgba(0,0,0,0.4);
     background: #1e293b;
-  }
-  .map-frame-container iframe {
-    width: 100%;
-    height: 100%;
-    border: 0;
   }
 
   /* --- Panel Admin --- */
@@ -122,7 +119,7 @@
   
   <div class="header-controls">
     <button id="btnViewGrid" class="view-btn active" onclick="cambiarVista('grid')">📋 Dashboard</button>
-    <button id="btnViewMap" class="view-btn" onclick="cambiarVista('map')">🗺️ Mapa Google Maps</button>
+    <button id="btnViewMap" class="view-btn" onclick="cambiarVista('map')">🗺️ Mapa Operacional</button>
     <button id="btnUnlock" class="btn-lock" onclick="solicitarClave()">🔒 Modo Lectura</button>
   </div>
 </div>
@@ -142,11 +139,10 @@
   <div id="app-root"></div>
 </div>
 
-<!-- VISTA 2: MAPA DE GOOGLE MAPS (EMBED INTEGRADO) -->
+<!-- VISTA 2: MAPA INTERACTIVO GOOGLE MAPS -->
 <div id="map-view">
-  <div class="map-frame-container">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d7891.536845865917!2d-70.81304695092764!3d-28.28769698151936!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1ses-419!2scl!4v1788881497316!5m2!1ses-419!2scl" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-  </div>
+  <div class="map-instruction">📍 <b>Modo Admin Activo:</b> Haz clic en cualquier lugar exacto del mapa para registrar y marcar con un punto rojo un nuevo equipo crítico.</div>
+  <div id="google-map"></div>
 </div>
 
 <!-- Modal Detallado -->
@@ -161,13 +157,49 @@
   </div>
 </div>
 
-<!-- Script Firebase -->
+<!-- Scripts Firebase y Google Maps API -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap" async defer></script>
 
 <script>
   let isAdmin = false;
   let editId = null;
+  let map;
+  let markers = [];
+  let tempLat = null;
+  let tempLng = null;
+
+  function initMap() {
+    // Coordenadas iniciales centradas en Planta Los Colorados / Atacama
+    const mlcCenter = { lat: -28.2876, lng: -70.8130 };
+    
+    map = new google.maps.Map(document.getElementById("google-map"), {
+      zoom: 15,
+      center: mlcCenter,
+      mapTypeId: "hybrid", // Vista satelital con etiquetas para identificar sectores de planta
+      disableDefaultUI: false
+    });
+
+    // Evento de clic en el mapa para marcar equipos nuevos en Modo Admin
+    map.addListener("click", (mapsMouseEvent) => {
+      if (!isAdmin) {
+        alert("🔒 Debes activar el Modo Admin para registrar nuevos equipos haciendo clic en el mapa.");
+        return;
+      }
+
+      tempLat = mapsMouseEvent.latLng.lat();
+      tempLng = mapsMouseEvent.latLng.lng();
+
+      // Desplazarse al panel superior y enfocar los inputs para completar la ficha
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('inArea').focus();
+      
+      alert(`📌 Coordenadas capturadas en el mapa.\nComplete los datos del activo arriba y presione Registrar.`);
+    });
+
+    renderizarMarcadoresMapa();
+  }
 
   function cambiarVista(vista) {
     const gridView = document.getElementById('dashboard-view');
@@ -185,7 +217,47 @@
       mapView.style.display = 'block';
       btnMap.classList.add('active');
       btnGrid.classList.remove('active');
+      
+      // Refrescar tamaño del mapa de Google si estaba oculto
+      if (map) {
+        google.maps.event.trigger(map, "resize");
+      }
     }
+  }
+
+  function renderizarMarcadoresMapa() {
+    if (!map) return;
+
+    // Limpiar marcadores antiguos del mapa
+    markers.forEach(m => m.setMap(null));
+    markers = [];
+
+    equipos.forEach(eq => {
+      if (eq.lat && eq.lng) {
+        // Crear un punto rojo brillante personalizado
+        const redDot = {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 9,
+          fillColor: "#ef4444",
+          fillOpacity: 1,
+          strokeColor: "#ffffff",
+          strokeWeight: 2,
+        };
+
+        const marker = new google.maps.Marker({
+          position: { lat: parseFloat(eq.lat), lng: parseFloat(eq.lng) },
+          map: map,
+          icon: redDot,
+          title: `Tag: ${eq.nombre} (${eq.area})`
+        });
+
+        marker.addListener("click", () => {
+          abrirModal(eq.id);
+        });
+
+        markers.push(marker);
+      }
+    });
   }
 
   function solicitarClave() {
@@ -225,6 +297,7 @@
     const data = snapshot.val();
     equipos = data ? Object.values(data) : [];
     renderDashboard();
+    renderizarMarcadoresMapa();
   });
 
   function guardarEquipo() {
@@ -238,16 +311,37 @@
     const imagenUrl = document.getElementById('inImagen').value.trim();
 
     if(area && nombre && vuln) {
-      const equipoData = { area, nombre, vulnerabilidad: vuln, evidencia: evi, accion, imagen: imagenUrl };
+      const equipoData = { 
+        area, 
+        nombre, 
+        vulnerabilidad: vuln, 
+        evidencia: evi, 
+        accion, 
+        imagen: imagenUrl 
+      };
 
+      // Si estamos editando o si hizo clic en el mapa, guardamos la ubicación
       if (editId) {
         equipoData.id = editId;
+        const eqOriginal = equipos.find(e => e.id === editId);
+        equipoData.lat = tempLat !== null ? tempLat : (eqOriginal.lat || null);
+        equipoData.lng = tempLng !== null ? tempLng : (eqOriginal.lng || null);
+
         equiposRef.child(editId).update(equipoData)
           .then(() => { resetFormulario(); })
           .catch(error => alert("❌ Error al actualizar:\n" + error.message));
       } else {
+        if (tempLat === null || tempLng === null) {
+          alert("⚠️ Atención: No ha seleccionado la ubicación exacta en el Mapa Operacional. Por favor, vaya a la pestaña 'Mapa Operacional' y haga clic sobre el sector de la falla.");
+          cambiarVista('map');
+          return;
+        }
+
         const nuevoId = Date.now().toString();
         equipoData.id = nuevoId;
+        equipoData.lat = tempLat;
+        equipoData.lng = tempLng;
+
         equiposRef.child(nuevoId).set(equipoData)
           .then(() => { resetFormulario(); })
           .catch(error => alert("❌ Error al guardar:\n" + error.message));
@@ -271,6 +365,9 @@
       document.getElementById('inImagen').value = eq.imagen || '';
       
       editId = id; 
+      tempLat = eq.lat || null;
+      tempLng = eq.lng || null;
+
       const btn = document.getElementById('btnSubmit');
       btn.innerText = "💾 Guardar Cambios";
       btn.style.background = "#16a34a"; 
@@ -281,6 +378,8 @@
   function resetFormulario() {
     document.querySelectorAll('.admin-panel input').forEach(input => input.value = '');
     editId = null;
+    tempLat = null;
+    tempLng = null;
     const btn = document.getElementById('btnSubmit');
     btn.innerText = "+ Registrar Activo";
     btn.style.background = "#0284c7"; 
@@ -315,7 +414,6 @@
     document.getElementById('evidenciaModal').style.display = 'flex';
   }
   
-  // Single function for closing modal
   function cerrarModal(event) {
     if (event && event.target !== document.getElementById('evidenciaModal')) return;
     document.getElementById('evidenciaModal').style.display = 'none';
