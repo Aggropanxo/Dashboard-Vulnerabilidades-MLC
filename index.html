@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DASHBOARD OPERACIONAL & MAPA - PLANTA MLC | CPF & CMP</title>
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   /* --- Estilos Base --- */
   body { background-color: #0b1120; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; padding: 30px; margin: 0; }
@@ -33,18 +35,18 @@
   .btn-lock { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; white-space: nowrap; }
   .btn-lock:hover { background: #1e293b; color: #fff; }
   
-  /* --- Contenedor del Mapa Interactivo --- */
+  /* --- Contenedor del Mapa --- */
   #map-view { display: none; margin-bottom: 30px; }
   .map-instruction { background: #1e293b; border: 1px solid #38bdf8; color: #38bdf8; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem; display: none; }
   body.admin-mode .map-instruction { display: block; }
   
-  #google-map {
+  #map-container {
     width: 100%;
     height: 500px;
     border-radius: 10px;
     border: 1px solid #334155;
     box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    background: #1e293b;
+    background: #000;
   }
 
   /* --- Panel Admin --- */
@@ -139,10 +141,10 @@
   <div id="app-root"></div>
 </div>
 
-<!-- VISTA 2: MAPA INTERACTIVO GOOGLE MAPS -->
+<!-- VISTA 2: MAPA INTERACTIVO -->
 <div id="map-view">
   <div class="map-instruction">📍 <b>Modo Admin Activo:</b> Haz clic en cualquier lugar exacto del mapa para registrar y marcar con un punto rojo un nuevo equipo crítico.</div>
-  <div id="google-map"></div>
+  <div id="map-container"></div>
 </div>
 
 <!-- Modal Detallado -->
@@ -157,49 +159,19 @@
   </div>
 </div>
 
-<!-- Scripts Firebase y Google Maps API -->
+<!-- Scripts Leaflet y Firebase -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap" async defer></script>
 
 <script>
   let isAdmin = false;
   let editId = null;
   let map;
-  let markers = [];
+  let markersLayer = L.layerGroup();
+  let mapaInicializado = false;
   let tempLat = null;
   let tempLng = null;
-
-  function initMap() {
-    // Coordenadas iniciales centradas en Planta Los Colorados / Atacama
-    const mlcCenter = { lat: -28.2876, lng: -70.8130 };
-    
-    map = new google.maps.Map(document.getElementById("google-map"), {
-      zoom: 15,
-      center: mlcCenter,
-      mapTypeId: "hybrid", // Vista satelital con etiquetas para identificar sectores de planta
-      disableDefaultUI: false
-    });
-
-    // Evento de clic en el mapa para marcar equipos nuevos en Modo Admin
-    map.addListener("click", (mapsMouseEvent) => {
-      if (!isAdmin) {
-        alert("🔒 Debes activar el Modo Admin para registrar nuevos equipos haciendo clic en el mapa.");
-        return;
-      }
-
-      tempLat = mapsMouseEvent.latLng.lat();
-      tempLng = mapsMouseEvent.latLng.lng();
-
-      // Desplazarse al panel superior y enfocar los inputs para completar la ficha
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      document.getElementById('inArea').focus();
-      
-      alert(`📌 Coordenadas capturadas en el mapa.\nComplete los datos del activo arriba y presione Registrar.`);
-    });
-
-    renderizarMarcadoresMapa();
-  }
 
   function cambiarVista(vista) {
     const gridView = document.getElementById('dashboard-view');
@@ -217,45 +189,63 @@
       mapView.style.display = 'block';
       btnMap.classList.add('active');
       btnGrid.classList.remove('active');
-      
-      // Refrescar tamaño del mapa de Google si estaba oculto
-      if (map) {
-        google.maps.event.trigger(map, "resize");
+
+      if (!mapaInicializado) {
+        initMap();
+        mapaInicializado = true;
+      } else {
+        map.invalidateSize();
       }
     }
   }
 
-  function renderizarMarcadoresMapa() {
+  function initMap() {
+    // Coordenadas orientadas en la zona de la planta en Atacama
+    map = L.map('map-container').setView([-28.2876, -70.8130], 14);
+    
+    // Usamos el mapa base estándar de Esri World Imagery (Satelital) para ver los caminos de la faena con claridad
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    }).addTo(map);
+
+    markersLayer.addTo(map);
+
+    // Evento clic en el mapa para capturar posición en Modo Admin
+    map.on('click', function(e) {
+      if (!isAdmin) {
+        alert("🔒 Debes activar el Modo Admin para registrar equipos haciendo clic en el mapa.");
+        return;
+      }
+
+      tempLat = e.latlng.lat;
+      tempLng = e.latlng.lng;
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('inArea').focus();
+      alert(`📌 Coordenadas capturadas en el mapa.\nComplete los datos del activo arriba y presione Registrar.`);
+    });
+
+    renderizarMarcadoresMapa(equipos);
+  }
+
+  function renderizarMarcadoresMapa(equiposList) {
     if (!map) return;
+    markersLayer.clearLayers();
 
-    // Limpiar marcadores antiguos del mapa
-    markers.forEach(m => m.setMap(null));
-    markers = [];
-
-    equipos.forEach(eq => {
+    equiposList.forEach(eq => {
       if (eq.lat && eq.lng) {
-        // Crear un punto rojo brillante personalizado
-        const redDot = {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 9,
-          fillColor: "#ef4444",
-          fillOpacity: 1,
-          strokeColor: "#ffffff",
-          strokeWeight: 2,
-        };
-
-        const marker = new google.maps.Marker({
-          position: { lat: parseFloat(eq.lat), lng: parseFloat(eq.lng) },
-          map: map,
-          icon: redDot,
-          title: `Tag: ${eq.nombre} (${eq.area})`
+        const redIcon = L.divIcon({
+          className: 'custom-map-marker',
+          html: '<div style="background-color: #ef4444; width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 12px #ef4444; border: 2px solid #ffffff;"></div>',
+          iconSize: [16, 16]
         });
 
-        marker.addListener("click", () => {
-          abrirModal(eq.id);
-        });
-
-        markers.push(marker);
+        const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon: redIcon });
+        marker.on('click', () => abrirModal(eq.id));
+        marker.bindPopup(`<b>Tag: ${eq.nombre}</b><br>Área: ${eq.area}<br><span style="color:#ef4444; font-weight:bold;">Estado Crítico</span>`);
+        
+        markersLayer.addLayer(marker);
       }
     });
   }
@@ -297,7 +287,7 @@
     const data = snapshot.val();
     equipos = data ? Object.values(data) : [];
     renderDashboard();
-    renderizarMarcadoresMapa();
+    renderizarMarcadoresMapa(equipos);
   });
 
   function guardarEquipo() {
@@ -311,16 +301,8 @@
     const imagenUrl = document.getElementById('inImagen').value.trim();
 
     if(area && nombre && vuln) {
-      const equipoData = { 
-        area, 
-        nombre, 
-        vulnerabilidad: vuln, 
-        evidencia: evi, 
-        accion, 
-        imagen: imagenUrl 
-      };
+      const equipoData = { area, nombre, vulnerabilidad: vuln, evidencia: evi, accion, imagen: imagenUrl };
 
-      // Si estamos editando o si hizo clic en el mapa, guardamos la ubicación
       if (editId) {
         equipoData.id = editId;
         const eqOriginal = equipos.find(e => e.id === editId);
@@ -332,7 +314,7 @@
           .catch(error => alert("❌ Error al actualizar:\n" + error.message));
       } else {
         if (tempLat === null || tempLng === null) {
-          alert("⚠️ Atención: No ha seleccionado la ubicación exacta en el Mapa Operacional. Por favor, vaya a la pestaña 'Mapa Operacional' y haga clic sobre el sector de la falla.");
+          alert("⚠️ Atención: No ha seleccionado la ubicación exacta en el Mapa Operacional. Vaya a la pestaña 'Mapa Operacional' y haga clic sobre el sector.");
           cambiarVista('map');
           return;
         }
@@ -405,7 +387,7 @@
     document.getElementById('modalEvi').innerText = eq.evidencia;
     document.getElementById('modalAccion').innerText = eq.accion;
     
-    const imgContainer = document.getElementById('modalImageContainer');
+    let imgContainer = document.getElementById('modalImageContainer');
     if (eq.imagen && eq.imagen !== "undefined" && eq.imagen !== "") {
       imgContainer.innerHTML = `<img src="${eq.imagen}" alt="Evidencia" class="modal-image">`;
     } else {
