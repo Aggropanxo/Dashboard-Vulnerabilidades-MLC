@@ -34,7 +34,7 @@
   body.admin-mode .map-instruction { display: block; }
   #map-container { width: 100%; height: 500px; border-radius: 8px; border: 1px solid #334155; background: #000; }
 
-  /* --- Panel Admin Expandido y Masivo --- */
+  /* --- Panel Admin --- */
   .admin-panel { display: none; background: #0f172a; padding: 15px; border-radius: 6px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; border: 1px solid #334155; }
   .admin-panel .input-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 150px; }
   .admin-panel label { font-size: 0.7rem; color: #38bdf8; font-weight: bold; margin-bottom: 3px; text-transform: uppercase; }
@@ -51,44 +51,76 @@
   #dashboard-view { display: block; }
   .area-title { color: #38bdf8; font-size: 1.1rem; border-left: 3px solid #38bdf8; padding-left: 8px; margin: 20px 0 10px 0; text-transform: uppercase; letter-spacing: 1px; }
   
-  /* Grilla extremadamente compacta para 184 activos */
-  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
   
   .card { 
     background: rgba(15, 23, 42, 0.9); 
-    border: 2px solid #334155; /* Default */
-    border-radius: 6px; 
+    border: 2px solid #334155; 
+    border-radius: 8px; 
     padding: 12px 6px; 
     position: relative; 
     cursor: pointer; 
-    transition: all 0.2s ease;
     display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-    min-height: 60px;
+    min-height: 65px;
+    transition: transform 0.2s ease;
   }
-  .card:hover { transform: translateY(-2px); filter: brightness(1.2); }
+  .card:hover { transform: translateY(-3px); }
   
-  /* Colores por Severidad */
-  .sev-alto { border-color: rgba(239, 68, 68, 0.7); box-shadow: 0 0 8px rgba(239, 68, 68, 0.2); }
-  .sev-medio { border-color: rgba(234, 179, 8, 0.7); box-shadow: 0 0 8px rgba(234, 179, 8, 0.2); }
-  .sev-bajo { border-color: rgba(34, 197, 94, 0.7); box-shadow: 0 0 8px rgba(34, 197, 94, 0.2); }
+  /* --- Semáforo de Animaciones Suaves (Baliza/Sirena) --- */
+  
+  /* ROJO: Sirena principal (Rápida y con resplandor fuerte) */
+  .sev-rojo {
+    border-color: rgba(239, 68, 68, 0.8);
+    animation: sirena-roja 1.2s ease-in-out infinite alternate;
+  }
+  @keyframes sirena-roja {
+    0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2), inset 0 0 5px rgba(239, 68, 68, 0.1); }
+    100% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.9), inset 0 0 15px rgba(239, 68, 68, 0.5); border-color: rgba(239, 68, 68, 1); }
+  }
 
+  /* NARANJA: Alerta secundaria (Media velocidad, resplandor medio) */
+  .sev-naranja {
+    border-color: rgba(249, 115, 22, 0.8);
+    animation: sirena-naranja 2s ease-in-out infinite alternate;
+  }
+  @keyframes sirena-naranja {
+    0% { box-shadow: 0 0 5px rgba(249, 115, 22, 0.1), inset 0 0 2px rgba(249, 115, 22, 0.05); }
+    100% { box-shadow: 0 0 18px rgba(249, 115, 22, 0.7), inset 0 0 10px rgba(249, 115, 22, 0.3); border-color: rgba(249, 115, 22, 1); }
+  }
+
+  /* AMARILLO: Advertencia leve (Lenta, resplandor suave) */
+  .sev-amarillo {
+    border-color: rgba(234, 179, 8, 0.6);
+    animation: respiracion-amarilla 3s ease-in-out infinite alternate;
+  }
+  @keyframes respiracion-amarilla {
+    0% { box-shadow: 0 0 0px rgba(234, 179, 8, 0); }
+    100% { box-shadow: 0 0 12px rgba(234, 179, 8, 0.5), inset 0 0 5px rgba(234, 179, 8, 0.2); }
+  }
+
+  /* VERDE: Normal (Estático, sin animación para no distraer) */
+  .sev-verde {
+    border-color: rgba(34, 197, 94, 0.4);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.1);
+  }
+
+  /* Puntos indicadores estáticos para mantener la referencia visual */
   .pulse-indicator { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; }
-  .sev-alto .pulse-indicator { background-color: #ef4444; animation: pulse-alto 1.5s infinite; }
-  .sev-medio .pulse-indicator { background-color: #eab308; animation: pulse-medio 2s infinite; }
-  .sev-bajo .pulse-indicator { background-color: #22c55e; } /* Sin pulso para bajo */
-
-  @keyframes pulse-alto { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 5px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-  @keyframes pulse-medio { 0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7); } 70% { box-shadow: 0 0 0 4px rgba(234, 179, 8, 0); } 100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); } }
+  .sev-rojo .pulse-indicator { background-color: #ef4444; }
+  .sev-naranja .pulse-indicator { background-color: #f97316; }
+  .sev-amarillo .pulse-indicator { background-color: #eab308; }
+  .sev-verde .pulse-indicator { background-color: #22c55e; }
   
   .delete-btn { display: none; position: absolute; bottom: 2px; right: 4px; background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem; z-index: 10; padding: 0;}
   .edit-btn { display: none; position: absolute; bottom: 2px; left: 4px; background: transparent; border: none; color: #38bdf8; cursor: pointer; font-size: 0.8rem; z-index: 10; padding: 0;}
   
-  .asset-tag { color: #f8fafc; font-size: 0.95rem; font-weight: 800; margin: 0; letter-spacing: 0.5px; }
-  .asset-days { font-size: 0.65rem; font-weight: bold; margin-top: 4px; padding: 2px 4px; border-radius: 3px; background: rgba(0,0,0,0.3); }
+  .asset-tag { color: #f8fafc; font-size: 1rem; font-weight: 800; margin: 0; letter-spacing: 0.5px; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+  .asset-days { font-size: 0.65rem; font-weight: bold; margin-top: 6px; padding: 3px 6px; border-radius: 4px; background: rgba(0,0,0,0.5); z-index: 2; border: 1px solid rgba(255,255,255,0.1); }
   
-  .sev-alto .asset-days { color: #fca5a5; }
-  .sev-medio .asset-days { color: #fde047; }
-  .sev-bajo .asset-days { color: #86efac; }
+  .sev-rojo .asset-days { color: #fca5a5; }
+  .sev-naranja .asset-days { color: #fdba74; }
+  .sev-amarillo .asset-days { color: #fde047; }
+  .sev-verde .asset-days { color: #86efac; }
 
   /* --- MODO ADMINISTRADOR ACTIVADO --- */
   body.admin-mode .admin-panel { display: flex; }
@@ -150,6 +182,15 @@
     <input type="text" id="inNombre" placeholder="ej. M-01" required>
   </div>
   <div class="input-group">
+    <label>Color (Severidad)</label>
+    <select id="inSeveridad">
+      <option value="Rojo">🔴 Rojo (Crítico / Acción Inmediata)</option>
+      <option value="Naranja">🟠 Naranja (Alerta / Precaución)</option>
+      <option value="Amarillo">🟡 Amarillo (Advertencia / Monitoreo)</option>
+      <option value="Verde">🟢 Verde (Normal / Buen Estado)</option>
+    </select>
+  </div>
+  <div class="input-group">
     <label>Componente</label>
     <input type="text" id="inComponente" placeholder="ej. Descanso Libre">
   </div>
@@ -164,14 +205,6 @@
   <div class="input-group">
     <label>Fecha Hallazgo</label>
     <input type="date" id="inFecha">
-  </div>
-  <div class="input-group">
-    <label>Severidad</label>
-    <select id="inSeveridad">
-      <option value="Alto">🔴 Alto (Crítico)</option>
-      <option value="Medio">🟡 Medio (Alerta)</option>
-      <option value="Bajo">🟢 Bajo (Monitoreo)</option>
-    </select>
   </div>
   
   <div class="input-group" style="flex-basis: 100%;">
@@ -195,12 +228,12 @@
   <div class="full-width">
     <div class="upload-box">
       <div style="flex-grow: 1;">
-        <label style="color:#10b981;">CARGA MASIVA DESDE EXCEL (CSV delimitado por ;)</label>
+        <label style="color:#10b981;">CARGA MASIVA CSV (Columnas: Área | Tag | Color)</label>
         <input type="file" id="inCsvFile" accept=".csv" style="background:transparent; border:none; padding:0; margin-top:5px;">
       </div>
-      <button class="btn-upload" onclick="procesarCSV()">📥 Cargar Base Datos</button>
+      <button class="btn-upload" onclick="procesarCSV()">📥 Subir Equipos</button>
     </div>
-    <button id="btnSubmit" onclick="guardarEquipo()" style="height: fit-content;">+ Registrar Activo Individual</button>
+    <button id="btnSubmit" onclick="guardarEquipo()" style="height: fit-content;">+ Guardar Activo</button>
   </div>
 </div>
 
@@ -222,7 +255,7 @@
     
     <div class="modal-header-flex">
       <h2 id="modalTitle" class="modal-title">Tag</h2>
-      <span id="modalSevBadge" class="modal-sev-badge">Nivel</span>
+      <span id="modalSevBadge" class="modal-sev-badge">Color</span>
     </div>
     
     <div class="modal-grid">
@@ -272,7 +305,7 @@
     }
   });
 
-  // Carga Masiva CSV
+  // Carga Masiva CSV Simplificada
   function procesarCSV() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inCsvFile');
@@ -286,31 +319,31 @@
       const lines = text.split('\n');
       let agregados = 0;
 
-      // Asumimos formato: Area;Tag;Componente;Aviso;OM;Fecha;Severidad;Estatus;Analisis;Recomendacion
-      for (let i = 1; i < lines.length; i++) { // i=1 ignora encabezados
+      for (let i = 1; i < lines.length; i++) { 
         if(lines[i].trim() === '') continue;
-        const cols = lines[i].split(';'); // Separador común en Excel Latam
+        const cols = lines[i].split(';'); 
         if(cols.length >= 2) {
           const eqId = Date.now().toString() + i;
+          
+          let colorLeido = cols[2] ? cols[2].trim().toLowerCase() : "verde";
+          let colorFinal = "Verde";
+          if (colorLeido.includes("rojo")) colorFinal = "Rojo";
+          if (colorLeido.includes("naranja")) colorFinal = "Naranja";
+          if (colorLeido.includes("amarillo")) colorFinal = "Amarillo";
+
           const equipo = {
             id: eqId,
             area: cols[0] ? cols[0].trim() : "Sin Área",
             nombre: cols[1] ? cols[1].trim() : "Desconocido",
-            componente: cols[2] ? cols[2].trim() : "",
-            aviso: cols[3] ? cols[3].trim() : "",
-            om: cols[4] ? cols[4].trim() : "",
-            fecha: cols[5] ? cols[5].trim() : new Date().toISOString().split('T')[0],
-            severidad: cols[6] ? cols[6].trim() : "Alto",
-            estatus: cols[7] ? cols[7].trim() : "",
-            analisis: cols[8] ? cols[8].trim() : "",
-            recomendacion: cols[9] ? cols[9].trim() : "",
-            lat: null, lng: null, imagenes: []
+            severidad: colorFinal,
+            componente: "", aviso: "", om: "", fecha: new Date().toISOString().split('T')[0], 
+            estatus: "", analisis: "", recomendacion: "", lat: null, lng: null, imagenes: []
           };
           equiposRef.child(eqId).set(equipo);
           agregados++;
         }
       }
-      alert(`✅ Carga masiva completada: ${agregados} activos registrados.`);
+      alert(`✅ Carga masiva completada: ${agregados} equipos registrados.`);
       fileInput.value = '';
     };
     reader.readAsText(file, 'UTF-8');
@@ -347,10 +380,14 @@
     markersLayer.clearLayers();
     equiposList.forEach(eq => {
       if (eq.lat && eq.lng) {
-        let color = eq.severidad === 'Bajo' ? '#22c55e' : (eq.severidad === 'Medio' ? '#eab308' : '#ef4444');
+        let colorHex = '#22c55e'; // Verde
+        if (eq.severidad === 'Rojo') colorHex = '#ef4444';
+        if (eq.severidad === 'Naranja') colorHex = '#f97316';
+        if (eq.severidad === 'Amarillo') colorHex = '#eab308';
+        
         const icon = L.divIcon({
           className: 'custom-map-marker',
-          html: `<div style="background-color: ${color}; width:14px; height:14px; border-radius:50%; border:2px solid #fff;"></div>`,
+          html: `<div style="background-color: ${colorHex}; width:14px; height:14px; border-radius:50%; border:2px solid #fff;"></div>`,
           iconSize: [14, 14]
         });
         const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon });
@@ -393,7 +430,7 @@
     renderizarMarcadoresMapa(equipos);
   });
 
-  // Guardar Individual
+  // Guardar Individual / Editar
   function guardarEquipo() {
     if (!isAdmin) return; 
     const area = document.getElementById('inArea').value.trim();
@@ -436,7 +473,7 @@
       document.getElementById('inAviso').value = eq.aviso || '';
       document.getElementById('inOm').value = eq.om || '';
       document.getElementById('inFecha').value = eq.fecha || '';
-      document.getElementById('inSeveridad').value = eq.severidad || 'Alto';
+      document.getElementById('inSeveridad').value = eq.severidad || 'Verde';
       document.getElementById('inEstatus').value = eq.estatus || '';
       document.getElementById('inAnalisis').value = eq.analisis || '';
       document.getElementById('inRecomendacion').value = eq.recomendacion || '';
@@ -449,20 +486,27 @@
 
   function resetFormulario() {
     document.querySelectorAll('.admin-panel input[type="text"], .admin-panel input[type="date"], .admin-panel textarea').forEach(i => i.value = '');
-    document.getElementById('inSeveridad').value = 'Alto';
+    document.getElementById('inSeveridad').value = 'Rojo';
     document.getElementById('inImagenesFiles').value = '';
     editId = null; tempLat = null; tempLng = null; imagenesBase64Temp = [];
-    document.getElementById('btnSubmit').innerText = "+ Registrar Activo Individual";
+    document.getElementById('btnSubmit').innerText = "+ Guardar Activo";
   }
 
   function eliminarEquipo(event, id) {
     event.stopPropagation(); if (!isAdmin) return;
-    if (confirm("⚠️ ¿Eliminar activo?")) { equiposRef.child(id).remove().then(() => { if (editId === id) resetFormulario(); }); }
+    if (confirm("⚠️ ¿Eliminar activo de la matriz?")) { equiposRef.child(id).remove().then(() => { if (editId === id) resetFormulario(); }); }
   }
 
   function calcularDias(fechaStr) {
     if (!fechaStr) return 0;
     return Math.max(0, Math.floor((new Date() - new Date(fechaStr)) / (1000 * 60 * 60 * 24)));
+  }
+
+  function valorSeveridad(color) {
+    if(color === 'Rojo') return 4;
+    if(color === 'Naranja') return 3;
+    if(color === 'Amarillo') return 2;
+    return 1;
   }
 
   function abrirModal(id) {
@@ -471,10 +515,13 @@
 
     document.getElementById('modalTitle').innerText = `${eq.nombre} - ${eq.area}`;
     
-    // Configurar Badge de Severidad
     const badge = document.getElementById('modalSevBadge');
-    badge.innerText = `Severidad: ${eq.severidad || 'Alto'}`;
-    badge.style.backgroundColor = eq.severidad === 'Bajo' ? '#22c55e' : (eq.severidad === 'Medio' ? '#facc15' : '#ef4444');
+    badge.innerText = `Estado: ${eq.severidad || 'Verde'}`;
+    let badgeColor = '#22c55e'; 
+    if(eq.severidad === 'Rojo') badgeColor = '#ef4444';
+    if(eq.severidad === 'Naranja') badgeColor = '#f97316';
+    if(eq.severidad === 'Amarillo') badgeColor = '#facc15';
+    badge.style.backgroundColor = badgeColor;
 
     document.getElementById('modalComponente').innerText = eq.componente || '-';
     document.getElementById('modalAviso').innerText = eq.aviso || '-';
@@ -510,12 +557,20 @@
     const equiposPorArea = equipos.reduce((acc, eq) => { (acc[eq.area] = acc[eq.area] || []).push(eq); return acc; }, {});
 
     for (const [area, eqs] of Object.entries(equiposPorArea)) {
-      // ORDENAR POR DÍAS (MAYOR A MENOR)
-      eqs.sort((a, b) => calcularDias(b.fecha) - calcularDias(a.fecha));
+      
+      eqs.sort((a, b) => {
+        const sevDiff = valorSeveridad(b.severidad) - valorSeveridad(a.severidad);
+        if (sevDiff !== 0) return sevDiff;
+        return calcularDias(b.fecha) - calcularDias(a.fecha);
+      });
 
       const html = eqs.map(eq => {
         const dias = calcularDias(eq.fecha);
-        const sevClass = eq.severidad === 'Bajo' ? 'sev-bajo' : (eq.severidad === 'Medio' ? 'sev-medio' : 'sev-alto');
+        let sevClass = 'sev-verde';
+        if(eq.severidad === 'Rojo') sevClass = 'sev-rojo';
+        if(eq.severidad === 'Naranja') sevClass = 'sev-naranja';
+        if(eq.severidad === 'Amarillo') sevClass = 'sev-amarillo';
+
         return `
           <div class="card ${sevClass}" onclick="abrirModal('${eq.id}')">
             <div class="pulse-indicator"></div>
