@@ -8,87 +8,87 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   /* --- Estilos Base --- */
-  body { background-color: #0b1120; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; padding: 30px; margin: 0; }
+  body { background-color: #0b1120; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; padding: 20px; margin: 0; }
   
   /* --- Encabezado Corporativo --- */
-  .header { border-bottom: 1px solid #1e293b; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
-  .header-left { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .header { border-bottom: 1px solid #1e293b; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
+  .header-left { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
   
-  /* Marcas */
-  .brand-badges { display: flex; gap: 10px; align-items: center; }
-  .brand-badge { background: #1e293b; border: 1px solid #334155; color: #ffffff; font-weight: 800; font-size: 1.3rem; padding: 8px 16px; border-radius: 6px; letter-spacing: 1px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+  .brand-badges { display: flex; gap: 8px; align-items: center; }
+  .brand-badge { background: #1e293b; border: 1px solid #334155; color: #ffffff; font-weight: 800; font-size: 1.1rem; padding: 5px 12px; border-radius: 4px; letter-spacing: 1px; }
   .brand-badge.cpf { border-left: 4px solid #38bdf8; }
   .brand-badge.cmp { border-left: 4px solid #ef4444; }
 
-  .header-titles h1 { color: #ffffff; font-size: 2rem; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
-  .header-titles p { color: #94a3b8; margin: 0; font-size: 1rem; }
+  .header-titles h1 { color: #ffffff; font-size: 1.5rem; margin: 0 0 3px 0; text-transform: uppercase; letter-spacing: 1px; }
+  .header-titles p { color: #94a3b8; margin: 0; font-size: 0.85rem; }
   
-  /* Controles Superiores Derecho */
-  .header-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   
-  /* Botones de Cambio de Vista */
-  .view-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+  .view-btn, .btn-lock { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: 0.3s; }
   .view-btn.active { background: #0284c7; color: white; border-color: #0284c7; }
-  .view-btn:hover { background: #334155; color: #fff; }
-
-  /* Botón Administrador */
-  .btn-lock { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; white-space: nowrap; }
-  .btn-lock:hover { background: #1e293b; color: #fff; }
+  .view-btn:hover, .btn-lock:hover { background: #334155; color: #fff; }
   
   /* --- Contenedor del Mapa --- */
-  #map-view { display: none; margin-bottom: 30px; }
-  .map-instruction { background: #1e293b; border: 1px solid #38bdf8; color: #38bdf8; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem; display: none; }
+  #map-view { display: none; margin-bottom: 20px; }
+  .map-instruction { background: #1e293b; border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 0.85rem; display: none; }
   body.admin-mode .map-instruction { display: block; }
-  
-  #map-container {
-    width: 100%;
-    height: 500px;
-    border-radius: 10px;
-    border: 1px solid #334155;
-    box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    background: #000;
-  }
+  #map-container { width: 100%; height: 500px; border-radius: 8px; border: 1px solid #334155; background: #000; }
 
-  /* --- Panel Admin Expandido --- */
-  .admin-panel { display: none; background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 30px; flex-wrap: wrap; gap: 12px; border: 1px solid #334155; }
-  .admin-panel .input-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 180px; }
-  .admin-panel label { font-size: 0.75rem; color: #38bdf8; font-weight: bold; margin-bottom: 4px; text-transform: uppercase; }
-  .admin-panel input, .admin-panel textarea { padding: 10px; border-radius: 5px; border: 1px solid #334155; background: #0f172a; color: white; width: 100%; box-sizing: border-box; font-family: inherit; }
-  .admin-panel textarea { resize: vertical; min-height: 80px; }
-  .admin-panel .full-width { flex-basis: 100%; display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-top: 10px; flex-wrap: wrap; }
-  .admin-panel button { background: #0284c7; color: white; cursor: pointer; font-weight: bold; border: none; border-radius: 5px; padding: 12px 25px; transition: background 0.3s; }
+  /* --- Panel Admin Expandido y Masivo --- */
+  .admin-panel { display: none; background: #0f172a; padding: 15px; border-radius: 6px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; border: 1px solid #334155; }
+  .admin-panel .input-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 150px; }
+  .admin-panel label { font-size: 0.7rem; color: #38bdf8; font-weight: bold; margin-bottom: 3px; text-transform: uppercase; }
+  .admin-panel input, .admin-panel textarea, .admin-panel select { padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: white; width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.85rem; }
+  .admin-panel textarea { resize: vertical; min-height: 50px; }
+  .admin-panel .full-width { flex-basis: 100%; display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-top: 5px; flex-wrap: wrap; border-top: 1px solid #334155; padding-top: 10px; }
+  .admin-panel button { background: #0284c7; color: white; cursor: pointer; font-weight: bold; border: none; border-radius: 4px; padding: 8px 15px; font-size: 0.85rem; transition: background 0.3s; }
   .admin-panel button:hover { opacity: 0.9; }
+  
+  .btn-upload { background: #10b981 !important; }
+  .upload-box { border: 1px dashed #10b981; padding: 10px; border-radius: 5px; display: flex; gap: 10px; align-items: center; background: rgba(16, 185, 129, 0.1); flex-grow: 1; }
 
-  /* --- Vista Cuadritos (Dashboard) --- */
+  /* --- Vista Cuadritos (Dashboard de Alta Densidad) --- */
   #dashboard-view { display: block; }
-  .area-title { color: #38bdf8; font-size: 1.4rem; border-left: 4px solid #38bdf8; padding-left: 12px; margin: 40px 0 20px 0; text-transform: uppercase; letter-spacing: 1px; }
-  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+  .area-title { color: #38bdf8; font-size: 1.1rem; border-left: 3px solid #38bdf8; padding-left: 8px; margin: 20px 0 10px 0; text-transform: uppercase; letter-spacing: 1px; }
+  
+  /* Grilla extremadamente compacta para 184 activos */
+  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
   
   .card { 
-    background: rgba(15, 23, 42, 0.8); 
-    border: 1px solid rgba(239, 68, 68, 0.5); 
-    border-radius: 8px; 
-    padding: 20px 15px; 
+    background: rgba(15, 23, 42, 0.9); 
+    border: 2px solid #334155; /* Default */
+    border-radius: 6px; 
+    padding: 12px 6px; 
     position: relative; 
     cursor: pointer; 
     transition: all 0.2s ease;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
     display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-    min-height: 95px;
+    min-height: 60px;
   }
-  .card:hover { transform: translateY(-3px); border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+  .card:hover { transform: translateY(-2px); filter: brightness(1.2); }
   
-  .pulse-indicator { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background-color: #ef4444; border-radius: 50%; animation: pulse 1.5s infinite; }
-  @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+  /* Colores por Severidad */
+  .sev-alto { border-color: rgba(239, 68, 68, 0.7); box-shadow: 0 0 8px rgba(239, 68, 68, 0.2); }
+  .sev-medio { border-color: rgba(234, 179, 8, 0.7); box-shadow: 0 0 8px rgba(234, 179, 8, 0.2); }
+  .sev-bajo { border-color: rgba(34, 197, 94, 0.7); box-shadow: 0 0 8px rgba(34, 197, 94, 0.2); }
+
+  .pulse-indicator { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; }
+  .sev-alto .pulse-indicator { background-color: #ef4444; animation: pulse-alto 1.5s infinite; }
+  .sev-medio .pulse-indicator { background-color: #eab308; animation: pulse-medio 2s infinite; }
+  .sev-bajo .pulse-indicator { background-color: #22c55e; } /* Sin pulso para bajo */
+
+  @keyframes pulse-alto { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 5px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+  @keyframes pulse-medio { 0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7); } 70% { box-shadow: 0 0 0 4px rgba(234, 179, 8, 0); } 100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); } }
   
-  .delete-btn { display: none; position: absolute; bottom: 5px; right: 8px; background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; z-index: 10; }
-  .delete-btn:hover { color: #b91c1c; }
-  .edit-btn { display: none; position: absolute; bottom: 5px; left: 8px; background: transparent; border: none; color: #38bdf8; cursor: pointer; font-size: 0.9rem; z-index: 10; }
-  .edit-btn:hover { color: #0284c7; }
+  .delete-btn { display: none; position: absolute; bottom: 2px; right: 4px; background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem; z-index: 10; padding: 0;}
+  .edit-btn { display: none; position: absolute; bottom: 2px; left: 4px; background: transparent; border: none; color: #38bdf8; cursor: pointer; font-size: 0.8rem; z-index: 10; padding: 0;}
   
-  .asset-tag { color: #fca5a5; font-size: 1.2rem; font-weight: 700; margin: 0; letter-spacing: 0.5px; }
-  .asset-sub { color: #94a3b8; font-size: 0.75rem; margin-top: 4px; text-transform: uppercase; }
-  .asset-days { color: #38bdf8; font-size: 0.7rem; font-weight: bold; margin-top: 2px; }
+  .asset-tag { color: #f8fafc; font-size: 0.95rem; font-weight: 800; margin: 0; letter-spacing: 0.5px; }
+  .asset-days { font-size: 0.65rem; font-weight: bold; margin-top: 4px; padding: 2px 4px; border-radius: 3px; background: rgba(0,0,0,0.3); }
+  
+  .sev-alto .asset-days { color: #fca5a5; }
+  .sev-medio .asset-days { color: #fde047; }
+  .sev-bajo .asset-days { color: #86efac; }
 
   /* --- MODO ADMINISTRADOR ACTIVADO --- */
   body.admin-mode .admin-panel { display: flex; }
@@ -97,46 +97,43 @@
   body.admin-mode .btn-lock { background: #16a34a; color: white; border-color: #16a34a; }
 
   /* --- Modal Detallado --- */
-  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-  .modal-content { background: #0f172a; padding: 30px; border-radius: 10px; border: 1px solid #38bdf8; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-  .modal-close { position: absolute; top: 15px; right: 20px; color: #fff; font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
+  .modal-content { background: #0f172a; padding: 25px; border-radius: 8px; border: 1px solid #334155; width: 95%; max-width: 700px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
+  .modal-close { position: absolute; top: 10px; right: 15px; color: #94a3b8; font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
   .modal-close:hover { color: #ef4444; }
-  .modal-title { color: #fca5a5; font-size: 1.4rem; margin-top: 0; margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
   
-  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+  .modal-header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 10px; margin-bottom: 15px; }
+  .modal-title { color: #f8fafc; font-size: 1.3rem; margin: 0; text-transform: uppercase; }
+  .modal-sev-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; color: #000; margin-right: 30px;}
+  
+  .modal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; background: #1e293b; padding: 15px; border-radius: 6px; }
   .modal-data-row { margin-bottom: 12px; }
-  .modal-label { color: #38bdf8; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; }
-  .modal-value { color: #ffffff; font-size: 0.95rem; white-space: pre-wrap; line-height: 1.4; }
-  .modal-value.highlight { color: #ef4444; font-weight: bold; }
+  .modal-label { color: #94a3b8; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .modal-value { color: #e2e8f0; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.3; }
   
-  /* --- Galería de Fotos --- */
-  .gallery-container { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-  .gallery-thumb { width: 90px; height: 90px; object-fit: cover; border-radius: 6px; border: 1px solid #334155; cursor: pointer; transition: transform 0.2s, border-color 0.2s; background: #000; }
-  .gallery-thumb:hover { transform: scale(1.05); border-color: #38bdf8; }
+  /* --- Galería --- */
+  .gallery-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .gallery-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid #334155; cursor: pointer; transition: transform 0.2s; }
+  .gallery-thumb:hover { transform: scale(1.1); border-color: #38bdf8; }
 
-  /* --- Visor de Imagen en Pantalla Completa (Zoom) --- */
+  /* --- Lightbox --- */
   .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 2000; justify-content: center; align-items: center; }
-  .lightbox-content { max-width: 90%; max-height: 90vh; border-radius: 4px; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
-  .lightbox-close { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 2.5rem; font-weight: bold; cursor: pointer; background: none; border: none; }
-  .lightbox-close:hover { color: #ef4444; }
+  .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 4px; }
+  .lightbox-close { position: absolute; top: 15px; right: 25px; color: #fff; font-size: 2.5rem; cursor: pointer; background: none; border: none; }
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="header-left">
-    <div class="brand-badges">
-      <span class="brand-badge cpf">CPF</span>
-      <span class="brand-badge cmp">CMP</span>
-    </div>
+    <div class="brand-badges"><span class="brand-badge cpf">CPF</span><span class="brand-badge cmp">CMP</span></div>
     <div class="header-titles">
-      <h1>DASHBOARD OPERACIONAL - PLANTA MLC</h1>
-      <p>Monitoreo de Condiciones y Gestión de Vulnerabilidades</p>
+      <h1>DASHBOARD OPERACIONAL - MLC</h1>
+      <p>Gestión de Vulnerabilidades y Activos Críticos</p>
     </div>
   </div>
-  
   <div class="header-controls">
-    <button id="btnViewGrid" class="view-btn active" onclick="cambiarVista('grid')">📋 Dashboard</button>
+    <button id="btnViewGrid" class="view-btn active" onclick="cambiarVista('grid')">📋 Matriz Activos</button>
     <button id="btnViewMap" class="view-btn" onclick="cambiarVista('map')">🗺️ Mapa Operacional</button>
     <button id="btnUnlock" class="btn-lock" onclick="solicitarClave()">🔒 Modo Lectura</button>
   </div>
@@ -154,42 +151,56 @@
   </div>
   <div class="input-group">
     <label>Componente</label>
-    <input type="text" id="inComponente" placeholder="ej. Rodamiento lado libre">
+    <input type="text" id="inComponente" placeholder="ej. Descanso Libre">
   </div>
   <div class="input-group">
     <label>Aviso SAP</label>
-    <input type="text" id="inAviso" placeholder="N° Aviso SAP">
+    <input type="text" id="inAviso">
   </div>
   <div class="input-group">
     <label>OM SAP</label>
-    <input type="text" id="inOm" placeholder="N° Orden de Mantenimiento">
+    <input type="text" id="inOm">
   </div>
   <div class="input-group">
-    <label>Fecha de Hallazgo</label>
+    <label>Fecha Hallazgo</label>
     <input type="date" id="inFecha">
+  </div>
+  <div class="input-group">
+    <label>Severidad</label>
+    <select id="inSeveridad">
+      <option value="Alto">🔴 Alto (Crítico)</option>
+      <option value="Medio">🟡 Medio (Alerta)</option>
+      <option value="Bajo">🟢 Bajo (Monitoreo)</option>
+    </select>
   </div>
   
   <div class="input-group" style="flex-basis: 100%;">
+    <label>Estatus Logístico / Operacional</label>
+    <textarea id="inEstatus" placeholder="ej. En bodega a la espera de detención..."></textarea>
+  </div>
+  <div class="input-group" style="flex-basis: 48%;">
     <label>Análisis Técnico</label>
-    <textarea id="inAnalisis" placeholder="Describa el análisis detallado de la anomalía detectada..."></textarea>
+    <textarea id="inAnalisis" placeholder="Análisis de condición..."></textarea>
   </div>
-  <div class="input-group" style="flex-basis: 100%;">
+  <div class="input-group" style="flex-basis: 48%;">
     <label>Recomendación / Acción</label>
-    <textarea id="inRecomendacion" placeholder="Describa la acción correctiva o mitigación sugerida..."></textarea>
-  </div>
-  <div class="input-group" style="flex-basis: 100%;">
-    <label>Estatus Operacional / Logístico</label>
-    <textarea id="inEstatus" placeholder="ej. Componente en bodega a la espera de ventana de mantenimiento..."></textarea>
+    <textarea id="inRecomendacion" placeholder="Acción correctiva..."></textarea>
   </div>
 
   <div class="input-group" style="flex-basis: 100%;">
-    <label>Subir Imágenes de Evidencia (Seleccione una o varias fotos)</label>
-    <input type="file" id="inImagenesFiles" accept="image/*" multiple style="background:#0f172a; padding: 7px; color:#94a3b8;">
+    <label>Subir Imágenes de Evidencia</label>
+    <input type="file" id="inImagenesFiles" accept="image/*" multiple>
   </div>
   
   <div class="full-width">
-    <span style="color: #94a3b8; font-size: 0.8rem;">💡 Tip: Haga clic en la pestaña "Mapa Operacional" para fijar la posición del equipo.</span>
-    <button id="btnSubmit" onclick="guardarEquipo()">+ Registrar Activo</button>
+    <div class="upload-box">
+      <div style="flex-grow: 1;">
+        <label style="color:#10b981;">CARGA MASIVA DESDE EXCEL (CSV delimitado por ;)</label>
+        <input type="file" id="inCsvFile" accept=".csv" style="background:transparent; border:none; padding:0; margin-top:5px;">
+      </div>
+      <button class="btn-upload" onclick="procesarCSV()">📥 Cargar Base Datos</button>
+    </div>
+    <button id="btnSubmit" onclick="guardarEquipo()" style="height: fit-content;">+ Registrar Activo Individual</button>
   </div>
 </div>
 
@@ -200,7 +211,7 @@
 
 <!-- VISTA 2: MAPA INTERACTIVO -->
 <div id="map-view">
-  <div class="map-instruction">📍 <b>Modo Admin Activo:</b> Haz clic en cualquier lugar exacto del mapa para asignar o actualizar las coordenadas del equipo.</div>
+  <div class="map-instruction">📍 <b>Modo Admin:</b> Clic en el mapa para asignar coordenadas geográficas al activo.</div>
   <div id="map-container"></div>
 </div>
 
@@ -208,164 +219,168 @@
 <div id="evidenciaModal" class="modal-overlay" onclick="cerrarModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="cerrarModal()">&times;</button>
-    <h2 id="modalTitle" class="modal-title">Detalle del Activo</h2>
+    
+    <div class="modal-header-flex">
+      <h2 id="modalTitle" class="modal-title">Tag</h2>
+      <span id="modalSevBadge" class="modal-sev-badge">Nivel</span>
+    </div>
     
     <div class="modal-grid">
       <div><span class="modal-label">Componente</span><span id="modalComponente" class="modal-value"></span></div>
       <div><span class="modal-label">Aviso SAP</span><span id="modalAviso" class="modal-value"></span></div>
       <div><span class="modal-label">OM SAP</span><span id="modalOm" class="modal-value"></span></div>
       <div><span class="modal-label">Fecha Hallazgo</span><span id="modalFecha" class="modal-value"></span></div>
-      <div><span class="modal-label">Antigüedad</span><span id="modalDias" class="modal-value highlight"></span></div>
+      <div><span class="modal-label">Tiempo Activo</span><span id="modalDias" class="modal-value" style="font-weight:bold; color:#38bdf8;"></span></div>
     </div>
 
+    <div class="modal-data-row"><span class="modal-label">Estatus Operacional</span><span id="modalEstatus" class="modal-value"></span></div>
     <div class="modal-data-row"><span class="modal-label">Análisis Técnico</span><span id="modalAnalisis" class="modal-value"></span></div>
     <div class="modal-data-row"><span class="modal-label">Recomendación / Acción</span><span id="modalRecomendacion" class="modal-value"></span></div>
-    <div class="modal-data-row"><span class="modal-label">Estatus Operacional</span><span id="modalEstatus" class="modal-value highlight"></span></div>
     
     <div class="modal-data-row">
-      <span class="modal-label">Galería de Evidencias Fotográficas (Haga clic para ampliar)</span>
+      <span class="modal-label">Galería de Evidencias</span>
       <div id="modalGalleryContainer" class="gallery-container"></div>
     </div>
   </div>
 </div>
 
-<!-- Visor Individual (Lightbox) para Zoom de Imágenes -->
+<!-- Lightbox -->
 <div id="lightboxOverlay" class="lightbox-overlay" onclick="cerrarLightbox()">
   <button class="lightbox-close" onclick="cerrarLightbox()">&times;</button>
-  <img id="lightboxImg" class="lightbox-content" src="" alt="Zoom Evidencia">
+  <img id="lightboxImg" class="lightbox-content" src="" alt="Zoom">
 </div>
 
-<!-- Scripts Leaflet y Firebase -->
+<!-- Scripts -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
-  let isAdmin = false;
-  let editId = null;
-  let map;
-  let markersLayer = L.layerGroup();
-  let mapaInicializado = false;
-  let tempLat = null;
-  let tempLng = null;
-  let imagenesBase64Temp = [];
+  let isAdmin = false; let editId = null; let map; let markersLayer = L.layerGroup();
+  let mapaInicializado = false; let tempLat = null; let tempLng = null; let imagenesBase64Temp = [];
 
-  // Procesar múltiples imágenes locales a Base64
+  // Imágenes
   document.getElementById('inImagenesFiles').addEventListener('change', function(e) {
     const files = e.target.files;
     if (files && files.length > 0) {
       imagenesBase64Temp = [];
-      let countProcessed = 0;
-      
       for (let i = 0; i < files.length; i++) {
         const reader = new FileReader();
-        reader.onload = function(uploadEvent) {
-          imagenesBase64Temp.push(uploadEvent.target.result);
-          countProcessed++;
-        };
+        reader.onload = function(uploadEvent) { imagenesBase64Temp.push(uploadEvent.target.result); };
         reader.readAsDataURL(files[i]);
       }
     }
   });
 
-  function cambiarVista(vista) {
-    const gridView = document.getElementById('dashboard-view');
-    const mapView = document.getElementById('map-view');
-    const btnGrid = document.getElementById('btnViewGrid');
-    const btnMap = document.getElementById('btnViewMap');
+  // Carga Masiva CSV
+  function procesarCSV() {
+    if (!isAdmin) { alert("Active el Modo Admin."); return; }
+    const fileInput = document.getElementById('inCsvFile');
+    if (!fileInput.files.length) { alert("Seleccione un archivo CSV primero."); return; }
+    
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+      const text = e.target.result;
+      const lines = text.split('\n');
+      let agregados = 0;
 
-    if (vista === 'grid') {
-      gridView.style.display = 'block';
-      mapView.style.display = 'none';
-      btnGrid.classList.add('active');
-      btnMap.classList.remove('active');
-    } else if (vista === 'map') {
-      gridView.style.display = 'none';
-      mapView.style.display = 'block';
-      btnMap.classList.add('active');
-      btnGrid.classList.remove('active');
-
-      if (!mapaInicializado) {
-        initMap();
-        mapaInicializado = true;
-      } else {
-        map.invalidateSize();
+      // Asumimos formato: Area;Tag;Componente;Aviso;OM;Fecha;Severidad;Estatus;Analisis;Recomendacion
+      for (let i = 1; i < lines.length; i++) { // i=1 ignora encabezados
+        if(lines[i].trim() === '') continue;
+        const cols = lines[i].split(';'); // Separador común en Excel Latam
+        if(cols.length >= 2) {
+          const eqId = Date.now().toString() + i;
+          const equipo = {
+            id: eqId,
+            area: cols[0] ? cols[0].trim() : "Sin Área",
+            nombre: cols[1] ? cols[1].trim() : "Desconocido",
+            componente: cols[2] ? cols[2].trim() : "",
+            aviso: cols[3] ? cols[3].trim() : "",
+            om: cols[4] ? cols[4].trim() : "",
+            fecha: cols[5] ? cols[5].trim() : new Date().toISOString().split('T')[0],
+            severidad: cols[6] ? cols[6].trim() : "Alto",
+            estatus: cols[7] ? cols[7].trim() : "",
+            analisis: cols[8] ? cols[8].trim() : "",
+            recomendacion: cols[9] ? cols[9].trim() : "",
+            lat: null, lng: null, imagenes: []
+          };
+          equiposRef.child(eqId).set(equipo);
+          agregados++;
+        }
       }
+      alert(`✅ Carga masiva completada: ${agregados} activos registrados.`);
+      fileInput.value = '';
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  // Vistas
+  function cambiarVista(vista) {
+    document.getElementById('dashboard-view').style.display = vista === 'grid' ? 'block' : 'none';
+    document.getElementById('map-view').style.display = vista === 'map' ? 'block' : 'none';
+    document.getElementById('btnViewGrid').classList.toggle('active', vista === 'grid');
+    document.getElementById('btnViewMap').classList.toggle('active', vista === 'map');
+    if (vista === 'map') {
+      if (!mapaInicializado) { initMap(); mapaInicializado = true; } 
+      else { map.invalidateSize(); }
     }
   }
 
+  // Mapa
   function initMap() {
     map = L.map('map-container').setView([-28.2876, -70.8130], 14);
-    
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19,
-      attribution: 'Tiles &copy; Esri'
-    }).addTo(map);
-
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(map);
     markersLayer.addTo(map);
 
     map.on('click', function(e) {
-      if (!isAdmin) {
-        alert("🔒 Debes activar el Modo Admin para fijar la ubicación en el mapa.");
-        return;
-      }
-      tempLat = e.latlng.lat;
-      tempLng = e.latlng.lng;
+      if (!isAdmin) return;
+      tempLat = e.latlng.lat; tempLng = e.latlng.lng;
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      alert(`📌 Coordenadas asignadas en el mapa.\nComplete los campos y presione Registrar.`);
     });
-
     renderizarMarcadoresMapa(equipos);
   }
 
   function renderizarMarcadoresMapa(equiposList) {
     if (!map) return;
     markersLayer.clearLayers();
-
     equiposList.forEach(eq => {
       if (eq.lat && eq.lng) {
-        const redIcon = L.divIcon({
+        let color = eq.severidad === 'Bajo' ? '#22c55e' : (eq.severidad === 'Medio' ? '#eab308' : '#ef4444');
+        const icon = L.divIcon({
           className: 'custom-map-marker',
-          html: '<div style="background-color: #ef4444; width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 12px #ef4444; border: 2px solid #ffffff;"></div>',
-          iconSize: [16, 16]
+          html: `<div style="background-color: ${color}; width:14px; height:14px; border-radius:50%; border:2px solid #fff;"></div>`,
+          iconSize: [14, 14]
         });
-
-        const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon: redIcon });
+        const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon });
         marker.on('click', () => abrirModal(eq.id));
-        marker.bindPopup(`<b>Tag: ${eq.nombre}</b><br>Área: ${eq.area}<br><span style="color:#ef4444; font-weight:bold;">Crítico</span>`);
         markersLayer.addLayer(marker);
       }
     });
   }
 
+  // Seguridad
   function solicitarClave() {
     if (isAdmin) {
       document.body.classList.remove('admin-mode');
       document.getElementById('btnUnlock').innerText = "🔒 Modo Lectura";
-      isAdmin = false;
-      resetFormulario(); 
-      return;
+      isAdmin = false; resetFormulario(); return;
     }
-    const claveIngresada = prompt("Ingrese la clave de operaciones para modificar el dashboard:");
-    if (claveIngresada === "Moncon2026") {
+    if (prompt("Ingrese clave:") === "Moncon2026") {
       document.body.classList.add('admin-mode');
       document.getElementById('btnUnlock').innerText = "🔓 Modo Admin Activo";
       isAdmin = true;
-    } else if (claveIngresada !== null) {
-      alert("Acceso denegado: Clave incorrecta.");
-    }
+    } else { alert("Denegado"); }
   }
 
+  // Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyBd5MEZdMmgzBs1xCyeGYeKtQx5gJIeY3w",
     authDomain: "dashboard-vulnerabilidades-mlc.firebaseapp.com",
     databaseURL: "https://dashboard-vulnerabilidades-mlc-default-rtdb.firebaseio.com",
-    projectId: "dashboard-vulnerabilidades-mlc",
-    storageBucket: "dashboard-vulnerabilidades-mlc.firebasestorage.app",
-    messagingSenderId: "1043912631590",
-    appId: "1:1043912631590:web:14638fc1503882f1268de7"
+    projectId: "dashboard-vulnerabilidades-mlc"
   };
-
   firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
   const equiposRef = database.ref('activos_criticos');
@@ -378,74 +393,42 @@
     renderizarMarcadoresMapa(equipos);
   });
 
+  // Guardar Individual
   function guardarEquipo() {
     if (!isAdmin) return; 
-    
     const area = document.getElementById('inArea').value.trim();
     const nombre = document.getElementById('inNombre').value.trim();
-    const componente = document.getElementById('inComponente').value.trim();
-    const aviso = document.getElementById('inAviso').value.trim();
-    const om = document.getElementById('inOm').value.trim();
-    const fecha = document.getElementById('inFecha').value;
-    const analisis = document.getElementById('inAnalisis').value.trim();
-    const recomendacion = document.getElementById('inRecomendacion').value.trim();
-    const estatus = document.getElementById('inEstatus').value.trim();
+    if(!area || !nombre) { alert("Mínimo Área y Tag requeridos."); return; }
 
-    if(area && nombre && analisis) {
-      let imagenesFinales = imagenesBase64Temp;
-      if (imagenesFinales.length === 0 && editId) {
-        const eqOriginal = equipos.find(e => e.id === editId);
-        imagenesFinales = eqOriginal.imagenes || (eqOriginal.imagen ? [eqOriginal.imagen] : []);
-      }
+    const eqData = { 
+      area, nombre, 
+      componente: document.getElementById('inComponente').value.trim(), 
+      aviso: document.getElementById('inAviso').value.trim(), 
+      om: document.getElementById('inOm').value.trim(), 
+      fecha: document.getElementById('inFecha').value || new Date().toISOString().split('T')[0], 
+      severidad: document.getElementById('inSeveridad').value,
+      estatus: document.getElementById('inEstatus').value.trim(),
+      analisis: document.getElementById('inAnalisis').value.trim(), 
+      recomendacion: document.getElementById('inRecomendacion').value.trim(),
+      imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (editId ? equipos.find(e=>e.id===editId).imagenes || [] : [])
+    };
 
-      const equipoData = { 
-        area, 
-        nombre, 
-        componente, 
-        aviso, 
-        om, 
-        fecha: fecha || new Date().toISOString().split('T')[0], 
-        analisis, 
-        recomendacion,
-        estatus,
-        imagenes: imagenesFinales
-      };
-
-      if (editId) {
-        equipoData.id = editId;
-        const eqOriginal = equipos.find(e => e.id === editId);
-        equipoData.lat = tempLat !== null ? tempLat : (eqOriginal.lat || null);
-        equipoData.lng = tempLng !== null ? tempLng : (eqOriginal.lng || null);
-
-        equiposRef.child(editId).update(equipoData)
-          .then(() => { resetFormulario(); })
-          .catch(error => alert("❌ Error al actualizar:\n" + error.message));
-      } else {
-        if (tempLat === null || tempLng === null) {
-          alert("⚠️ Atención: Vaya a la pestaña 'Mapa Operacional' y haga clic para fijar la posición georreferenciada.");
-          cambiarVista('map');
-          return;
-        }
-
-        const nuevoId = Date.now().toString();
-        equipoData.id = nuevoId;
-        equipoData.lat = tempLat;
-        equipoData.lng = tempLng;
-
-        equiposRef.child(nuevoId).set(equipoData)
-          .then(() => { resetFormulario(); })
-          .catch(error => alert("❌ Error al guardar:\n" + error.message));
-      }
+    if (editId) {
+      eqData.id = editId;
+      const eqOrig = equipos.find(e => e.id === editId);
+      eqData.lat = tempLat !== null ? tempLat : (eqOrig.lat || null);
+      eqData.lng = tempLng !== null ? tempLng : (eqOrig.lng || null);
+      equiposRef.child(editId).update(eqData).then(resetFormulario);
     } else {
-      alert("⚠️ Completa al menos Área, Tag/Equipo y el Análisis Técnico.");
+      eqData.id = Date.now().toString();
+      eqData.lat = tempLat; eqData.lng = tempLng;
+      equiposRef.child(eqData.id).set(eqData).then(resetFormulario);
     }
   }
 
   function editarEquipo(event, id) {
-    event.stopPropagation(); 
-    if (!isAdmin) return;
-    
-    const eq = equipos.find(item => item.id === id);
+    event.stopPropagation(); if (!isAdmin) return;
+    const eq = equipos.find(i => i.id === id);
     if (eq) {
       document.getElementById('inArea').value = eq.area || '';
       document.getElementById('inNombre').value = eq.nombre || '';
@@ -453,138 +436,98 @@
       document.getElementById('inAviso').value = eq.aviso || '';
       document.getElementById('inOm').value = eq.om || '';
       document.getElementById('inFecha').value = eq.fecha || '';
+      document.getElementById('inSeveridad').value = eq.severidad || 'Alto';
+      document.getElementById('inEstatus').value = eq.estatus || '';
       document.getElementById('inAnalisis').value = eq.analisis || '';
       document.getElementById('inRecomendacion').value = eq.recomendacion || '';
-      document.getElementById('inEstatus').value = eq.estatus || '';
-      
-      editId = id; 
-      tempLat = eq.lat || null;
-      tempLng = eq.lng || null;
-      imagenesBase64Temp = eq.imagenes || (eq.imagen ? [eq.imagen] : []);
-
-      const btn = document.getElementById('btnSubmit');
-      btn.innerText = "💾 Guardar Cambios";
-      btn.style.background = "#16a34a"; 
+      editId = id; tempLat = eq.lat || null; tempLng = eq.lng || null;
+      imagenesBase64Temp = eq.imagenes || [];
+      document.getElementById('btnSubmit').innerText = "💾 Guardar Cambios";
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
   function resetFormulario() {
-    document.querySelectorAll('.admin-panel input, .admin-panel textarea').forEach(input => input.value = '');
-    editId = null;
-    tempLat = null;
-    tempLng = null;
-    imagenesBase64Temp = [];
-    const btn = document.getElementById('btnSubmit');
-    btn.innerText = "+ Registrar Activo";
-    btn.style.background = "#0284c7"; 
+    document.querySelectorAll('.admin-panel input[type="text"], .admin-panel input[type="date"], .admin-panel textarea').forEach(i => i.value = '');
+    document.getElementById('inSeveridad').value = 'Alto';
+    document.getElementById('inImagenesFiles').value = '';
+    editId = null; tempLat = null; tempLng = null; imagenesBase64Temp = [];
+    document.getElementById('btnSubmit').innerText = "+ Registrar Activo Individual";
   }
 
   function eliminarEquipo(event, id) {
-    event.stopPropagation();
-    if (!isAdmin) return; 
-    const eq = equipos.find(item => item.id === id);
-    if (eq && confirm(`⚠️ ¿Confirma retirar el tag "${eq.nombre}"?`)) {
-      equiposRef.child(id).remove()
-        .then(() => { if (editId === id) resetFormulario(); }) 
-        .catch(error => console.error(error));
-    }
+    event.stopPropagation(); if (!isAdmin) return;
+    if (confirm("⚠️ ¿Eliminar activo?")) { equiposRef.child(id).remove().then(() => { if (editId === id) resetFormulario(); }); }
   }
 
   function calcularDias(fechaStr) {
     if (!fechaStr) return 0;
-    const hallazgo = new Date(fechaStr);
-    const hoy = new Date();
-    const diferenciaMs = hoy - hallazgo;
-    const dias = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24));
-    return dias >= 0 ? dias : 0;
+    return Math.max(0, Math.floor((new Date() - new Date(fechaStr)) / (1000 * 60 * 60 * 24)));
   }
 
   function abrirModal(id) {
-    const eq = equipos.find(item => item.id === id);
+    const eq = equipos.find(i => i.id === id);
     if (!eq) return;
 
-    document.getElementById('modalTitle').innerText = `Tag: ${eq.nombre} (${eq.area})`;
-    document.getElementById('modalComponente').innerText = eq.componente || 'N/A';
-    document.getElementById('modalAviso').innerText = eq.aviso || 'Sin Aviso';
-    document.getElementById('modalOm').innerText = eq.om || 'Sin OM';
-    document.getElementById('modalFecha').innerText = eq.fecha || 'N/A';
+    document.getElementById('modalTitle').innerText = `${eq.nombre} - ${eq.area}`;
     
-    const dias = calcularDias(eq.fecha);
-    document.getElementById('modalDias').innerText = `${dias} días activos`;
+    // Configurar Badge de Severidad
+    const badge = document.getElementById('modalSevBadge');
+    badge.innerText = `Severidad: ${eq.severidad || 'Alto'}`;
+    badge.style.backgroundColor = eq.severidad === 'Bajo' ? '#22c55e' : (eq.severidad === 'Medio' ? '#facc15' : '#ef4444');
 
-    document.getElementById('modalAnalisis').innerText = eq.analisis || 'Sin análisis registrado';
-    document.getElementById('modalRecomendacion').innerText = eq.recomendacion || 'Sin recomendación registrada';
-    document.getElementById('modalEstatus').innerText = eq.estatus || 'Sin estatus especificado';
+    document.getElementById('modalComponente').innerText = eq.componente || '-';
+    document.getElementById('modalAviso').innerText = eq.aviso || '-';
+    document.getElementById('modalOm').innerText = eq.om || '-';
+    document.getElementById('modalFecha').innerText = eq.fecha || '-';
+    document.getElementById('modalDias').innerText = `${calcularDias(eq.fecha)} días`;
+    document.getElementById('modalEstatus').innerText = eq.estatus || 'No definido';
+    document.getElementById('modalAnalisis').innerText = eq.analisis || 'Sin información';
+    document.getElementById('modalRecomendacion').innerText = eq.recomendacion || 'Sin información';
     
-    const galleryContainer = document.getElementById('modalGalleryContainer');
-    galleryContainer.innerHTML = '';
-
-    // Compatibilidad con formato antiguo (imagen única) o nuevo (galería de imágenes)
-    let listaImgs = eq.imagenes || (eq.imagen ? [eq.imagen] : []);
-
-    if (listaImgs.length > 0) {
-      listaImgs.forEach(imgUrl => {
-        if (imgUrl && imgUrl !== "") {
-          const thumb = document.createElement('img');
-          thumb.src = imgUrl;
-          thumb.className = 'gallery-thumb';
-          thumb.onclick = () => abrirLightbox(imgUrl);
-          galleryContainer.appendChild(thumb);
+    const gal = document.getElementById('modalGalleryContainer');
+    gal.innerHTML = '';
+    if (eq.imagenes && eq.imagenes.length > 0) {
+      eq.imagenes.forEach(img => {
+        if(img) {
+          const t = document.createElement('img'); t.src = img; t.className = 'gallery-thumb';
+          t.onclick = () => abrirLightbox(img);
+          gal.appendChild(t);
         }
       });
-    }
-
-    if (galleryContainer.children.length === 0) {
-      galleryContainer.innerHTML = `<p class="no-image-text">Sin respaldos visuales adjuntos.</p>`;
-    }
-
+    } else { gal.innerHTML = `<span style="color:#94a3b8; font-size:0.8rem;">Sin evidencias.</span>`; }
     document.getElementById('evidenciaModal').style.display = 'flex';
   }
   
-  function cerrarModal(event) {
-    if (event && event.target !== document.getElementById('evidenciaModal')) return;
-    document.getElementById('evidenciaModal').style.display = 'none';
-  }
-
-  // Funciones del Visor de Pantalla Completa (Zoom de Fotos)
-  function abrirLightbox(url) {
-    document.getElementById('lightboxImg').src = url;
-    document.getElementById('lightboxOverlay').style.display = 'flex';
-  }
-
-  function cerrarLightbox() {
-    document.getElementById('lightboxOverlay').style.display = 'none';
-  }
+  function cerrarModal(e) { if (e && e.target !== document.getElementById('evidenciaModal')) return; document.getElementById('evidenciaModal').style.display = 'none'; }
+  function abrirLightbox(url) { document.getElementById('lightboxImg').src = url; document.getElementById('lightboxOverlay').style.display = 'flex'; }
+  function cerrarLightbox() { document.getElementById('lightboxOverlay').style.display = 'none'; }
 
   function renderDashboard() {
     const root = document.getElementById('app-root');
     root.innerHTML = '';
     
-    const equiposPorArea = equipos.reduce((acc, eq) => {
-      (acc[eq.area] = acc[eq.area] || []).push(eq);
-      return acc;
-    }, {});
+    const equiposPorArea = equipos.reduce((acc, eq) => { (acc[eq.area] = acc[eq.area] || []).push(eq); return acc; }, {});
 
     for (const [area, eqs] of Object.entries(equiposPorArea)) {
-      const htmlEquipos = eqs.map(eq => {
+      // ORDENAR POR DÍAS (MAYOR A MENOR)
+      eqs.sort((a, b) => calcularDias(b.fecha) - calcularDias(a.fecha));
+
+      const html = eqs.map(eq => {
         const dias = calcularDias(eq.fecha);
+        const sevClass = eq.severidad === 'Bajo' ? 'sev-bajo' : (eq.severidad === 'Medio' ? 'sev-medio' : 'sev-alto');
         return `
-          <div class="card" onclick="abrirModal('${eq.id}')">
+          <div class="card ${sevClass}" onclick="abrirModal('${eq.id}')">
             <div class="pulse-indicator"></div>
             <button class="edit-btn" onclick="editarEquipo(event, '${eq.id}')" title="Editar">✏️</button>
             <button class="delete-btn" onclick="eliminarEquipo(event, '${eq.id}')" title="Eliminar">✖</button>
             <h3 class="asset-tag">${eq.nombre}</h3>
-            <span class="asset-sub">Ver Detalle</span>
-            <span class="asset-days">⏱️ ${dias} días en alerta</span>
+            <span class="asset-days">${dias} DÍAS</span>
           </div>
         `;
       }).join('');
       
-      root.innerHTML += `
-        <h2 class="area-title">${area}</h2>
-        <div class="critical-grid">${htmlEquipos}</div>
-      `;
+      root.innerHTML += `<h2 class="area-title">${area}</h2><div class="critical-grid">${html}</div>`;
     }
   }
 </script>
