@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DASHBOARD OPERACIONAL & MAPA - PLANTA MLC | CPF & CMP</title>
-<!-- Leaflet CSS para el Mapa -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   /* --- Estilos Base --- */
   body { background-color: #0b1120; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; padding: 30px; margin: 0; }
@@ -35,14 +33,21 @@
   .btn-lock { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; white-space: nowrap; }
   .btn-lock:hover { background: #1e293b; color: #fff; }
   
-  /* --- Contenedor del Mapa --- */
+  /* --- Contenedor del Mapa (Google Maps Embed) --- */
   #map-view { display: none; margin-bottom: 30px; }
-  #map-container {
+  .map-frame-container {
     width: 100%;
     height: 500px;
     border-radius: 10px;
     border: 1px solid #334155;
+    overflow: hidden;
     box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    background: #1e293b;
+  }
+  .map-frame-container iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
   }
 
   /* --- Panel Admin --- */
@@ -116,9 +121,8 @@
   </div>
   
   <div class="header-controls">
-    <!-- Pestañas para alternar vistas -->
     <button id="btnViewGrid" class="view-btn active" onclick="cambiarVista('grid')">📋 Dashboard</button>
-    <button id="btnViewMap" class="view-btn" onclick="cambiarVista('map')">🗺️ Mapa</button>
+    <button id="btnViewMap" class="view-btn" onclick="cambiarVista('map')">🗺️ Mapa Google Maps</button>
     <button id="btnUnlock" class="btn-lock" onclick="solicitarClave()">🔒 Modo Lectura</button>
   </div>
 </div>
@@ -129,8 +133,6 @@
   <input type="text" id="inVuln" placeholder="Falla (ej. Holgura)" required>
   <input type="text" id="inEvi" placeholder="Evidencia (ej. 15 cpm)" required>
   <input type="text" id="inAccion" placeholder="Acción Requerida" required>
-  <input type="text" id="inLat" placeholder="Latitud (ej. -28.46)" required>
-  <input type="text" id="inLng" placeholder="Longitud (ej. -70.75)" required>
   <input type="text" id="inImagen" placeholder="URL Imagen - Opcional">
   <button id="btnSubmit" onclick="guardarEquipo()">+ Registrar Activo</button>
 </div>
@@ -140,9 +142,11 @@
   <div id="app-root"></div>
 </div>
 
-<!-- VISTA 2: MAPA INTERACTIVO -->
+<!-- VISTA 2: MAPA DE GOOGLE MAPS (EMBED INTEGRADO) -->
 <div id="map-view">
-  <div id="map-container"></div>
+  <div class="map-frame-container">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d7891.536845865917!2d-70.81304695092764!3d-28.28769698151936!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1ses-419!2scl!4v1788881497316!5m2!1ses-419!2scl" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
 </div>
 
 <!-- Modal Detallado -->
@@ -157,19 +161,14 @@
   </div>
 </div>
 
-<!-- Scripts Leaflet y Firebase -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Script Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
   let isAdmin = false;
   let editId = null;
-  let map;
-  let markersLayer = L.layerGroup();
-  let mapaInicializado = false;
 
-  // Control de cambio de vistas
   function cambiarVista(vista) {
     const gridView = document.getElementById('dashboard-view');
     const mapView = document.getElementById('map-view');
@@ -186,48 +185,7 @@
       mapView.style.display = 'block';
       btnMap.classList.add('active');
       btnGrid.classList.remove('active');
-
-      // Inicializar el mapa solo la primera vez que se abre para evitar errores de renderizado
-      if (!mapaInicializado) {
-        initMap();
-        mapaInicializado = true;
-      } else {
-        map.invalidateSize(); // Refresca el tamaño del mapa si estaba oculto
-      }
     }
-  }
-
-  function initMap() {
-    map = L.map('map-container').setView([-28.45, -70.73], 14);
-    
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{z}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
-    }).addTo(map);
-
-    markersLayer.addTo(map);
-    actualizarMarcadoresMapa(equipos);
-  }
-
-  function actualizarMarcadoresMapa(equiposList) {
-    if (!map) return;
-    markersLayer.clearLayers();
-
-    equiposList.forEach(eq => {
-      if (eq.lat && eq.lng) {
-        const redIcon = L.divIcon({
-          className: 'custom-map-marker',
-          html: '<div style="background-color: #ef4444; width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 10px #ef4444; border: 2px solid #ffffff;"></div>',
-          iconSize: [14, 14]
-        });
-
-        const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon: redIcon });
-        marker.on('click', () => abrirModal(eq.id));
-        marker.bindPopup(`<b>Tag: ${eq.nombre}</b><br>Área: ${eq.area}<br><span style="color:#ef4444; font-weight:bold;">Estado Crítico</span>`);
-        
-        markersLayer.addLayer(marker);
-      }
-    });
   }
 
   function solicitarClave() {
@@ -267,7 +225,6 @@
     const data = snapshot.val();
     equipos = data ? Object.values(data) : [];
     renderDashboard();
-    actualizarMarcadoresMapa(equipos);
   });
 
   function guardarEquipo() {
@@ -278,12 +235,10 @@
     const vuln = document.getElementById('inVuln').value.trim();
     const evi = document.getElementById('inEvi').value.trim();
     const accion = document.getElementById('inAccion').value.trim();
-    const lat = document.getElementById('inLat').value.trim();
-    const lng = document.getElementById('inLng').value.trim();
     const imagenUrl = document.getElementById('inImagen').value.trim();
 
     if(area && nombre && vuln) {
-      const equipoData = { area, nombre, vulnerabilidad: vuln, evidencia: evi, accion, lat, lng, imagen: imagenUrl };
+      const equipoData = { area, nombre, vulnerabilidad: vuln, evidencia: evi, accion, imagen: imagenUrl };
 
       if (editId) {
         equipoData.id = editId;
@@ -313,8 +268,6 @@
       document.getElementById('inVuln').value = eq.vulnerabilidad;
       document.getElementById('inEvi').value = eq.evidencia;
       document.getElementById('inAccion').value = eq.accion;
-      document.getElementById('inLat').value = eq.lat || '';
-      document.getElementById('inLng').value = eq.lng || '';
       document.getElementById('inImagen').value = eq.imagen || '';
       
       editId = id; 
@@ -362,6 +315,7 @@
     document.getElementById('evidenciaModal').style.display = 'flex';
   }
   
+  // Single function for closing modal
   function cerrarModal(event) {
     if (event && event.target !== document.getElementById('evidenciaModal')) return;
     document.getElementById('evidenciaModal').style.display = 'none';
