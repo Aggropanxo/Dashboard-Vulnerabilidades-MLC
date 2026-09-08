@@ -5,35 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Moncon - CPF Ingeniería | CMP</title>
 <style>
-  /* --- Estilos Base y Fondo Dark Mode --- */
+  /* --- Estilos Base --- */
   body { background-color: #0b1120; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; padding: 30px; margin: 0; }
-  .header { border-bottom: 1px solid #1e293b; padding-bottom: 15px; margin-bottom: 20px; }
-  .header h1 { color: #ffffff; font-size: 2.2rem; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
-  .header p { color: #94a3b8; margin: 0; font-size: 1.1rem; }
   
-  /* --- Formulario de Ingreso (Admin Panel) --- */
-  .admin-panel { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 10px; border: 1px solid #334155; }
+  /* --- Encabezado --- */
+  .header { border-bottom: 1px solid #1e293b; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+  .header-titles h1 { color: #ffffff; font-size: 2.2rem; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
+  .header-titles p { color: #94a3b8; margin: 0; font-size: 1.1rem; }
+  
+  /* Botón Administrador */
+  .btn-lock { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+  .btn-lock:hover { background: #1e293b; color: #fff; }
+  
+  /* --- Panel Admin (Oculto por defecto) --- */
+  .admin-panel { display: none; background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 30px; flex-wrap: wrap; gap: 10px; border: 1px solid #334155; }
   .admin-panel input { padding: 10px; border-radius: 5px; border: 1px solid #334155; background: #0f172a; color: white; flex-grow: 1; min-width: 150px; }
   .admin-panel button { background: #0284c7; color: white; cursor: pointer; font-weight: bold; border: none; border-radius: 5px; padding: 10px 20px; flex-grow: 0; transition: background 0.3s; }
   .admin-panel button:hover { background: #0369a1; }
   
-  /* --- Estilos de Áreas y Grilla --- */
+  /* --- Grilla y Tarjetas --- */
   .area-title { color: #38bdf8; font-size: 1.4rem; border-left: 4px solid #38bdf8; padding-left: 12px; margin: 40px 0 20px 0; text-transform: uppercase; letter-spacing: 1px; }
   .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
-  
-  /* --- Tarjetas de Equipos --- */
   .card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 10px; padding: 25px; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 0 15px rgba(239, 68, 68, 0.1); }
   .card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.25); }
   .pulse-indicator { position: absolute; top: 25px; right: 45px; width: 10px; height: 10px; background-color: #ef4444; border-radius: 50%; animation: pulse 1.5s infinite; }
   @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-  .delete-btn { position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 1.3rem; z-index: 10; }
+  
+  /* Botón Eliminar (Oculto por defecto) */
+  .delete-btn { display: none; position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 1.3rem; z-index: 10; }
   .delete-btn:hover { color: #b91c1c; }
+  
   .asset-name { color: #fca5a5; font-size: 1.3rem; margin: 0 0 15px 0; padding-right: 40px; }
   .data-label { color: #94a3b8; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; display: block; margin-top: 12px;}
   .data-value { color: #fff; font-size: 0.95rem; margin-top: 3px; }
   .highlight { color: #ef4444; font-weight: bold; }
 
-  /* --- Ventana Emergente (Modal de Evidencia) --- */
+  /* --- MODO ADMINISTRADOR ACTIVADO --- */
+  body.admin-mode .admin-panel { display: flex; }
+  body.admin-mode .delete-btn { display: block; }
+  body.admin-mode .btn-lock { background: #16a34a; color: white; border-color: #16a34a; }
+
+  /* --- Modal de Evidencia --- */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
   .modal-content { background: #0f172a; padding: 25px; border-radius: 8px; border: 1px solid #38bdf8; max-width: 90%; max-height: 90%; display: flex; flex-direction: column; align-items: center; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
   .modal-close { position: absolute; top: 10px; right: 15px; color: #fff; font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; }
@@ -46,8 +58,12 @@
 <body>
 
 <div class="header">
-  <h1>Hotspots Operacionales - Planta CMP</h1>
-  <p>Monitoreo de Condiciones y Diagnóstico de Vulnerabilidades | Nivel: Crítico (Rojo)</p>
+  <div class="header-titles">
+    <h1>Hotspots Operacionales - Planta CMP</h1>
+    <p>Monitoreo de Condiciones y Diagnóstico de Vulnerabilidades | Nivel: Crítico (Rojo)</p>
+  </div>
+  <!-- Botón para pedir la clave -->
+  <button id="btnUnlock" class="btn-lock" onclick="solicitarClave()">🔒 Modo Lectura</button>
 </div>
 
 <div class="admin-panel">
@@ -70,11 +86,35 @@
   </div>
 </div>
 
-<!-- Scripts de Firebase (Core y Realtime Database) -->
+<!-- Scripts de Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
+  // SISTEMA DE SEGURIDAD FRONTEND
+  let isAdmin = false;
+  
+  function solicitarClave() {
+    if (isAdmin) {
+      // Si ya es admin, este botón servirá para cerrar sesión
+      document.body.classList.remove('admin-mode');
+      document.getElementById('btnUnlock').innerText = "🔒 Modo Lectura";
+      isAdmin = false;
+      return;
+    }
+
+    const claveIngresada = prompt("Ingrese la clave de operaciones para modificar el dashboard:");
+    
+    // AQUÍ DEFINES TU CLAVE (Sensible a mayúsculas y minúsculas)
+    if (claveIngresada === "Moncon2026") {
+      document.body.classList.add('admin-mode');
+      document.getElementById('btnUnlock').innerText = "🔓 Modo Admin Activo";
+      isAdmin = true;
+    } else if (claveIngresada !== null) {
+      alert("Acceso denegado: Clave incorrecta.");
+    }
+  }
+
   // 1. CONFIGURACIÓN EXACTA DE TU PROYECTO FIREBASE
   const firebaseConfig = {
     apiKey: "AIzaSyBd5MEZdMmgzBs1xCyeGYeKtQx5gJIeY3w",
@@ -87,22 +127,20 @@
     measurementId: "G-MBLS9ZNJJL"
   };
 
-  // 2. Inicializar la conexión con la nube
   firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
   const equiposRef = database.ref('activos_criticos');
-
   let equipos = [];
 
-  // 3. Listener en Tiempo Real: Reacciona instantáneamente a los cambios en la BD
   equiposRef.on('value', (snapshot) => {
     const data = snapshot.val();
     equipos = data ? Object.values(data) : [];
     renderDashboard();
   });
 
-  // 4. Inyección de nuevos hallazgos hacia la nube
   function agregarEquipo() {
+    if (!isAdmin) return; // Doble validación de seguridad
+    
     const area = document.getElementById('inArea').value.trim();
     const nombre = document.getElementById('inNombre').value.trim();
     const vuln = document.getElementById('inVuln').value.trim();
@@ -112,16 +150,7 @@
 
     if(area && nombre && vuln) {
       const nuevoId = Date.now().toString();
-      
-      const nuevoEquipo = {
-        id: nuevoId,
-        area: area,
-        nombre: nombre,
-        vulnerabilidad: vuln,
-        evidencia: evi,
-        accion: accion,
-        imagen: imagenUrl
-      };
+      const nuevoEquipo = { id: nuevoId, area, nombre, vulnerabilidad: vuln, evidencia: evi, accion, imagen: imagenUrl };
 
       equiposRef.child(nuevoId).set(nuevoEquipo)
         .then(() => {
@@ -133,13 +162,13 @@
     }
   }
 
-  // 5. Retiro de activos (Mantenimiento ejecutado)
   function eliminarEquipo(event, id) {
     event.stopPropagation();
+    if (!isAdmin) return; // Doble validación de seguridad
     
     const equipo = equipos.find(eq => eq.id === id);
     if (equipo) {
-      const confirmacion = confirm(`⚠️ ALERTA DE SISTEMA (Mantenimiento):\n\n¿Confirma que desea retirar el activo "${equipo.nombre}" del mapa de criticidad operacional?\n\nEsta acción eliminará el hallazgo del dashboard para todos los usuarios.`);
+      const confirmacion = confirm(`⚠️ ALERTA DE SISTEMA (Mantenimiento):\n\n¿Confirma que desea retirar el activo "${equipo.nombre}" del mapa de criticidad operacional?`);
       if (confirmacion) {
         equiposRef.child(id).remove()
           .catch(error => console.error("Error al retirar activo: ", error));
@@ -147,7 +176,6 @@
     }
   }
 
-  // Funciones de control del Visor de Imágenes
   function abrirModal(nombreEquipo, urlImagen) {
     const modal = document.getElementById('evidenciaModal');
     const title = document.getElementById('modalTitle');
@@ -160,12 +188,12 @@
     }
     modal.style.display = 'flex';
   }
+  
   function cerrarModal(event) {
     if (event && event.target !== document.getElementById('evidenciaModal')) return;
     document.getElementById('evidenciaModal').style.display = 'none';
   }
 
-  // Renderizado dinámico del DOM
   function renderDashboard() {
     const root = document.getElementById('app-root');
     root.innerHTML = '';
