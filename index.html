@@ -8,23 +8,13 @@
   /* --- Estilos Base --- */
   body { background-color: #0b1120; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; padding: 30px; margin: 0; }
   
-  /* --- Encabezado Corporativo Tipográfico --- */
+  /* --- Encabezado Corporativo --- */
   .header { border-bottom: 1px solid #1e293b; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
   .header-left { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
   
-  /* Bloques de Texto Tipográfico para Marcas */
+  /* Marcas */
   .brand-badges { display: flex; gap: 10px; align-items: center; }
-  .brand-badge { 
-    background: #1e293b; 
-    border: 1px solid #334155; 
-    color: #ffffff; 
-    font-weight: 800; 
-    font-size: 1.3rem; 
-    padding: 8px 16px; 
-    border-radius: 6px; 
-    letter-spacing: 1px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-  }
+  .brand-badge { background: #1e293b; border: 1px solid #334155; color: #ffffff; font-weight: 800; font-size: 1.3rem; padding: 8px 16px; border-radius: 6px; letter-spacing: 1px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
   .brand-badge.cpf { border-left: 4px solid #38bdf8; }
   .brand-badge.cmp { border-left: 4px solid #ef4444; }
 
@@ -41,26 +31,44 @@
   .admin-panel button { background: #0284c7; color: white; cursor: pointer; font-weight: bold; border: none; border-radius: 5px; padding: 10px 20px; flex-grow: 0; transition: background 0.3s; }
   .admin-panel button:hover { opacity: 0.9; }
   
-  /* --- Grilla y Tarjetas --- */
+  /* --- Grilla de Tags Compactos --- */
   .area-title { color: #38bdf8; font-size: 1.4rem; border-left: 4px solid #38bdf8; padding-left: 12px; margin: 40px 0 20px 0; text-transform: uppercase; letter-spacing: 1px; }
-  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
-  .card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 10px; padding: 25px; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 0 15px rgba(239, 68, 68, 0.1); }
-  .card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.25); }
+  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
   
-  /* Indicador de Pulso */
-  .pulse-indicator { position: absolute; top: 25px; right: 80px; width: 10px; height: 10px; background-color: #ef4444; border-radius: 50%; animation: pulse 1.5s infinite; }
-  @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+  /* Tarjeta Estilo Tag / Botón de Acceso Rápido */
+  .card { 
+    background: rgba(15, 23, 42, 0.8); 
+    border: 1px solid rgba(239, 68, 68, 0.5); 
+    border-radius: 8px; 
+    padding: 20px 15px; 
+    position: relative; 
+    cursor: pointer; 
+    transition: all 0.2s ease;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 80px;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: #ef4444;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+  }
   
-  /* Botones de Acción (Ocultos por defecto) */
-  .delete-btn { display: none; position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 1.3rem; z-index: 10; }
+  .pulse-indicator { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background-color: #ef4444; border-radius: 50%; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+  
+  /* Botones de Acción en el Tag */
+  .delete-btn { display: none; position: absolute; bottom: 5px; right: 8px; background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; z-index: 10; }
   .delete-btn:hover { color: #b91c1c; }
-  .edit-btn { display: none; position: absolute; top: 16px; right: 45px; background: transparent; border: none; color: #38bdf8; cursor: pointer; font-size: 1.2rem; z-index: 10; }
+  .edit-btn { display: none; position: absolute; bottom: 5px; left: 8px; background: transparent; border: none; color: #38bdf8; cursor: pointer; font-size: 0.9rem; z-index: 10; }
   .edit-btn:hover { color: #0284c7; }
   
-  .asset-name { color: #fca5a5; font-size: 1.3rem; margin: 0 0 15px 0; padding-right: 70px; }
-  .data-label { color: #94a3b8; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; display: block; margin-top: 12px;}
-  .data-value { color: #fff; font-size: 0.95rem; margin-top: 3px; }
-  .highlight { color: #ef4444; font-weight: bold; }
+  .asset-tag { color: #fca5a5; font-size: 1.2rem; font-weight: 700; margin: 0; letter-spacing: 0.5px; }
+  .asset-sub { color: #94a3b8; font-size: 0.75rem; margin-top: 4px; text-transform: uppercase; }
 
   /* --- MODO ADMINISTRADOR ACTIVADO --- */
   body.admin-mode .admin-panel { display: flex; }
@@ -68,21 +76,26 @@
   body.admin-mode .edit-btn { display: block; }
   body.admin-mode .btn-lock { background: #16a34a; color: white; border-color: #16a34a; }
 
-  /* --- Modal de Evidencia --- */
+  /* --- Modal de Resumen y Evidencia Detallada --- */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-  .modal-content { background: #0f172a; padding: 25px; border-radius: 8px; border: 1px solid #38bdf8; max-width: 90%; max-height: 90%; display: flex; flex-direction: column; align-items: center; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-  .modal-close { position: absolute; top: 10px; right: 15px; color: #fff; font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; }
+  .modal-content { background: #0f172a; padding: 30px; border-radius: 10px; border: 1px solid #38bdf8; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+  .modal-close { position: absolute; top: 15px; right: 20px; color: #fff; font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; }
   .modal-close:hover { color: #ef4444; }
-  .modal-title { color: #38bdf8; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; }
-  .modal-image { max-width: 100%; max-height: 70vh; border-radius: 4px; border: 1px solid #334155; margin-top: 15px; }
-  .no-image-text { color: #94a3b8; margin-top: 20px; font-style: italic; }
+  
+  .modal-title { color: #fca5a5; font-size: 1.5rem; margin-top: 0; margin-bottom: 20px; text-transform: uppercase; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+  .modal-data-row { margin-bottom: 15px; }
+  .modal-label { color: #38bdf8; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 3px; }
+  .modal-value { color: #ffffff; font-size: 1rem; }
+  .modal-value.highlight { color: #ef4444; font-weight: bold; }
+  
+  .modal-image { width: 100%; max-height: 50vh; object-fit: contain; border-radius: 6px; border: 1px solid #334155; margin-top: 10px; background: #000; }
+  .no-image-text { color: #94a3b8; margin-top: 10px; font-style: italic; font-size: 0.9rem; }
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="header-left">
-    <!-- Marcas tipográficas integradas -->
     <div class="brand-badges">
       <span class="brand-badge cpf">CPF</span>
       <span class="brand-badge cmp">CMP</span>
@@ -97,7 +110,7 @@
 
 <div class="admin-panel">
   <input type="text" id="inArea" placeholder="Área (ej. Chancado Primario)" required>
-  <input type="text" id="inNombre" placeholder="Equipo (ej. Motor Principal)" required>
+  <input type="text" id="inNombre" placeholder="N° Equipo / Tag (ej. M-01)" required>
   <input type="text" id="inVuln" placeholder="Falla (ej. Holgura mecánica)" required>
   <input type="text" id="inEvi" placeholder="Evidencia (ej. Amplitud 15 cpm)" required>
   <input type="text" id="inAccion" placeholder="Acción (ej. Ajuste pernos anclaje)" required>
@@ -107,11 +120,28 @@
 
 <div id="app-root"></div>
 
+<!-- Modal Detallado de Resumen e Imagen -->
 <div id="evidenciaModal" class="modal-overlay" onclick="cerrarModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="cerrarModal()">&times;</button>
-    <h2 id="modalTitle" class="modal-title">Evidencia Técnica</h2>
-    <div id="modalImageContainer"></div>
+    <h2 id="modalTitle" class="modal-title">Detalle del Activo</h2>
+    
+    <div class="modal-data-row">
+      <span class="modal-label">Vulnerabilidad Principal</span>
+      <span id="modalVuln" class="modal-value"></span>
+    </div>
+    <div class="modal-data-row">
+      <span class="modal-label">Evidencia Moncon</span>
+      <span id="modalEvi" class="modal-value highlight"></span>
+    </div>
+    <div class="modal-data-row">
+      <span class="modal-label">Estrategia de Acción Requerida</span>
+      <span id="modalAccion" class="modal-value"></span>
+    </div>
+    <div class="modal-data-row">
+      <span class="modal-label">Respaldo Empírico (Espectro / Termografía)</span>
+      <div id="modalImageContainer"></div>
+    </div>
   </div>
 </div>
 
@@ -189,7 +219,7 @@
           .catch(error => alert("❌ Error al guardar:\n" + error.message));
       }
     } else {
-      alert("⚠️ Error de ingreso: Por favor, completa al menos el Área, Equipo y Falla técnica.");
+      alert("⚠️ Error de ingreso: Completa al menos el Área, Tag/Equipo y Falla.");
     }
   }
 
@@ -230,7 +260,7 @@
     
     const equipo = equipos.find(eq => eq.id === id);
     if (equipo) {
-      const confirmacion = confirm(`⚠️ ALERTA DE SISTEMA:\n\n¿Confirma que desea retirar el activo "${equipo.nombre}"?`);
+      const confirmacion = confirm(`⚠️ ALERTA DE SISTEMA:\n\n¿Confirma que desea retirar el tag "${equipo.nombre}"?`);
       if (confirmacion) {
         equiposRef.child(id).remove()
           .then(() => { if (editId === id) resetFormulario(); }) 
@@ -239,17 +269,24 @@
     }
   }
 
-  function abrirModal(nombreEquipo, urlImagen) {
-    const modal = document.getElementById('evidenciaModal');
-    const title = document.getElementById('modalTitle');
+  // Mostrar el Resumen Completo y la Imagen en el Modal
+  function abrirModal(id) {
+    const eq = equipos.find(item => item.id === id);
+    if (!eq) return;
+
+    document.getElementById('modalTitle').innerText = `Tag: ${eq.nombre} (${eq.area})`;
+    document.getElementById('modalVuln').innerText = eq.vulnerabilidad;
+    document.getElementById('modalEvi').innerText = eq.evidencia;
+    document.getElementById('modalAccion').innerText = eq.accion;
+    
     const imgContainer = document.getElementById('modalImageContainer');
-    title.innerText = `Evidencia Empírica: ${nombreEquipo}`;
-    if (urlImagen && urlImagen !== "undefined" && urlImagen !== "") {
-      imgContainer.innerHTML = `<img src="${urlImagen}" alt="Evidencia" class="modal-image">`;
+    if (eq.imagen && eq.imagen !== "undefined" && eq.imagen !== "") {
+      imgContainer.innerHTML = `<img src="${eq.imagen}" alt="Evidencia ${eq.nombre}" class="modal-image">`;
     } else {
-      imgContainer.innerHTML = `<p class="no-image-text">Sin respaldo visual adjunto.</p>`;
+      imgContainer.innerHTML = `<p class="no-image-text">Sin respaldo visual adjunto para este activo.</p>`;
     }
-    modal.style.display = 'flex';
+
+    document.getElementById('evidenciaModal').style.display = 'flex';
   }
   
   function cerrarModal(event) {
@@ -268,17 +305,12 @@
 
     for (const [area, eqs] of Object.entries(equiposPorArea)) {
       const htmlEquipos = eqs.map(eq => `
-        <div class="card" onclick="abrirModal('${eq.nombre}', '${eq.imagen}')">
+        <div class="card" onclick="abrirModal('${eq.id}')">
           <div class="pulse-indicator"></div>
           <button class="edit-btn" onclick="editarEquipo(event, '${eq.id}')" title="Editar activo">✏️</button>
           <button class="delete-btn" onclick="eliminarEquipo(event, '${eq.id}')" title="Dar de baja activo">✖</button>
-          <h3 class="asset-name">${eq.nombre}</h3>
-          <span class="data-label">Vulnerabilidad Principal</span>
-          <span class="data-value">${eq.vulnerabilidad}</span>
-          <span class="data-label">Evidencia Moncon</span>
-          <span class="data-value highlight">${eq.evidencia}</span>
-          <span class="data-label">Estrategia de Acción</span>
-          <span class="data-value">${eq.accion}</span>
+          <h3 class="asset-tag">${eq.nombre}</h3>
+          <span class="asset-sub">Ver Detalle</span>
         </div>
       `).join('');
       
