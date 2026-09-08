@@ -47,26 +47,20 @@
   .btn-upload { background: #10b981 !important; }
   .upload-box { border: 1px dashed #10b981; padding: 10px; border-radius: 5px; display: flex; gap: 10px; align-items: center; background: rgba(16, 185, 129, 0.1); flex-grow: 1; }
 
-  /* --- Vista Cuadritos (Dashboard de Alta Densidad) --- */
+  /* --- Vista Cuadritos --- */
   #dashboard-view { display: block; }
   .area-title { color: #38bdf8; font-size: 1.1rem; border-left: 3px solid #38bdf8; padding-left: 8px; margin: 20px 0 10px 0; text-transform: uppercase; letter-spacing: 1px; }
   
   .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
   
   .card { 
-    background: rgba(15, 23, 42, 0.9); 
-    border: 2px solid #334155; 
-    border-radius: 8px; 
-    padding: 12px 6px; 
-    position: relative; 
-    cursor: pointer; 
-    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-    min-height: 65px;
-    transition: transform 0.2s ease;
+    background: rgba(15, 23, 42, 0.9); border: 2px solid #334155; border-radius: 8px; padding: 12px 6px; 
+    position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; 
+    justify-content: center; text-align: center; min-height: 65px; transition: transform 0.2s ease;
   }
   .card:hover { transform: translateY(-3px); }
   
-  /* --- Semáforo de Animaciones Suaves (Baliza/Sirena) --- */
+  /* Animaciones Sirena Suave */
   .sev-rojo { border-color: rgba(239, 68, 68, 0.8); animation: sirena-roja 1.2s ease-in-out infinite alternate; }
   @keyframes sirena-roja { 0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2), inset 0 0 5px rgba(239, 68, 68, 0.1); } 100% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.9), inset 0 0 15px rgba(239, 68, 68, 0.5); border-color: rgba(239, 68, 68, 1); } }
 
@@ -84,8 +78,9 @@
   .sev-amarillo .pulse-indicator { background-color: #eab308; }
   .sev-verde .pulse-indicator { background-color: #22c55e; }
   
-  .delete-btn { display: none; position: absolute; bottom: 2px; right: 4px; background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem; z-index: 10; padding: 0;}
-  .edit-btn { display: none; position: absolute; bottom: 2px; left: 4px; background: transparent; border: none; color: #38bdf8; cursor: pointer; font-size: 0.8rem; z-index: 10; padding: 0;}
+  .delete-btn, .edit-btn { display: none; position: absolute; bottom: 2px; background: transparent; border: none; font-size: 0.8rem; z-index: 10; padding: 0; cursor: pointer; }
+  .delete-btn { right: 4px; color: #ef4444; }
+  .edit-btn { left: 4px; color: #38bdf8; }
   
   .asset-tag { color: #f8fafc; font-size: 1rem; font-weight: 800; margin: 0; letter-spacing: 0.5px; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
   .asset-days { font-size: 0.65rem; font-weight: bold; margin-top: 6px; padding: 3px 6px; border-radius: 4px; background: rgba(0,0,0,0.5); z-index: 2; border: 1px solid rgba(255,255,255,0.1); }
@@ -95,13 +90,13 @@
   .sev-amarillo .asset-days { color: #fde047; }
   .sev-verde .asset-days { color: #86efac; }
 
-  /* --- MODO ADMINISTRADOR ACTIVADO --- */
+  /* MODO ADMINISTRADOR ACTIVADO */
   body.admin-mode .admin-panel { display: flex; }
   body.admin-mode .delete-btn { display: block; }
   body.admin-mode .edit-btn { display: block; }
   body.admin-mode .btn-lock { background: #16a34a; color: white; border-color: #16a34a; }
 
-  /* --- Modal Detallado --- */
+  /* Modal Detallado */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
   .modal-content { background: #0f172a; padding: 25px; border-radius: 8px; border: 1px solid #334155; width: 95%; max-width: 700px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
   .modal-close { position: absolute; top: 10px; right: 15px; color: #94a3b8; font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
@@ -116,12 +111,10 @@
   .modal-label { color: #94a3b8; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; }
   .modal-value { color: #e2e8f0; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.3; }
   
-  /* --- Galería --- */
   .gallery-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
   .gallery-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid #334155; cursor: pointer; transition: transform 0.2s; }
   .gallery-thumb:hover { transform: scale(1.1); border-color: #38bdf8; }
 
-  /* --- Lightbox --- */
   .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 2000; justify-content: center; align-items: center; }
   .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 4px; }
   .lightbox-close { position: absolute; top: 15px; right: 25px; color: #fff; font-size: 2.5rem; cursor: pointer; background: none; border: none; }
@@ -144,7 +137,6 @@
   </div>
 </div>
 
-<!-- PANEL ADMINISTRADOR ESTRICTO -->
 <div class="admin-panel">
   <div class="input-group">
     <label>Área Operacional</label>
@@ -201,36 +193,29 @@
   <div class="full-width">
     <div class="upload-box">
       <div style="flex-grow: 1;">
-        <label style="color:#10b981;">CARGA MASIVA A PRUEBA DE ERRORES (CSV de tu Excel)</label>
-        <input type="file" id="inCsvFile" accept=".csv" style="background:transparent; border:none; padding:0; margin-top:5px;">
+        <label style="color:#10b981;">CARGA MASIVA EXCEL (Archivo .xlsx o .xls)</label>
+        <input type="file" id="inExcelFile" accept=".xlsx, .xls, .csv" style="background:transparent; border:none; padding:0; margin-top:5px;">
       </div>
-      <button class="btn-upload" onclick="procesarCSV()">📥 Subir Equipos</button>
+      <button class="btn-upload" onclick="procesarExcel()">📥 Subir Archivo Excel</button>
     </div>
     <button id="btnSubmit" onclick="guardarEquipo()" style="height: fit-content;">+ Guardar Activo</button>
   </div>
 </div>
 
-<!-- VISTA 1: CUADRITOS (DASHBOARD) -->
-<div id="dashboard-view">
-  <div id="app-root"></div>
-</div>
+<div id="dashboard-view"><div id="app-root"></div></div>
 
-<!-- VISTA 2: MAPA INTERACTIVO -->
 <div id="map-view">
   <div class="map-instruction">📍 <b>Modo Admin:</b> Clic en el mapa para asignar coordenadas geográficas al activo.</div>
   <div id="map-container"></div>
 </div>
 
-<!-- Modal Detallado -->
 <div id="evidenciaModal" class="modal-overlay" onclick="cerrarModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="cerrarModal()">&times;</button>
-    
     <div class="modal-header-flex">
       <h2 id="modalTitle" class="modal-title">Tag</h2>
       <span id="modalSevBadge" class="modal-sev-badge">Color</span>
     </div>
-    
     <div class="modal-grid">
       <div><span class="modal-label">Componente</span><span id="modalComponente" class="modal-value"></span></div>
       <div><span class="modal-label">Aviso SAP</span><span id="modalAviso" class="modal-value"></span></div>
@@ -238,11 +223,9 @@
       <div><span class="modal-label">Fecha Hallazgo</span><span id="modalFecha" class="modal-value"></span></div>
       <div><span class="modal-label">Tiempo Activo</span><span id="modalDias" class="modal-value" style="font-weight:bold; color:#38bdf8;"></span></div>
     </div>
-
     <div class="modal-data-row"><span class="modal-label">Estatus Operacional</span><span id="modalEstatus" class="modal-value"></span></div>
     <div class="modal-data-row"><span class="modal-label">Análisis Técnico</span><span id="modalAnalisis" class="modal-value"></span></div>
     <div class="modal-data-row"><span class="modal-label">Recomendación / Acción</span><span id="modalRecomendacion" class="modal-value"></span></div>
-    
     <div class="modal-data-row">
       <span class="modal-label">Galería de Evidencias</span>
       <div id="modalGalleryContainer" class="gallery-container"></div>
@@ -250,13 +233,13 @@
   </div>
 </div>
 
-<!-- Lightbox -->
 <div id="lightboxOverlay" class="lightbox-overlay" onclick="cerrarLightbox()">
   <button class="lightbox-close" onclick="cerrarLightbox()">&times;</button>
   <img id="lightboxImg" class="lightbox-content" src="" alt="Zoom">
 </div>
 
-<!-- Scripts -->
+<!-- LIBRERÍAS DE LECTURA DE EXCEL (SheetJS), LEAFLET y FIREBASE -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -277,60 +260,66 @@
     }
   });
 
-  // CARGA MASIVA CSV REPROGRAMADA PARA CUALQUIER FORMATO DE EXCEL
-  function procesarCSV() {
+  // NUEVA CARGA INTELIGENTE QUE LEE .XLSX DIRECTO (Adiós a los errores de formato)
+  function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
-    const fileInput = document.getElementById('inCsvFile');
-    if (!fileInput.files.length) { alert("Seleccione un archivo CSV primero."); return; }
+    const fileInput = document.getElementById('inExcelFile');
+    if (!fileInput.files.length) { alert("Seleccione un archivo de Excel primero."); return; }
     
     const file = fileInput.files[0];
     const reader = new FileReader();
     
     reader.onload = function(e) {
-      const text = e.target.result;
-      const lines = text.split('\n');
-      let agregados = 0;
-
-      for (let i = 0; i < lines.length; i++) { 
-        if(lines[i].trim() === '') continue;
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, {type: 'array'});
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
         
-        // Separar por coma o punto y coma
-        let cols = lines[i].split(/[,;]/); 
-        
-        // Limpiar comillas
-        cols = cols.map(c => c.replace(/(^"|"$)/g, '').trim());
+        // Convertir la hoja a matriz (array de arrays)
+        const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+        let agregados = 0;
 
-        // Eliminar primera columna si está vacía (defecto en exportación de algunos Excels)
-        if (cols.length > 0 && cols[0] === '') cols.shift();
+        for (let i = 0; i < jsonRows.length; i++) {
+          let row = jsonRows[i];
+          
+          // Limpiar columnas fantasmas iniciales (si dejaron celdas vacías a la izquierda)
+          while(row.length > 0 && (row[0] === null || row[0] === undefined || String(row[0]).trim() === '')) {
+            row.shift();
+          }
 
-        // Ignorar encabezados
-        if (cols.length < 2 || cols[0].toLowerCase().includes("área") || cols[0].toLowerCase().includes("area")) {
-          continue;
+          // Si la fila está vacía o es el encabezado (dice "Área"), la saltamos
+          if (row.length < 2) continue;
+          const col0 = String(row[0]).toLowerCase();
+          if (col0.includes('área') || col0.includes('area')) continue;
+
+          // Armamos el equipo
+          const eqId = Date.now().toString() + i;
+          let colorLeido = row[2] ? String(row[2]).toLowerCase() : "verde";
+          let colorFinal = "Verde";
+          if (colorLeido.includes("rojo")) colorFinal = "Rojo";
+          if (colorLeido.includes("naranja")) colorFinal = "Naranja";
+          if (colorLeido.includes("amarillo")) colorFinal = "Amarillo";
+
+          const equipo = {
+            id: eqId,
+            area: row[0] ? String(row[0]).trim() : "Sin Área",
+            nombre: row[1] ? String(row[1]).trim() : "Desconocido",
+            severidad: colorFinal,
+            componente: "", aviso: "", om: "", fecha: new Date().toISOString().split('T')[0], 
+            estatus: "", analisis: "", recomendacion: "", lat: null, lng: null, imagenes: []
+          };
+          equiposRef.child(eqId).set(equipo);
+          agregados++;
         }
-
-        const eqId = Date.now().toString() + i;
-        
-        let colorLeido = cols[2] ? cols[2].toLowerCase() : "verde";
-        let colorFinal = "Verde";
-        if (colorLeido.includes("rojo")) colorFinal = "Rojo";
-        if (colorLeido.includes("naranja")) colorFinal = "Naranja";
-        if (colorLeido.includes("amarillo")) colorFinal = "Amarillo";
-
-        const equipo = {
-          id: eqId,
-          area: cols[0] ? cols[0] : "Sin Área",
-          nombre: cols[1] ? cols[1] : "Desconocido",
-          severidad: colorFinal,
-          componente: "", aviso: "", om: "", fecha: new Date().toISOString().split('T')[0], 
-          estatus: "", analisis: "", recomendacion: "", lat: null, lng: null, imagenes: []
-        };
-        equiposRef.child(eqId).set(equipo);
-        agregados++;
+        alert(`✅ Éxito total: ${agregados} equipos procesados desde Excel.`);
+        fileInput.value = '';
+      } catch (error) {
+        alert("❌ Error procesando Excel: Asegúrese de subir un archivo válido.");
+        console.error(error);
       }
-      alert(`✅ Carga masiva completada: ${agregados} equipos registrados con éxito.`);
-      fileInput.value = '';
     };
-    reader.readAsText(file, 'UTF-8');
+    reader.readAsArrayBuffer(file);
   }
 
   function cambiarVista(vista) {
