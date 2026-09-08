@@ -49,16 +49,20 @@
     background: #000;
   }
 
-  /* --- Panel Admin --- */
-  .admin-panel { display: none; background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 30px; flex-wrap: wrap; gap: 10px; border: 1px solid #334155; }
-  .admin-panel input { padding: 10px; border-radius: 5px; border: 1px solid #334155; background: #0f172a; color: white; flex-grow: 1; min-width: 140px; }
-  .admin-panel button { background: #0284c7; color: white; cursor: pointer; font-weight: bold; border: none; border-radius: 5px; padding: 10px 20px; flex-grow: 0; transition: background 0.3s; }
+  /* --- Panel Admin Expandido --- */
+  .admin-panel { display: none; background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 30px; flex-wrap: wrap; gap: 12px; border: 1px solid #334155; }
+  .admin-panel .input-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 180px; }
+  .admin-panel label { font-size: 0.75rem; color: #38bdf8; font-weight: bold; margin-bottom: 4px; text-transform: uppercase; }
+  .admin-panel input, .admin-panel textarea { padding: 10px; border-radius: 5px; border: 1px solid #334155; background: #0f172a; color: white; width: 100%; box-sizing: border-box; font-family: inherit; }
+  .admin-panel textarea { resize: vertical; min-height: 80px; }
+  .admin-panel .full-width { flex-basis: 100%; display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-top: 10px; flex-wrap: wrap; }
+  .admin-panel button { background: #0284c7; color: white; cursor: pointer; font-weight: bold; border: none; border-radius: 5px; padding: 12px 25px; transition: background 0.3s; }
   .admin-panel button:hover { opacity: 0.9; }
-  
+
   /* --- Vista Cuadritos (Dashboard) --- */
   #dashboard-view { display: block; }
   .area-title { color: #38bdf8; font-size: 1.4rem; border-left: 4px solid #38bdf8; padding-left: 12px; margin: 40px 0 20px 0; text-transform: uppercase; letter-spacing: 1px; }
-  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
   
   .card { 
     background: rgba(15, 23, 42, 0.8); 
@@ -70,7 +74,7 @@
     transition: all 0.2s ease;
     box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
     display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-    min-height: 80px;
+    min-height: 95px;
   }
   .card:hover { transform: translateY(-3px); border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
   
@@ -84,6 +88,7 @@
   
   .asset-tag { color: #fca5a5; font-size: 1.2rem; font-weight: 700; margin: 0; letter-spacing: 0.5px; }
   .asset-sub { color: #94a3b8; font-size: 0.75rem; margin-top: 4px; text-transform: uppercase; }
+  .asset-days { color: #38bdf8; font-size: 0.7rem; font-weight: bold; margin-top: 2px; }
 
   /* --- MODO ADMINISTRADOR ACTIVADO --- */
   body.admin-mode .admin-panel { display: flex; }
@@ -93,15 +98,17 @@
 
   /* --- Modal Detallado --- */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-  .modal-content { background: #0f172a; padding: 30px; border-radius: 10px; border: 1px solid #38bdf8; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+  .modal-content { background: #0f172a; padding: 30px; border-radius: 10px; border: 1px solid #38bdf8; width: 90%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
   .modal-close { position: absolute; top: 15px; right: 20px; color: #fff; font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; }
   .modal-close:hover { color: #ef4444; }
-  .modal-title { color: #fca5a5; font-size: 1.5rem; margin-top: 0; margin-bottom: 20px; text-transform: uppercase; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
-  .modal-data-row { margin-bottom: 15px; }
-  .modal-label { color: #38bdf8; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 3px; }
-  .modal-value { color: #ffffff; font-size: 1rem; }
+  .modal-title { color: #fca5a5; font-size: 1.4rem; margin-top: 0; margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+  
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+  .modal-data-row { margin-bottom: 12px; }
+  .modal-label { color: #38bdf8; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .modal-value { color: #ffffff; font-size: 0.95rem; white-space: pre-wrap; line-height: 1.4; }
   .modal-value.highlight { color: #ef4444; font-weight: bold; }
-  .modal-image { width: 100%; max-height: 50vh; object-fit: contain; border-radius: 6px; border: 1px solid #334155; margin-top: 10px; background: #000; }
+  .modal-image { width: 100%; max-height: 45vh; object-fit: contain; border-radius: 6px; border: 1px solid #334155; margin-top: 10px; background: #000; }
   .no-image-text { color: #94a3b8; margin-top: 10px; font-style: italic; font-size: 0.9rem; }
 </style>
 </head>
@@ -126,14 +133,55 @@
   </div>
 </div>
 
+<!-- PANEL ADMINISTRADOR ESTRICTO -->
 <div class="admin-panel">
-  <input type="text" id="inArea" placeholder="Área (ej. Chancado)" required>
-  <input type="text" id="inNombre" placeholder="N° Tag (ej. M-01)" required>
-  <input type="text" id="inVuln" placeholder="Falla (ej. Holgura)" required>
-  <input type="text" id="inEvi" placeholder="Evidencia (ej. 15 cpm)" required>
-  <input type="text" id="inAccion" placeholder="Acción Requerida" required>
-  <input type="text" id="inImagen" placeholder="URL Imagen - Opcional">
-  <button id="btnSubmit" onclick="guardarEquipo()">+ Registrar Activo</button>
+  <div class="input-group">
+    <label>Área Operacional</label>
+    <input type="text" id="inArea" placeholder="ej. Chancado Primario" required>
+  </div>
+  <div class="input-group">
+    <label>N° Tag / Equipo</label>
+    <input type="text" id="inNombre" placeholder="ej. M-01" required>
+  </div>
+  <div class="input-group">
+    <label>Componente</label>
+    <input type="text" id="inComponente" placeholder="ej. Rodamiento lado libre">
+  </div>
+  <div class="input-group">
+    <label>Aviso SAP</label>
+    <input type="text" id="inAviso" placeholder="N° Aviso SAP">
+  </div>
+  <div class="input-group">
+    <label>OM SAP</label>
+    <input type="text" id="inOm" placeholder="N° Orden de Mantenimiento">
+  </div>
+  <div class="input-group">
+    <label>Fecha de Hallazgo</label>
+    <input type="date" id="inFecha">
+  </div>
+  <div class="input-group">
+    <label>Estatus (Libre)</label>
+    <input type="text" id="inEstatus" placeholder="ej. En bodega / Por comprar / En pañol">
+  </div>
+  
+  <div class="input-group" style="flex-basis: 100%;">
+    <label>Análisis Técnico</label>
+    <textarea id="inAnalisis" placeholder="Describa el análisis detallado de la anomalía detectada..."></textarea>
+  </div>
+  <div class="input-group" style="flex-basis: 100%;">
+    <label>Recomendación / Acción</label>
+    <textarea id="inRecomendacion" placeholder="Describa la acción correctiva o mitigación sugerida..."></textarea>
+  </div>
+  
+  <div class="input-group">
+    <label>Subir Imagen (Termografía / Evidencia)</label>
+    <input type="file" id="inImagenFile" accept="image/*" style="background:#0f172a; padding: 7px; color:#94a3b8;">
+  </div>
+  
+  <div class="full-width">
+    <span style="color: #94a3b8; font-size: 0.8rem;">💡 Tip: Haga clic en la pestaña "Mapa Operacional" para fijar la posición del equipo.</span>
+    <button id="btnSubmit" onclick="guardarEquipo()">+ Registrar Activo</button>
+  </div>
 </div>
 
 <!-- VISTA 1: CUADRITOS (DASHBOARD) -->
@@ -143,7 +191,7 @@
 
 <!-- VISTA 2: MAPA INTERACTIVO -->
 <div id="map-view">
-  <div class="map-instruction">📍 <b>Modo Admin Activo:</b> Haz clic en cualquier lugar exacto del mapa para registrar y marcar con un punto rojo un nuevo equipo crítico.</div>
+  <div class="map-instruction">📍 <b>Modo Admin Activo:</b> Haz clic en cualquier lugar exacto del mapa para asignar o actualizar las coordenadas del equipo.</div>
   <div id="map-container"></div>
 </div>
 
@@ -152,10 +200,23 @@
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="cerrarModal()">&times;</button>
     <h2 id="modalTitle" class="modal-title">Detalle del Activo</h2>
-    <div class="modal-data-row"><span class="modal-label">Vulnerabilidad</span><span id="modalVuln" class="modal-value"></span></div>
-    <div class="modal-data-row"><span class="modal-label">Evidencia Moncon</span><span id="modalEvi" class="modal-value highlight"></span></div>
-    <div class="modal-data-row"><span class="modal-label">Acción Requerida</span><span id="modalAccion" class="modal-value"></span></div>
-    <div class="modal-data-row"><span class="modal-label">Respaldo Empírico</span><div id="modalImageContainer"></div></div>
+    
+    <div class="modal-grid">
+      <div><span class="modal-label">Componente</span><span id="modalComponente" class="modal-value"></span></div>
+      <div><span class="modal-label">Estatus Operacional</span><span id="modalEstatus" class="modal-value highlight"></span></div>
+      <div><span class="modal-label">Aviso SAP</span><span id="modalAviso" class="modal-value"></span></div>
+      <div><span class="modal-label">OM SAP</span><span id="modalOm" class="modal-value"></span></div>
+      <div><span class="modal-label">Fecha Hallazgo</span><span id="modalFecha" class="modal-value"></span></div>
+      <div><span class="modal-label">Antigüedad</span><span id="modalDias" class="modal-value highlight"></span></div>
+    </div>
+
+    <div class="modal-data-row"><span class="modal-label">Análisis Técnico</span><span id="modalAnalisis" class="modal-value"></span></div>
+    <div class="modal-data-row"><span class="modal-label">Recomendación / Acción</span><span id="modalRecomendacion" class="modal-value"></span></div>
+    
+    <div class="modal-data-row">
+      <span class="modal-label">Evidencia Fotográfica / Respaldo</span>
+      <div id="modalImageContainer"></div>
+    </div>
   </div>
 </div>
 
@@ -172,6 +233,18 @@
   let mapaInicializado = false;
   let tempLat = null;
   let tempLng = null;
+  let imagenBase64Temp = "";
+
+  document.getElementById('inImagenFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(uploadEvent) {
+        imagenBase64Temp = uploadEvent.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 
   function cambiarVista(vista) {
     const gridView = document.getElementById('dashboard-view');
@@ -200,30 +273,24 @@
   }
 
   function initMap() {
-    // Coordenadas orientadas en la zona de la planta en Atacama
     map = L.map('map-container').setView([-28.2876, -70.8130], 14);
     
-    // Usamos el mapa base estándar de Esri World Imagery (Satelital) para ver los caminos de la faena con claridad
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19,
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+      attribution: 'Tiles &copy; Esri'
     }).addTo(map);
 
     markersLayer.addTo(map);
 
-    // Evento clic en el mapa para capturar posición en Modo Admin
     map.on('click', function(e) {
       if (!isAdmin) {
-        alert("🔒 Debes activar el Modo Admin para registrar equipos haciendo clic en el mapa.");
+        alert("🔒 Debes activar el Modo Admin para fijar la ubicación en el mapa.");
         return;
       }
-
       tempLat = e.latlng.lat;
       tempLng = e.latlng.lng;
-
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      document.getElementById('inArea').focus();
-      alert(`📌 Coordenadas capturadas en el mapa.\nComplete los datos del activo arriba y presione Registrar.`);
+      alert(`📌 Coordenadas asignadas en el mapa.\nComplete los campos y presione Registrar.`);
     });
 
     renderizarMarcadoresMapa(equipos);
@@ -243,8 +310,7 @@
 
         const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon: redIcon });
         marker.on('click', () => abrirModal(eq.id));
-        marker.bindPopup(`<b>Tag: ${eq.nombre}</b><br>Área: ${eq.area}<br><span style="color:#ef4444; font-weight:bold;">Estado Crítico</span>`);
-        
+        marker.bindPopup(`<b>Tag: ${eq.nombre}</b><br>Área: ${eq.area}<br><span style="color:#ef4444; font-weight:bold;">${eq.estatus || 'Crítico'}</span>`);
         markersLayer.addLayer(marker);
       }
     });
@@ -295,13 +361,27 @@
     
     const area = document.getElementById('inArea').value.trim();
     const nombre = document.getElementById('inNombre').value.trim();
-    const vuln = document.getElementById('inVuln').value.trim();
-    const evi = document.getElementById('inEvi').value.trim();
-    const accion = document.getElementById('inAccion').value.trim();
-    const imagenUrl = document.getElementById('inImagen').value.trim();
+    const componente = document.getElementById('inComponente').value.trim();
+    const aviso = document.getElementById('inAviso').value.trim();
+    const om = document.getElementById('inOm').value.trim();
+    const fecha = document.getElementById('inFecha').value;
+    const estatus = document.getElementById('inEstatus').value.trim();
+    const analisis = document.getElementById('inAnalisis').value.trim();
+    const recomendacion = document.getElementById('inRecomendacion').value.trim();
 
-    if(area && nombre && vuln) {
-      const equipoData = { area, nombre, vulnerabilidad: vuln, evidencia: evi, accion, imagen: imagenUrl };
+    if(area && nombre && analisis) {
+      const equipoData = { 
+        area, 
+        nombre, 
+        componente, 
+        aviso, 
+        om, 
+        fecha: fecha || new Date().toISOString().split('T')[0], 
+        estatus, 
+        analisis, 
+        recomendacion,
+        imagen: imagenBase64Temp || (editId ? (equipos.find(e => e.id === editId).imagen || "") : "")
+      };
 
       if (editId) {
         equipoData.id = editId;
@@ -314,7 +394,7 @@
           .catch(error => alert("❌ Error al actualizar:\n" + error.message));
       } else {
         if (tempLat === null || tempLng === null) {
-          alert("⚠️ Atención: No ha seleccionado la ubicación exacta en el Mapa Operacional. Vaya a la pestaña 'Mapa Operacional' y haga clic sobre el sector.");
+          alert("⚠️ Atención: Vaya a la pestaña 'Mapa Operacional' y haga clic para fijar la posición georreferenciada.");
           cambiarVista('map');
           return;
         }
@@ -329,7 +409,7 @@
           .catch(error => alert("❌ Error al guardar:\n" + error.message));
       }
     } else {
-      alert("⚠️ Completa al menos Área, Tag/Equipo y Falla.");
+      alert("⚠️ Completa al menos Área, Tag/Equipo y el Análisis Técnico.");
     }
   }
 
@@ -339,16 +419,20 @@
     
     const eq = equipos.find(item => item.id === id);
     if (eq) {
-      document.getElementById('inArea').value = eq.area;
-      document.getElementById('inNombre').value = eq.nombre;
-      document.getElementById('inVuln').value = eq.vulnerabilidad;
-      document.getElementById('inEvi').value = eq.evidencia;
-      document.getElementById('inAccion').value = eq.accion;
-      document.getElementById('inImagen').value = eq.imagen || '';
+      document.getElementById('inArea').value = eq.area || '';
+      document.getElementById('inNombre').value = eq.nombre || '';
+      document.getElementById('inComponente').value = eq.componente || '';
+      document.getElementById('inAviso').value = eq.aviso || '';
+      document.getElementById('inOm').value = eq.om || '';
+      document.getElementById('inFecha').value = eq.fecha || '';
+      document.getElementById('inEstatus').value = eq.estatus || '';
+      document.getElementById('inAnalisis').value = eq.analisis || '';
+      document.getElementById('inRecomendacion').value = eq.recomendacion || '';
       
       editId = id; 
       tempLat = eq.lat || null;
       tempLng = eq.lng || null;
+      imagenBase64Temp = eq.imagen || '';
 
       const btn = document.getElementById('btnSubmit');
       btn.innerText = "💾 Guardar Cambios";
@@ -358,10 +442,11 @@
   }
 
   function resetFormulario() {
-    document.querySelectorAll('.admin-panel input').forEach(input => input.value = '');
+    document.querySelectorAll('.admin-panel input, .admin-panel textarea').forEach(input => input.value = '');
     editId = null;
     tempLat = null;
     tempLng = null;
+    imagenBase64Temp = "";
     const btn = document.getElementById('btnSubmit');
     btn.innerText = "+ Registrar Activo";
     btn.style.background = "#0284c7"; 
@@ -378,17 +463,34 @@
     }
   }
 
+  function calcularDias(fechaStr) {
+    if (!fechaStr) return 0;
+    const hallazgo = new Date(fechaStr);
+    const hoy = new Date();
+    const diferenciaMs = hoy - hallazgo;
+    const dias = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24));
+    return dias >= 0 ? dias : 0;
+  }
+
   function abrirModal(id) {
     const eq = equipos.find(item => item.id === id);
     if (!eq) return;
 
     document.getElementById('modalTitle').innerText = `Tag: ${eq.nombre} (${eq.area})`;
-    document.getElementById('modalVuln').innerText = eq.vulnerabilidad;
-    document.getElementById('modalEvi').innerText = eq.evidencia;
-    document.getElementById('modalAccion').innerText = eq.accion;
+    document.getElementById('modalComponente').innerText = eq.componente || 'N/A';
+    document.getElementById('modalEstatus').innerText = eq.estatus || 'Sin estatus especificado';
+    document.getElementById('modalAviso').innerText = eq.aviso || 'Sin Aviso';
+    document.getElementById('modalOm').innerText = eq.om || 'Sin OM';
+    document.getElementById('modalFecha').innerText = eq.fecha || 'N/A';
     
-    let imgContainer = document.getElementById('modalImageContainer');
-    if (eq.imagen && eq.imagen !== "undefined" && eq.imagen !== "") {
+    const dias = calcularDias(eq.fecha);
+    document.getElementById('modalDias').innerText = `${dias} días activos`;
+
+    document.getElementById('modalAnalisis').innerText = eq.analisis || 'Sin análisis registrado';
+    document.getElementById('modalRecomendacion').innerText = eq.recomendacion || 'Sin recomendación registrada';
+    
+    const imgContainer = document.getElementById('modalImageContainer');
+    if (eq.imagen && eq.imagen !== "") {
       imgContainer.innerHTML = `<img src="${eq.imagen}" alt="Evidencia" class="modal-image">`;
     } else {
       imgContainer.innerHTML = `<p class="no-image-text">Sin respaldo visual adjunto.</p>`;
@@ -411,15 +513,19 @@
     }, {});
 
     for (const [area, eqs] of Object.entries(equiposPorArea)) {
-      const htmlEquipos = eqs.map(eq => `
-        <div class="card" onclick="abrirModal('${eq.id}')">
-          <div class="pulse-indicator"></div>
-          <button class="edit-btn" onclick="editarEquipo(event, '${eq.id}')" title="Editar">✏️</button>
-          <button class="delete-btn" onclick="eliminarEquipo(event, '${eq.id}')" title="Eliminar">✖</button>
-          <h3 class="asset-tag">${eq.nombre}</h3>
-          <span class="asset-sub">Ver Detalle</span>
-        </div>
-      `).join('');
+      const htmlEquipos = eqs.map(eq => {
+        const dias = calcularDias(eq.fecha);
+        return `
+          <div class="card" onclick="abrirModal('${eq.id}')">
+            <div class="pulse-indicator"></div>
+            <button class="edit-btn" onclick="editarEquipo(event, '${eq.id}')" title="Editar">✏️</button>
+            <button class="delete-btn" onclick="eliminarEquipo(event, '${eq.id}')" title="Eliminar">✖</button>
+            <h3 class="asset-tag">${eq.nombre}</h3>
+            <span class="asset-sub">Ver Detalle</span>
+            <span class="asset-days">⏱️ ${dias} días en alerta</span>
+          </div>
+        `;
+      }).join('');
       
       root.innerHTML += `
         <h2 class="area-title">${area}</h2>
