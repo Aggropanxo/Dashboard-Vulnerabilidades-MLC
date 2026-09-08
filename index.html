@@ -8,16 +8,28 @@
   /* --- Estilos Base --- */
   body { background-color: #0b1120; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; padding: 30px; margin: 0; }
   
-  /* --- Encabezado Corporativo --- */
+  /* --- Encabezado Corporativo Tipográfico --- */
   .header { border-bottom: 1px solid #1e293b; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
-  .header-left { display: flex; align-items: center; gap: 25px; flex-wrap: wrap; }
+  .header-left { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
   
-  /* Contenedor de Logos Alianzas */
-  .logos-wrapper { display: flex; gap: 15px; align-items: center; }
-  .company-logo { height: 65px; width: 140px; object-fit: contain; background-color: #ffffff; padding: 10px; border-radius: 8px; border: 1px solid #334155; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-  
-  .header-titles h1 { color: #ffffff; font-size: 2.2rem; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
-  .header-titles p { color: #94a3b8; margin: 0; font-size: 1.1rem; }
+  /* Bloques de Texto Tipográfico para Marcas */
+  .brand-badges { display: flex; gap: 10px; align-items: center; }
+  .brand-badge { 
+    background: #1e293b; 
+    border: 1px solid #334155; 
+    color: #ffffff; 
+    font-weight: 800; 
+    font-size: 1.3rem; 
+    padding: 8px 16px; 
+    border-radius: 6px; 
+    letter-spacing: 1px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  }
+  .brand-badge.cpf { border-left: 4px solid #38bdf8; }
+  .brand-badge.cmp { border-left: 4px solid #ef4444; }
+
+  .header-titles h1 { color: #ffffff; font-size: 2rem; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
+  .header-titles p { color: #94a3b8; margin: 0; font-size: 1rem; }
   
   /* Botón Administrador */
   .btn-lock { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; height: fit-content; white-space: nowrap; }
@@ -70,9 +82,10 @@
 
 <div class="header">
   <div class="header-left">
-    <div class="logos-wrapper">
-      <img src="logo.jpeg" alt="Logo CPF Ingeniería" class="company-logo">
-      <img src="cmp-logo.png" alt="Logo CMP" class="company-logo">
+    <!-- Marcas tipográficas integradas -->
+    <div class="brand-badges">
+      <span class="brand-badge cpf">CPF</span>
+      <span class="brand-badge cmp">CMP</span>
     </div>
     <div class="header-titles">
       <h1>DASHBOARD OPERACIONAL - PLANTA MLC</h1>
@@ -89,7 +102,6 @@
   <input type="text" id="inEvi" placeholder="Evidencia (ej. Amplitud 15 cpm)" required>
   <input type="text" id="inAccion" placeholder="Acción (ej. Ajuste pernos anclaje)" required>
   <input type="text" id="inImagen" placeholder="URL Imagen (Termografía/Espectro) - Opcional">
-  <!-- Botón ahora con ID para cambiarlo en tiempo de ejecución -->
   <button id="btnSubmit" onclick="guardarEquipo()">+ Registrar Activo</button>
 </div>
 
@@ -109,14 +121,14 @@
 
 <script>
   let isAdmin = false;
-  let editId = null; // Variable para saber si estamos editando
+  let editId = null; 
   
   function solicitarClave() {
     if (isAdmin) {
       document.body.classList.remove('admin-mode');
       document.getElementById('btnUnlock').innerText = "🔒 Modo Lectura";
       isAdmin = false;
-      resetFormulario(); // Limpiar si cierra sesión a mitad de edición
+      resetFormulario(); 
       return;
     }
     const claveIngresada = prompt("Ingrese la clave de operaciones para modificar el dashboard:");
@@ -151,7 +163,6 @@
     renderDashboard();
   });
 
-  // FUNCIÓN UNIFICADA (GUARDAR NUEVO O ACTUALIZAR EXISTENTE)
   function guardarEquipo() {
     if (!isAdmin) return; 
     
@@ -166,21 +177,15 @@
       const equipoData = { area, nombre, vulnerabilidad: vuln, evidencia: evi, accion, imagen: imagenUrl };
 
       if (editId) {
-        // Estamos editando un equipo existente
         equipoData.id = editId;
         equiposRef.child(editId).update(equipoData)
-          .then(() => {
-            resetFormulario();
-          })
+          .then(() => { resetFormulario(); })
           .catch(error => alert("❌ Error al actualizar:\n" + error.message));
       } else {
-        // Estamos creando un equipo nuevo
         const nuevoId = Date.now().toString();
         equipoData.id = nuevoId;
         equiposRef.child(nuevoId).set(equipoData)
-          .then(() => {
-            resetFormulario();
-          })
+          .then(() => { resetFormulario(); })
           .catch(error => alert("❌ Error al guardar:\n" + error.message));
       }
     } else {
@@ -188,9 +193,8 @@
     }
   }
 
-  // FUNCIÓN PARA PREPARAR LA EDICIÓN EN EL FORMULARIO
   function editarEquipo(event, id) {
-    event.stopPropagation(); // Evita que se abra la imagen
+    event.stopPropagation(); 
     if (!isAdmin) return;
     
     const equipo = equipos.find(eq => eq.id === id);
@@ -202,24 +206,22 @@
       document.getElementById('inAccion').value = equipo.accion;
       document.getElementById('inImagen').value = equipo.imagen || '';
       
-      editId = id; // Guardar el ID que estamos editando
+      editId = id; 
       
       const btn = document.getElementById('btnSubmit');
       btn.innerText = "💾 Guardar Cambios";
-      btn.style.background = "#16a34a"; // Color verde para indicar guardado
+      btn.style.background = "#16a34a"; 
 
-      // Desplazarse suavemente hacia arriba para ver el formulario
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
-  // FUNCIÓN PARA LIMPIAR EL FORMULARIO Y SALIR DE EDICIÓN
   function resetFormulario() {
     document.querySelectorAll('.admin-panel input').forEach(input => input.value = '');
     editId = null;
     const btn = document.getElementById('btnSubmit');
     btn.innerText = "+ Registrar Activo";
-    btn.style.background = "#0284c7"; // Vuelve al color original
+    btn.style.background = "#0284c7"; 
   }
 
   function eliminarEquipo(event, id) {
@@ -228,10 +230,10 @@
     
     const equipo = equipos.find(eq => eq.id === id);
     if (equipo) {
-      const confirmacion = confirm(`⚠️ ALERTA DE SISTEMA (Mantenimiento):\n\n¿Confirma que desea retirar el activo "${equipo.nombre}" del mapa de criticidad operacional?`);
+      const confirmacion = confirm(`⚠️ ALERTA DE SISTEMA:\n\n¿Confirma que desea retirar el activo "${equipo.nombre}"?`);
       if (confirmacion) {
         equiposRef.child(id).remove()
-          .then(() => { if (editId === id) resetFormulario(); }) // Si estaba editando el que borró, limpia el panel
+          .then(() => { if (editId === id) resetFormulario(); }) 
           .catch(error => console.error("Error al retirar activo: ", error));
       }
     }
