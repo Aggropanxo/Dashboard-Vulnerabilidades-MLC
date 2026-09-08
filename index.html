@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DASHBOARD OPERACIONAL - PLANTA MLC | CPF & CMP</title>
+<title>DASHBOARD OPERACIONAL & MAPA - PLANTA MLC | CPF & CMP</title>
+<!-- Leaflet CSS para el Mapa -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   /* --- Estilos Base --- */
   body { background-color: #0b1120; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; padding: 30px; margin: 0; }
   
   /* --- Encabezado Corporativo --- */
-  .header { border-bottom: 1px solid #1e293b; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+  .header { border-bottom: 1px solid #1e293b; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
   .header-left { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
   
   /* Marcas */
@@ -21,21 +23,39 @@
   .header-titles h1 { color: #ffffff; font-size: 2rem; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
   .header-titles p { color: #94a3b8; margin: 0; font-size: 1rem; }
   
+  /* Controles Superiores Derecho */
+  .header-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  
+  /* Botones de Cambio de Vista */
+  .view-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+  .view-btn.active { background: #0284c7; color: white; border-color: #0284c7; }
+  .view-btn:hover { background: #334155; color: #fff; }
+
   /* Botón Administrador */
-  .btn-lock { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; height: fit-content; white-space: nowrap; }
+  .btn-lock { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; white-space: nowrap; }
   .btn-lock:hover { background: #1e293b; color: #fff; }
   
+  /* --- Contenedor del Mapa --- */
+  #map-view { display: none; margin-bottom: 30px; }
+  #map-container {
+    width: 100%;
+    height: 500px;
+    border-radius: 10px;
+    border: 1px solid #334155;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  }
+
   /* --- Panel Admin --- */
   .admin-panel { display: none; background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 30px; flex-wrap: wrap; gap: 10px; border: 1px solid #334155; }
-  .admin-panel input { padding: 10px; border-radius: 5px; border: 1px solid #334155; background: #0f172a; color: white; flex-grow: 1; min-width: 150px; }
+  .admin-panel input { padding: 10px; border-radius: 5px; border: 1px solid #334155; background: #0f172a; color: white; flex-grow: 1; min-width: 140px; }
   .admin-panel button { background: #0284c7; color: white; cursor: pointer; font-weight: bold; border: none; border-radius: 5px; padding: 10px 20px; flex-grow: 0; transition: background 0.3s; }
   .admin-panel button:hover { opacity: 0.9; }
   
-  /* --- Grilla de Tags Compactos --- */
+  /* --- Vista Cuadritos (Dashboard) --- */
+  #dashboard-view { display: block; }
   .area-title { color: #38bdf8; font-size: 1.4rem; border-left: 4px solid #38bdf8; padding-left: 12px; margin: 40px 0 20px 0; text-transform: uppercase; letter-spacing: 1px; }
   .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
   
-  /* Tarjeta Estilo Tag / Botón de Acceso Rápido */
   .card { 
     background: rgba(15, 23, 42, 0.8); 
     border: 1px solid rgba(239, 68, 68, 0.5); 
@@ -45,23 +65,14 @@
     cursor: pointer; 
     transition: all 0.2s ease;
     box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
     min-height: 80px;
   }
-  .card:hover {
-    transform: translateY(-3px);
-    border-color: #ef4444;
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
-  }
+  .card:hover { transform: translateY(-3px); border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
   
   .pulse-indicator { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background-color: #ef4444; border-radius: 50%; animation: pulse 1.5s infinite; }
   @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
   
-  /* Botones de Acción en el Tag */
   .delete-btn { display: none; position: absolute; bottom: 5px; right: 8px; background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; z-index: 10; }
   .delete-btn:hover { color: #b91c1c; }
   .edit-btn { display: none; position: absolute; bottom: 5px; left: 8px; background: transparent; border: none; color: #38bdf8; cursor: pointer; font-size: 0.9rem; z-index: 10; }
@@ -76,18 +87,16 @@
   body.admin-mode .edit-btn { display: block; }
   body.admin-mode .btn-lock { background: #16a34a; color: white; border-color: #16a34a; }
 
-  /* --- Modal de Resumen y Evidencia Detallada --- */
+  /* --- Modal Detallado --- */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
   .modal-content { background: #0f172a; padding: 30px; border-radius: 10px; border: 1px solid #38bdf8; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
   .modal-close { position: absolute; top: 15px; right: 20px; color: #fff; font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; }
   .modal-close:hover { color: #ef4444; }
-  
   .modal-title { color: #fca5a5; font-size: 1.5rem; margin-top: 0; margin-bottom: 20px; text-transform: uppercase; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
   .modal-data-row { margin-bottom: 15px; }
   .modal-label { color: #38bdf8; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 3px; }
   .modal-value { color: #ffffff; font-size: 1rem; }
   .modal-value.highlight { color: #ef4444; font-weight: bold; }
-  
   .modal-image { width: 100%; max-height: 50vh; object-fit: contain; border-radius: 6px; border: 1px solid #334155; margin-top: 10px; background: #000; }
   .no-image-text { color: #94a3b8; margin-top: 10px; font-style: italic; font-size: 0.9rem; }
 </style>
@@ -102,57 +111,125 @@
     </div>
     <div class="header-titles">
       <h1>DASHBOARD OPERACIONAL - PLANTA MLC</h1>
-      <p>Monitoreo de Condiciones y Diagnóstico de Vulnerabilidades | Nivel: Crítico (Rojo)</p>
+      <p>Monitoreo de Condiciones y Gestión de Vulnerabilidades</p>
     </div>
   </div>
-  <button id="btnUnlock" class="btn-lock" onclick="solicitarClave()">🔒 Modo Lectura</button>
+  
+  <div class="header-controls">
+    <!-- Pestañas para alternar vistas -->
+    <button id="btnViewGrid" class="view-btn active" onclick="cambiarVista('grid')">📋 Dashboard</button>
+    <button id="btnViewMap" class="view-btn" onclick="cambiarVista('map')">🗺️ Mapa</button>
+    <button id="btnUnlock" class="btn-lock" onclick="solicitarClave()">🔒 Modo Lectura</button>
+  </div>
 </div>
 
 <div class="admin-panel">
-  <input type="text" id="inArea" placeholder="Área (ej. Chancado Primario)" required>
-  <input type="text" id="inNombre" placeholder="N° Equipo / Tag (ej. M-01)" required>
-  <input type="text" id="inVuln" placeholder="Falla (ej. Holgura mecánica)" required>
-  <input type="text" id="inEvi" placeholder="Evidencia (ej. Amplitud 15 cpm)" required>
-  <input type="text" id="inAccion" placeholder="Acción (ej. Ajuste pernos anclaje)" required>
-  <input type="text" id="inImagen" placeholder="URL Imagen (Termografía/Espectro) - Opcional">
+  <input type="text" id="inArea" placeholder="Área (ej. Chancado)" required>
+  <input type="text" id="inNombre" placeholder="N° Tag (ej. M-01)" required>
+  <input type="text" id="inVuln" placeholder="Falla (ej. Holgura)" required>
+  <input type="text" id="inEvi" placeholder="Evidencia (ej. 15 cpm)" required>
+  <input type="text" id="inAccion" placeholder="Acción Requerida" required>
+  <input type="text" id="inLat" placeholder="Latitud (ej. -28.46)" required>
+  <input type="text" id="inLng" placeholder="Longitud (ej. -70.75)" required>
+  <input type="text" id="inImagen" placeholder="URL Imagen - Opcional">
   <button id="btnSubmit" onclick="guardarEquipo()">+ Registrar Activo</button>
 </div>
 
-<div id="app-root"></div>
+<!-- VISTA 1: CUADRITOS (DASHBOARD) -->
+<div id="dashboard-view">
+  <div id="app-root"></div>
+</div>
 
-<!-- Modal Detallado de Resumen e Imagen -->
+<!-- VISTA 2: MAPA INTERACTIVO -->
+<div id="map-view">
+  <div id="map-container"></div>
+</div>
+
+<!-- Modal Detallado -->
 <div id="evidenciaModal" class="modal-overlay" onclick="cerrarModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="cerrarModal()">&times;</button>
     <h2 id="modalTitle" class="modal-title">Detalle del Activo</h2>
-    
-    <div class="modal-data-row">
-      <span class="modal-label">Vulnerabilidad Principal</span>
-      <span id="modalVuln" class="modal-value"></span>
-    </div>
-    <div class="modal-data-row">
-      <span class="modal-label">Evidencia Moncon</span>
-      <span id="modalEvi" class="modal-value highlight"></span>
-    </div>
-    <div class="modal-data-row">
-      <span class="modal-label">Estrategia de Acción Requerida</span>
-      <span id="modalAccion" class="modal-value"></span>
-    </div>
-    <div class="modal-data-row">
-      <span class="modal-label">Respaldo Empírico (Espectro / Termografía)</span>
-      <div id="modalImageContainer"></div>
-    </div>
+    <div class="modal-data-row"><span class="modal-label">Vulnerabilidad</span><span id="modalVuln" class="modal-value"></span></div>
+    <div class="modal-data-row"><span class="modal-label">Evidencia Moncon</span><span id="modalEvi" class="modal-value highlight"></span></div>
+    <div class="modal-data-row"><span class="modal-label">Acción Requerida</span><span id="modalAccion" class="modal-value"></span></div>
+    <div class="modal-data-row"><span class="modal-label">Respaldo Empírico</span><div id="modalImageContainer"></div></div>
   </div>
 </div>
 
-<!-- Scripts de Firebase -->
+<!-- Scripts Leaflet y Firebase -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
   let isAdmin = false;
-  let editId = null; 
-  
+  let editId = null;
+  let map;
+  let markersLayer = L.layerGroup();
+  let mapaInicializado = false;
+
+  // Control de cambio de vistas
+  function cambiarVista(vista) {
+    const gridView = document.getElementById('dashboard-view');
+    const mapView = document.getElementById('map-view');
+    const btnGrid = document.getElementById('btnViewGrid');
+    const btnMap = document.getElementById('btnViewMap');
+
+    if (vista === 'grid') {
+      gridView.style.display = 'block';
+      mapView.style.display = 'none';
+      btnGrid.classList.add('active');
+      btnMap.classList.remove('active');
+    } else if (vista === 'map') {
+      gridView.style.display = 'none';
+      mapView.style.display = 'block';
+      btnMap.classList.add('active');
+      btnGrid.classList.remove('active');
+
+      // Inicializar el mapa solo la primera vez que se abre para evitar errores de renderizado
+      if (!mapaInicializado) {
+        initMap();
+        mapaInicializado = true;
+      } else {
+        map.invalidateSize(); // Refresca el tamaño del mapa si estaba oculto
+      }
+    }
+  }
+
+  function initMap() {
+    map = L.map('map-container').setView([-28.45, -70.73], 14);
+    
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{z}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+    }).addTo(map);
+
+    markersLayer.addTo(map);
+    actualizarMarcadoresMapa(equipos);
+  }
+
+  function actualizarMarcadoresMapa(equiposList) {
+    if (!map) return;
+    markersLayer.clearLayers();
+
+    equiposList.forEach(eq => {
+      if (eq.lat && eq.lng) {
+        const redIcon = L.divIcon({
+          className: 'custom-map-marker',
+          html: '<div style="background-color: #ef4444; width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 10px #ef4444; border: 2px solid #ffffff;"></div>',
+          iconSize: [14, 14]
+        });
+
+        const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon: redIcon });
+        marker.on('click', () => abrirModal(eq.id));
+        marker.bindPopup(`<b>Tag: ${eq.nombre}</b><br>Área: ${eq.area}<br><span style="color:#ef4444; font-weight:bold;">Estado Crítico</span>`);
+        
+        markersLayer.addLayer(marker);
+      }
+    });
+  }
+
   function solicitarClave() {
     if (isAdmin) {
       document.body.classList.remove('admin-mode');
@@ -171,7 +248,6 @@
     }
   }
 
-  // CONFIGURACIÓN FIREBASE
   const firebaseConfig = {
     apiKey: "AIzaSyBd5MEZdMmgzBs1xCyeGYeKtQx5gJIeY3w",
     authDomain: "dashboard-vulnerabilidades-mlc.firebaseapp.com",
@@ -191,6 +267,7 @@
     const data = snapshot.val();
     equipos = data ? Object.values(data) : [];
     renderDashboard();
+    actualizarMarcadoresMapa(equipos);
   });
 
   function guardarEquipo() {
@@ -201,10 +278,12 @@
     const vuln = document.getElementById('inVuln').value.trim();
     const evi = document.getElementById('inEvi').value.trim();
     const accion = document.getElementById('inAccion').value.trim();
+    const lat = document.getElementById('inLat').value.trim();
+    const lng = document.getElementById('inLng').value.trim();
     const imagenUrl = document.getElementById('inImagen').value.trim();
 
     if(area && nombre && vuln) {
-      const equipoData = { area, nombre, vulnerabilidad: vuln, evidencia: evi, accion, imagen: imagenUrl };
+      const equipoData = { area, nombre, vulnerabilidad: vuln, evidencia: evi, accion, lat, lng, imagen: imagenUrl };
 
       if (editId) {
         equipoData.id = editId;
@@ -219,7 +298,7 @@
           .catch(error => alert("❌ Error al guardar:\n" + error.message));
       }
     } else {
-      alert("⚠️ Error de ingreso: Completa al menos el Área, Tag/Equipo y Falla.");
+      alert("⚠️ Completa al menos Área, Tag/Equipo y Falla.");
     }
   }
 
@@ -227,21 +306,21 @@
     event.stopPropagation(); 
     if (!isAdmin) return;
     
-    const equipo = equipos.find(eq => eq.id === id);
-    if (equipo) {
-      document.getElementById('inArea').value = equipo.area;
-      document.getElementById('inNombre').value = equipo.nombre;
-      document.getElementById('inVuln').value = equipo.vulnerabilidad;
-      document.getElementById('inEvi').value = equipo.evidencia;
-      document.getElementById('inAccion').value = equipo.accion;
-      document.getElementById('inImagen').value = equipo.imagen || '';
+    const eq = equipos.find(item => item.id === id);
+    if (eq) {
+      document.getElementById('inArea').value = eq.area;
+      document.getElementById('inNombre').value = eq.nombre;
+      document.getElementById('inVuln').value = eq.vulnerabilidad;
+      document.getElementById('inEvi').value = eq.evidencia;
+      document.getElementById('inAccion').value = eq.accion;
+      document.getElementById('inLat').value = eq.lat || '';
+      document.getElementById('inLng').value = eq.lng || '';
+      document.getElementById('inImagen').value = eq.imagen || '';
       
       editId = id; 
-      
       const btn = document.getElementById('btnSubmit');
       btn.innerText = "💾 Guardar Cambios";
       btn.style.background = "#16a34a"; 
-
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
@@ -257,19 +336,14 @@
   function eliminarEquipo(event, id) {
     event.stopPropagation();
     if (!isAdmin) return; 
-    
-    const equipo = equipos.find(eq => eq.id === id);
-    if (equipo) {
-      const confirmacion = confirm(`⚠️ ALERTA DE SISTEMA:\n\n¿Confirma que desea retirar el tag "${equipo.nombre}"?`);
-      if (confirmacion) {
-        equiposRef.child(id).remove()
-          .then(() => { if (editId === id) resetFormulario(); }) 
-          .catch(error => console.error("Error al retirar activo: ", error));
-      }
+    const eq = equipos.find(item => item.id === id);
+    if (eq && confirm(`⚠️ ¿Confirma retirar el tag "${eq.nombre}"?`)) {
+      equiposRef.child(id).remove()
+        .then(() => { if (editId === id) resetFormulario(); }) 
+        .catch(error => console.error(error));
     }
   }
 
-  // Mostrar el Resumen Completo y la Imagen en el Modal
   function abrirModal(id) {
     const eq = equipos.find(item => item.id === id);
     if (!eq) return;
@@ -281,11 +355,10 @@
     
     const imgContainer = document.getElementById('modalImageContainer');
     if (eq.imagen && eq.imagen !== "undefined" && eq.imagen !== "") {
-      imgContainer.innerHTML = `<img src="${eq.imagen}" alt="Evidencia ${eq.nombre}" class="modal-image">`;
+      imgContainer.innerHTML = `<img src="${eq.imagen}" alt="Evidencia" class="modal-image">`;
     } else {
-      imgContainer.innerHTML = `<p class="no-image-text">Sin respaldo visual adjunto para este activo.</p>`;
+      imgContainer.innerHTML = `<p class="no-image-text">Sin respaldo visual adjunto.</p>`;
     }
-
     document.getElementById('evidenciaModal').style.display = 'flex';
   }
   
@@ -307,8 +380,8 @@
       const htmlEquipos = eqs.map(eq => `
         <div class="card" onclick="abrirModal('${eq.id}')">
           <div class="pulse-indicator"></div>
-          <button class="edit-btn" onclick="editarEquipo(event, '${eq.id}')" title="Editar activo">✏️</button>
-          <button class="delete-btn" onclick="eliminarEquipo(event, '${eq.id}')" title="Dar de baja activo">✖</button>
+          <button class="edit-btn" onclick="editarEquipo(event, '${eq.id}')" title="Editar">✏️</button>
+          <button class="delete-btn" onclick="eliminarEquipo(event, '${eq.id}')" title="Eliminar">✖</button>
           <h3 class="asset-tag">${eq.nombre}</h3>
           <span class="asset-sub">Ver Detalle</span>
         </div>
