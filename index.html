@@ -607,7 +607,7 @@
   });
 
   function guardarEquipo() {
-    if (!isAdmin) return; 
+    if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const area = document.getElementById('inArea').value.trim();
     const nombre = document.getElementById('inNombre').value.trim().toUpperCase();
     if(!area || !nombre) { alert("Mínimo Área y Tag requeridos."); return; }
@@ -637,12 +637,15 @@
     eqData.lat = tempLat !== null ? tempLat : (eqOrig ? eqOrig.lat : null);
     eqData.lng = tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null);
     
-    equiposRef.child(eqId).update(eqData).then(resetFormulario);
+    equiposRef.child(eqId).update(eqData).then(() => {
+      alert("✅ Cambios guardados correctamente.");
+      resetFormulario();
+    });
   }
 
-  // --- FUNCIÓN DE EDICIÓN AUTOMÁTICA EN EL PANEL ---
+  // --- FUNCIÓN DE EDICIÓN INFALIBLE ---
   function editarEquipo(event, id) {
-    event.stopPropagation(); // Evita abrir el modal general
+    event.stopPropagation(); 
     if (!isAdmin) {
       alert("⚠️ Debe activar el Modo Admin para editar.");
       return;
@@ -669,8 +672,6 @@
       imagenesBase64Temp = eq.imagenes || [];
       
       document.getElementById('btnSubmit').innerText = "💾 Guardar Cambios";
-      
-      // Auto-desplazar y enfocar el panel de administración
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
@@ -802,12 +803,13 @@
         else if(eq.severidad === 'Plomo') { sevClass = 'sev-plomo'; textoDias = 'SIN MEDIR'; }
 
         const tipoTexto = eq.tipo_equipo ? eq.tipo_equipo : 'Equipo';
+        const safeId = JSON.stringify(eq.id); // Asegura que el ID se pase de forma segura sin romper comillas
 
         return `
           <div class="card ${sevClass}" onclick="abrirModal('${eq.id}')">
             <div class="pulse-indicator"></div>
-            <button class="edit-btn" onclick="editarEquipo(event, '${eq.id}')" title="Editar">✏️</button>
-            <button class="delete-btn" onclick="eliminarEquipo(event, '${eq.id}')" title="Eliminar">✖</button>
+            <button class="edit-btn" onclick="editarEquipo(event, ${safeId})" title="Editar">✏️</button>
+            <button class="delete-btn" onclick="eliminarEquipo(event, ${safeId})" title="Eliminar">✖</button>
             <span class="asset-type-badge" title="${tipoTexto}">${tipoTexto}</span>
             <h3 class="asset-tag">${eq.nombre}</h3>
             <span class="asset-days">⏱️ ${textoDias}</span>
