@@ -411,7 +411,7 @@
     }
   }
 
-  // --- CONTROLADOR DE CLICS INFALIBLE (CORRECCIÓN DE ID) ---
+  // --- CONTROLADOR DE CLICS (EDICIÓN BLINDADA SIN CRUZAR IDs) ---
   document.getElementById('app-root').addEventListener('click', function(e) {
     const delBtn = e.target.closest('.delete-btn');
     const card = e.target.closest('.card');
@@ -421,14 +421,23 @@
       eliminarEquipo(delBtn.getAttribute('data-id'));
     } else if (card) {
       const id = card.getAttribute('data-id');
+      // Buscar explícitamente el equipo cuyo ID coincida con la tarjeta presionada
       const eqTarget = equipos.find(i => String(i.id) === String(id));
       
       if (isAdmin) {
-        // Carga DIRECTAMENTE el equipo en el que hiciste clic sin confusiones
-        if (confirm(`✏️ MODO EDICIÓN\n\n¿Desea editar los datos del equipo ${eqTarget ? eqTarget.nombre : id}?\n\n- [Aceptar] para Editar arriba en el panel.\n- [Cancelar] para ver Detalles.`)) {
-          cargarDatosAlFormulario(eqTarget);
+        if (editId && String(editId) !== String(id)) {
+          const eqActual = equipos.find(i => String(i.id) === String(editId));
+          const nombreActual = eqActual ? eqActual.nombre : 'actual';
+          
+          if (confirm(`⚠️ EDICIÓN EN CURSO\n\n¿Desea GUARDAR los cambios del equipo ${nombreActual} y pasar a editar el equipo ${eqTarget ? eqTarget.nombre : id}?`)) {
+            guardarEquipoYEditarNuevo(eqTarget);
+          }
         } else {
-          abrirModal(id);
+          if (confirm(`✏️ MODO EDICIÓN\n\n¿Desea editar los datos del equipo ${eqTarget ? eqTarget.nombre : id}?\n\n- [Aceptar] para Editar arriba en el panel.\n- [Cancelar] para ver Detalles.`)) {
+            cargarDatosAlFormulario(eqTarget);
+          } else {
+            abrirModal(id);
+          }
         }
       } else {
         abrirModal(id);
@@ -467,7 +476,7 @@
     }
   }
 
-  // --- LECTOR EXCEL ROBUSTO ---
+  // --- LECTOR EXCEL CON PURGA AUTOMÁTICA (ELIMINACIÓN DE EQUIPOS RETIRADOS) ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -479,6 +488,7 @@
       try {
         const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
         let agregados = 0;
+        let tagsEnExcel = new Set();
 
         workbook.SheetNames.forEach(sheetName => {
           if (sheetName.toLowerCase().match(/2025|2026|grupos|reserva/)) return;
@@ -517,26 +527,37 @@
 
             const tagLimpio = eqVal.toUpperCase();
             const eqId = tagLimpio.replace(/[.#$\[\]\s\/]/g, "_");
-            const fechaVal = String(row[colIdxFecha]||'').trim();
+            tagsEnExcel.add(eqId);
 
+            const fechaVal = String(row[colIdxFecha]||'').trim();
             const updateData = { area: areaVal, nombre: tagLimpio, tipo_equipo: String(row[colIdxTipo]||'').trim() };
             
             if (fechaVal && !fechaVal.includes('1900') && !fechaVal.toLowerCase().includes('nat') && fechaVal !== 'undefined') {
               updateData.ultima_medicion = fechaVal;
             } else { updateData.ultima_medicion = ''; }
 
-            const eqExist = equipos.find(e => e.id === eqId);
+            const eqExist = equipos.find(e => String(e.id) === String(eqId));
             if (!eqExist) {
               updateData.severidad = updateData.ultima_medicion ? "Verde" : "Plomo";
               updateData.fecha = new Date().toISOString().split('T')[0];
             }
-            // Si ya existe, NO pisamos la severidad ni comentarios manuales del usuario.
-            
+            // Si ya existe, se respetan los colores y notas manuales que ya tenía el usuario.
+
             equiposRef.child(eqId).update(updateData);
             agregados++;
           }
         });
-        alert(`✅ Carga masiva completada: ${agregados} activos leídos.`);
+
+        // PURGA AUTOMÁTICA: Eliminar de Firebase los equipos que ya no vienen en el Excel (sacados de línea)
+        let eliminadosPorPurga = 0;
+        equipos.forEach(eq => {
+          if (!tagsEnExcel.has(String(eq.id))) {
+            equiposRef.child(eq.id).remove();
+            eliminadosPorPurga++;
+          }
+        });
+
+        alert(`✅ Sincronización completada:\n- ${agregados} activos leídos/actualizados.\n- ${eliminadosPorPurga} activos retirados eliminados automáticamente.`);
         fileInput.value = '';
       } catch (err) { alert("❌ Error procesando Excel: " + err.message); }
     };
@@ -620,7 +641,7 @@
     renderizarMarcadoresMapa(equipos);
   });
 
-  // --- MOTOR DE GUARDADO Y EDICIÓN LIMPIO ---
+  // --- MOTOR DE GUARDADO Y EDICIÓN ---
   function procesarGuardado() {
     if (!isAdmin) return; 
     const area = document.getElementById('inArea').value.trim();
@@ -653,6 +674,39 @@
     }).catch(err => alert("❌ Error al guardar: " + err.message));
   }
 
+  function guardarEquipoYEditarNuevo(nuevoEq) {
+    if (!editId) { cargarDatosAlFormulario(nuevoEq); return; }
+    
+    const area = document.getElementById('inArea').value.trim();
+    const nombre = document.getElementById('inNombre').value.trim().toUpperCase();
+    if(!area || !nombre) { alert("⚠️ Faltan datos en el equipo actual."); return; }
+
+    let eqId = editId;
+    const eqOrig = equipos.find(e => String(e.id) === String(eqId));
+
+    const eqData = { 
+      id: eqId, area, nombre, 
+      tipo_equipo: document.getElementById('inTipo').value.trim(),
+      componente: document.getElementById('inComponente').value.trim(), 
+      aviso: document.getElementById('inAviso').value.trim(), 
+      om: document.getElementById('inOm').value.trim(), 
+      fecha: document.getElementById('inFecha').value || '', 
+      ultima_medicion: document.getElementById('inUltimaMedicion').value || '', 
+      severidad: document.getElementById('inSeveridad').value,
+      estatus: document.getElementById('inEstatus').value.trim(),
+      analisis: document.getElementById('inAnalisis').value.trim(), 
+      recomendacion: document.getElementById('inRecomendacion').value.trim(),
+      imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : []),
+      lat: tempLat !== null ? tempLat : (eqOrig ? eqOrig.lat : null),
+      lng: tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null)
+    };
+    
+    equiposRef.child(eqId).update(eqData).then(() => {
+      imagenesBase64Temp = [];
+      cargarDatosAlFormulario(nuevoEq);
+    }).catch(err => alert("❌ Error al actualizar: " + err.message));
+  }
+
   function cargarDatosAlFormulario(eq) {
     if (!eq) return;
     try {
@@ -674,7 +728,7 @@
       document.getElementById('inAnalisis').value = eq.analisis || '';
       document.getElementById('inRecomendacion').value = eq.recomendacion || '';
       
-      editId = eq.id; // Asignamos el ID exacto del equipo que estamos tocando
+      editId = eq.id; // Asignación limpia del ID correcto
       tempLat = eq.lat || null; 
       tempLng = eq.lng || null;
       imagenesBase64Temp = eq.imagenes || [];
@@ -806,7 +860,7 @@
           <button class="delete-btn" data-id="${eq.id}" title="Eliminar">✖</button>
           <span class="asset-type-badge" title="${eq.tipo_equipo || 'Equipo'}">${eq.tipo_equipo || 'Equipo'}</span>
           <h3 class="asset-tag">${eq.nombre}</h3>
-          <span class="asset-days">⏱️ ${eq.textDias}</span>
+          <span class="asset-days">⏱️ ${eq.textDias}</b>
         </div>
       `).join('');
       
