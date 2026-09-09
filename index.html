@@ -260,7 +260,7 @@
     }
   });
 
-  // NUEVA CARGA INTELIGENTE QUE LEE .XLSX DIRECTO (Adiós a los errores de formato)
+  // NUEVA CARGA INTELIGENTE QUE LEE .XLSX DIRECTO A PRUEBA DE FALLOS
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -276,24 +276,25 @@
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         
-        // Convertir la hoja a matriz (array de arrays)
         const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1});
         let agregados = 0;
 
         for (let i = 0; i < jsonRows.length; i++) {
           let row = jsonRows[i];
           
-          // Limpiar columnas fantasmas iniciales (si dejaron celdas vacías a la izquierda)
           while(row.length > 0 && (row[0] === null || row[0] === undefined || String(row[0]).trim() === '')) {
             row.shift();
           }
 
-          // Si la fila está vacía o es el encabezado (dice "Área"), la saltamos
           if (row.length < 2) continue;
-          const col0 = String(row[0]).toLowerCase();
-          if (col0.includes('área') || col0.includes('area')) continue;
+          
+          // LA CORRECCIÓN CLAVE: Verifica que sea la palabra exacta Área o Tag, y no una frase como "AREA 49"
+          const col0 = String(row[0]).toLowerCase().trim();
+          const col1 = String(row[1]).toLowerCase().trim();
+          if (col0 === 'área' || col0 === 'area' || col1 === 'tag' || col1 === 'n° tag') {
+            continue;
+          }
 
-          // Armamos el equipo
           const eqId = Date.now().toString() + i;
           let colorLeido = row[2] ? String(row[2]).toLowerCase() : "verde";
           let colorFinal = "Verde";
@@ -351,7 +352,7 @@
     markersLayer.clearLayers();
     equiposList.forEach(eq => {
       if (eq.lat && eq.lng) {
-        let colorHex = '#22c55e'; // Verde
+        let colorHex = '#22c55e'; 
         if (eq.severidad === 'Rojo') colorHex = '#ef4444';
         if (eq.severidad === 'Naranja') colorHex = '#f97316';
         if (eq.severidad === 'Amarillo') colorHex = '#eab308';
