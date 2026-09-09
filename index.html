@@ -150,10 +150,8 @@
   .sev-verde .pulse-indicator { background-color: #22c55e; }
   .sev-plomo .pulse-indicator { background-color: #64748b; }
   
-  .delete-btn, .edit-btn { display: none; position: absolute; bottom: 3px; background: rgba(0,0,0,0.85); border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); font-size: 0.75rem; z-index: 100; padding: 2px 6px; cursor: pointer; }
-  .delete-btn { right: 3px; color: #ef4444; }
-  .edit-btn { left: 3px; color: #38bdf8; }
-  .delete-btn:hover, .edit-btn:hover { background: #334155; }
+  .delete-btn { display: none; position: absolute; top: 2px; left: 2px; background: rgba(0,0,0,0.85); border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); font-size: 0.75rem; z-index: 100; padding: 2px 6px; cursor: pointer; color: #ef4444; }
+  .delete-btn:hover { background: #334155; }
   
   .asset-type-badge { font-size: 0.65rem; color: var(--accent-color); font-weight: 800; text-transform: uppercase; margin-bottom: 2px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95px; }
   .asset-tag { color: var(--text-main); font-size: 1rem; font-weight: 900; margin: 0; letter-spacing: 0.5px; z-index: 2; text-shadow: 0 1px 3px var(--shadow-color); }
@@ -161,7 +159,6 @@
   /* MEJORA LECTURA DÍAS SIN MEDIR */
   .asset-days { font-size: 0.60rem; font-weight: 900; margin-top: 5px; padding: 4px 6px; border-radius: 4px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; letter-spacing: 0.5px; }
   
-  /* Colores Días Modo Oscuro */
   .sev-rojo .asset-days { color: #fca5a5; }
   .sev-naranja .asset-days { color: #fdba74; }
   .sev-amarillo .asset-days { color: #fde047; }
@@ -170,7 +167,6 @@
 
   /* MODO ADMINISTRADOR ACTIVADO */
   body.admin-mode .delete-btn { display: block !important; }
-  body.admin-mode .edit-btn { display: block !important; }
   body.admin-mode .admin-panel { display: flex; }
   body.admin-mode .btn-lock { background: #16a34a; color: white; border-color: #16a34a; }
 
@@ -407,23 +403,29 @@
     }
   }
 
-  // --- DELEGACIÓN DE EVENTOS INFALIBLE ---
+  // --- CONTROLADOR GLOBAL DE CLICS EN TARJETAS ---
   document.getElementById('app-root').addEventListener('click', function(e) {
-    const editBtn = e.target.closest('.edit-btn');
     const delBtn = e.target.closest('.delete-btn');
     const card = e.target.closest('.card');
 
-    if (editBtn) {
-      e.stopPropagation();
-      const id = editBtn.getAttribute('data-id');
-      editarEquipo(id);
-    } else if (delBtn) {
+    if (delBtn) {
       e.stopPropagation();
       const id = delBtn.getAttribute('data-id');
       eliminarEquipo(id);
     } else if (card) {
       const id = card.getAttribute('data-id');
-      abrirModal(id);
+      const eq = equipos.find(i => i.id === id);
+      
+      // Si el Modo Admin está activo, pregunta si quieres Editar o Ver. Si no, abre el Modal directo.
+      if (isAdmin) {
+        if (confirm(`✏️ MODO EDICIÓN\n\n¿Desea modificar los datos del equipo ${eq ? eq.nombre : ''}?\n\n- [Aceptar] para Editar.\n- [Cancelar] para ver Detalles.`)) {
+          editarEquipo(id);
+        } else {
+          abrirModal(id);
+        }
+      } else {
+        abrirModal(id);
+      }
     }
   });
 
@@ -618,10 +620,13 @@
       lng: tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null)
     };
     
-    equiposRef.child(eqId).update(eqData).then(resetFormulario);
+    equiposRef.child(eqId).update(eqData).then(() => {
+      alert("✅ Equipo guardado/actualizado correctamente.");
+      resetFormulario();
+    });
   }
 
-  // --- EDICIÓN CON INDICADOR VISUAL (ARREGLADO) ---
+  // --- CARGA DE DATOS AL PANEL ---
   function editarEquipo(id) {
     if (!isAdmin) { alert("⚠️ Active el Modo Admin."); return; }
     const eq = equipos.find(i => i.id === id);
@@ -767,7 +772,6 @@
       const cardsHTML = eqs.map(eq => `
         <div class="card ${eq.sevClass}" data-id="${eq.id}">
           <div class="pulse-indicator"></div>
-          <button class="edit-btn" data-id="${eq.id}" title="Editar">✏️</button>
           <button class="delete-btn" data-id="${eq.id}" title="Eliminar">✖</button>
           <span class="asset-type-badge" title="${eq.tipo_equipo || 'Equipo'}">${eq.tipo_equipo || 'Equipo'}</span>
           <h3 class="asset-tag">${eq.nombre}</h3>
