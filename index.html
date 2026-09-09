@@ -143,14 +143,12 @@
   body.light-mode .view-btn:hover, body.light-mode .btn-lock:hover { background: #e2e8f0; }
   body.light-mode .view-btn.active { background: #0284c7; color: #fff; }
   
-  /* KPIs Modo Claro */
   body.light-mode .kpi-card { background: #ffffff; border-color: #cbd5e1; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
   body.light-mode .kpi-label { color: #475569; }
   body.light-mode .kpi-rojo .kpi-value { text-shadow: none; }
   body.light-mode .kpi-naranja .kpi-value { text-shadow: none; }
   body.light-mode .kpi-amarillo .kpi-value { text-shadow: none; }
 
-  /* Panel y Tarjetas Modo Claro */
   body.light-mode .admin-panel { background: #ffffff; border-color: #cbd5e1; }
   body.light-mode .admin-panel input, body.light-mode .admin-panel textarea, body.light-mode .admin-panel select { background: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
   body.light-mode .map-instruction { background: #f0f9ff; border-color: #38bdf8; color: #0284c7; }
@@ -163,7 +161,6 @@
   body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #fde047; }
   body.light-mode .sev-verde .asset-days { background: #dcfce7; color: #166534 !important; border-color: #bbf7d0; }
 
-  /* Modal Modo Claro */
   body.light-mode .modal-content { background: #ffffff; border-color: #cbd5e1; }
   body.light-mode .modal-grid { background: #f8fafc; }
   body.light-mode .modal-title { color: #0f172a; }
@@ -227,11 +224,15 @@
 <div class="admin-panel">
   <div class="input-group">
     <label>Área Operacional</label>
-    <input type="text" id="inArea" placeholder="ej. Chancado Primario" required>
+    <input type="text" id="inArea" placeholder="ej. Área 61" required>
   </div>
   <div class="input-group">
     <label>N° Tag / Equipo</label>
-    <input type="text" id="inNombre" placeholder="ej. M-01" required>
+    <input type="text" id="inNombre" placeholder="ej. MH27152" required>
+  </div>
+  <div class="input-group">
+    <label>Tipo Equipo</label>
+    <input type="text" id="inTipo" placeholder="ej. Transportador, Módulo">
   </div>
   <div class="input-group">
     <label>Color (Severidad)</label>
@@ -243,7 +244,7 @@
     </select>
   </div>
   <div class="input-group">
-    <label>Componente</label>
+    <label>Componente Específico</label>
     <input type="text" id="inComponente" placeholder="ej. Descanso Libre">
   </div>
   <div class="input-group">
@@ -254,13 +255,12 @@
     <label>OM SAP</label>
     <input type="text" id="inOm">
   </div>
-  <!-- SEPARACIÓN: Hallazgo Histórico y Última Medición -->
   <div class="input-group">
-    <label>Fecha de Hallazgo (Histórico)</label>
+    <label>Fecha de Hallazgo</label>
     <input type="date" id="inFecha">
   </div>
   <div class="input-group">
-    <label>Última Medición (Ruta)</label>
+    <label>Última Medición</label>
     <input type="date" id="inUltimaMedicion">
   </div>
   
@@ -285,10 +285,10 @@
   <div class="full-width">
     <div class="upload-box">
       <div style="flex-grow: 1;">
-        <label style="color:#10b981;">CARGA MASIVA EXCEL (Columnas: Área, Tag, Color, Últ. Medición)</label>
+        <label style="color:#10b981;">CARGA MASIVA EXCEL (Columnas: AREA | EQUIPO | Tipo equipo | ULTIMA FECHA)</label>
         <input type="file" id="inExcelFile" accept=".xlsx, .xls, .csv" style="background:transparent; border:none; padding:0; margin-top:5px;">
       </div>
-      <button class="btn-upload" onclick="procesarExcel()">📥 Subir Archivo Excel</button>
+      <button class="btn-upload" onclick="procesarExcel()">📥 Actualizar desde Excel</button>
     </div>
     <button id="btnSubmit" onclick="guardarEquipo()" style="height: fit-content;">+ Guardar Activo</button>
   </div>
@@ -309,6 +309,7 @@
       <span id="modalSevBadge" class="modal-sev-badge">Color</span>
     </div>
     <div class="modal-grid">
+      <div><span class="modal-label">Tipo Equipo</span><span id="modalTipo" class="modal-value" style="font-weight:bold; color:#f8fafc;"></span></div>
       <div><span class="modal-label">Componente</span><span id="modalComponente" class="modal-value"></span></div>
       <div><span class="modal-label">Aviso SAP</span><span id="modalAviso" class="modal-value"></span></div>
       <div><span class="modal-label">OM SAP</span><span id="modalOm" class="modal-value"></span></div>
@@ -341,10 +342,6 @@
   let isAdmin = false; let editId = null; let map; let markersLayer = L.layerGroup();
   let mapaInicializado = false; let tempLat = null; let tempLng = null; let imagenesBase64Temp = [];
   let mapMarkersObj = {};
-
-  if (localStorage.getItem('mlc_theme') === 'light') {
-    document.getElementById('btnTheme').innerText = '🌙 Modo Oscuro';
-  }
 
   function toggleTheme() {
     const body = document.body;
@@ -386,7 +383,7 @@
     }
   }
 
-  // --- ACTUALIZACIÓN INTELIGENTE (UPSERT) VÍA EXCEL ---
+  // --- ACTUALIZACIÓN INTELIGENTE (4 COLUMNAS: AREA, EQUIPO, TIPO, FECHA) ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -402,7 +399,6 @@
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         
-        // raw: false asegura que las fechas se lean como texto formateado y no números enteros de Excel
         const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false, dateNF: 'yyyy-mm-dd'});
         let agregados = 0;
 
@@ -413,31 +409,28 @@
           
           const col0 = String(row[0]).toLowerCase().trim();
           const col1 = String(row[1]).toLowerCase().trim();
-          if (col0 === 'área' || col0 === 'area' || col1 === 'tag' || col1 === 'n° tag') { continue; }
+          if (col0 === 'área' || col0 === 'area' || col1 === 'equipo' || col1 === 'tag') { continue; }
 
-          // LLAVE MAESTRA: Usamos el TAG como ID único (limpio de espacios y caracteres inválidos)
           const tagLimpio = String(row[1]).trim().toUpperCase();
           const eqId = tagLimpio.replace(/[.#$\[\]\s]/g, "_");
 
-          let colorLeido = row[2] ? String(row[2]).toLowerCase() : "verde";
-          let colorFinal = "Verde";
-          if (colorLeido.includes("rojo")) colorFinal = "Rojo";
-          if (colorLeido.includes("naranja")) colorFinal = "Naranja";
-          if (colorLeido.includes("amarillo")) colorFinal = "Amarillo";
-
-          // Objeto con solo los datos que trae el Excel para NO sobreescribir imágenes ni análisis
           const updateData = {
             area: row[0] ? String(row[0]).trim() : "Sin Área",
             nombre: tagLimpio,
-            severidad: colorFinal
+            tipo_equipo: row[2] ? String(row[2]).trim() : ""
           };
 
-          // Si agregaste la 4ta columna de Fecha en el Excel, la captura
           if (row[3]) {
             updateData.ultima_medicion = String(row[3]).trim();
           }
 
-          // Se usa .update() en lugar de .set() para actualizar sin borrar lo demás
+          // Si el equipo es nuevo, le damos Severidad Verde y Fecha Hallazgo por defecto
+          const eqExistente = equipos.find(e => e.id === eqId);
+          if (!eqExistente) {
+            updateData.severidad = "Verde";
+            updateData.fecha = new Date().toISOString().split('T')[0];
+          }
+
           equiposRef.child(eqId).update(updateData);
           agregados++;
         }
@@ -542,6 +535,7 @@
 
     const eqData = { 
       area, nombre, 
+      tipo_equipo: document.getElementById('inTipo').value.trim(),
       componente: document.getElementById('inComponente').value.trim(), 
       aviso: document.getElementById('inAviso').value.trim(), 
       om: document.getElementById('inOm').value.trim(), 
@@ -556,7 +550,6 @@
 
     let eqId = editId;
     if (!eqId) {
-      // Si es un ingreso manual nuevo, usamos el TAG como ID para mantener consistencia con el Excel
       eqId = nombre.replace(/[.#$\[\]\s]/g, "_");
     }
 
@@ -565,7 +558,6 @@
     eqData.lat = tempLat !== null ? tempLat : (eqOrig ? eqOrig.lat : null);
     eqData.lng = tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null);
     
-    // Usamos update para no chocar
     equiposRef.child(eqId).update(eqData).then(resetFormulario);
   }
 
@@ -575,6 +567,7 @@
     if (eq) {
       document.getElementById('inArea').value = eq.area || '';
       document.getElementById('inNombre').value = eq.nombre || '';
+      document.getElementById('inTipo').value = eq.tipo_equipo || '';
       document.getElementById('inComponente').value = eq.componente || '';
       document.getElementById('inAviso').value = eq.aviso || '';
       document.getElementById('inOm').value = eq.om || '';
@@ -607,7 +600,7 @@
   function calcularDias(fechaStr) {
     if (!fechaStr) return 0;
     const dateObj = new Date(fechaStr);
-    if (isNaN(dateObj)) return 0; // Por si viene un formato raro del Excel
+    if (isNaN(dateObj)) return 0;
     return Math.max(0, Math.floor((new Date() - dateObj) / (1000 * 60 * 60 * 24)));
   }
 
@@ -632,6 +625,7 @@
     if(eq.severidad === 'Amarillo') badgeColor = '#facc15';
     badge.style.backgroundColor = badgeColor;
 
+    document.getElementById('modalTipo').innerText = eq.tipo_equipo || '-';
     document.getElementById('modalComponente').innerText = eq.componente || '-';
     document.getElementById('modalAviso').innerText = eq.aviso || '-';
     document.getElementById('modalOm').innerText = eq.om || '-';
@@ -668,7 +662,7 @@
     root.innerHTML = '';
     
     const equiposFiltrados = equipos.filter(eq => 
-      eq.nombre.toLowerCase().includes(filtro) || eq.area.toLowerCase().includes(filtro)
+      eq.nombre.toLowerCase().includes(filtro) || eq.area.toLowerCase().includes(filtro) || (eq.tipo_equipo && eq.tipo_equipo.toLowerCase().includes(filtro))
     );
 
     let cRojo = 0, cNaranja = 0, cAmarillo = 0, cVerde = 0;
