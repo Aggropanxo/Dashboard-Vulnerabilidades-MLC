@@ -411,7 +411,7 @@
     }
   }
 
-  // --- CONTROLADOR DE CLICS (EDICIÓN BLINDADA SIN CRUZAR IDs) ---
+  // --- CONTROLADOR DE CLICS BLINDADO (CORRECCIÓN TOTAL DE EDICIÓN) ---
   document.getElementById('app-root').addEventListener('click', function(e) {
     const delBtn = e.target.closest('.delete-btn');
     const card = e.target.closest('.card');
@@ -421,19 +421,20 @@
       eliminarEquipo(delBtn.getAttribute('data-id'));
     } else if (card) {
       const id = card.getAttribute('data-id');
-      // Buscar explícitamente el equipo cuyo ID coincida con la tarjeta presionada
       const eqTarget = equipos.find(i => String(i.id) === String(id));
       
+      if (!eqTarget) return;
+
       if (isAdmin) {
         if (editId && String(editId) !== String(id)) {
           const eqActual = equipos.find(i => String(i.id) === String(editId));
           const nombreActual = eqActual ? eqActual.nombre : 'actual';
           
-          if (confirm(`⚠️ EDICIÓN EN CURSO\n\n¿Desea GUARDAR los cambios del equipo ${nombreActual} y pasar a editar el equipo ${eqTarget ? eqTarget.nombre : id}?`)) {
+          if (confirm(`⚠️ EDICIÓN EN CURSO\n\n¿Desea GUARDAR los cambios del equipo ${nombreActual} y pasar a editar el equipo ${eqTarget.nombre}?`)) {
             guardarEquipoYEditarNuevo(eqTarget);
           }
         } else {
-          if (confirm(`✏️ MODO EDICIÓN\n\n¿Desea editar los datos del equipo ${eqTarget ? eqTarget.nombre : id}?\n\n- [Aceptar] para Editar arriba en el panel.\n- [Cancelar] para ver Detalles.`)) {
+          if (confirm(`✏️ MODO EDICIÓN\n\n¿Desea editar los datos del equipo ${eqTarget.nombre}?\n\n- [Aceptar] para Editar arriba en el panel.\n- [Cancelar] para ver Detalles.`)) {
             cargarDatosAlFormulario(eqTarget);
           } else {
             abrirModal(id);
@@ -476,7 +477,7 @@
     }
   }
 
-  // --- LECTOR EXCEL CON PURGA AUTOMÁTICA (ELIMINACIÓN DE EQUIPOS RETIRADOS) ---
+  // --- LECTOR EXCEL ANTI-NULOS (LEE LAS 207 FILAS SIN CORTARSE) ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -522,8 +523,10 @@
             const areaVal = String(row[colIdxArea]||'').trim();
             const eqVal = String(row[colIdxEquipo]||'').trim();
             
-            if (!eqVal || eqVal.toLowerCase() === 'undefined' || eqVal.toLowerCase() === 'equipo' || eqVal.toLowerCase() === 'equipos') continue;
-            if (!areaVal || areaVal.toLowerCase() === 'area' || areaVal.toLowerCase() === 'área') continue;
+            // FILTRO ESTRICTO ANTI-NULOS / ANTI-UNDEFINED
+            if (!eqVal || eqVal === '' || eqVal.toLowerCase() === 'undefined' || eqVal.toLowerCase() === 'null') continue;
+            if (!areaVal || areaVal === '' || areaVal.toLowerCase() === 'undefined' || areaVal.toLowerCase() === 'null') continue;
+            if (eqVal.toLowerCase().includes('equipo') || areaVal.toLowerCase().includes('area')) continue;
 
             const tagLimpio = eqVal.toUpperCase();
             const eqId = tagLimpio.replace(/[.#$\[\]\s\/]/g, "_");
@@ -541,14 +544,13 @@
               updateData.severidad = updateData.ultima_medicion ? "Verde" : "Plomo";
               updateData.fecha = new Date().toISOString().split('T')[0];
             }
-            // Si ya existe, se respetan los colores y notas manuales que ya tenía el usuario.
-
+            
             equiposRef.child(eqId).update(updateData);
             agregados++;
           }
         });
 
-        // PURGA AUTOMÁTICA: Eliminar de Firebase los equipos que ya no vienen en el Excel (sacados de línea)
+        // PURGA AUTOMÁTICA: Eliminar equipos que ya no vienen en el Excel
         let eliminadosPorPurga = 0;
         equipos.forEach(eq => {
           if (!tagsEnExcel.has(String(eq.id))) {
@@ -728,7 +730,7 @@
       document.getElementById('inAnalisis').value = eq.analisis || '';
       document.getElementById('inRecomendacion').value = eq.recomendacion || '';
       
-      editId = eq.id; // Asignación limpia del ID correcto
+      editId = eq.id; // ID exacto y limpio asignado para edición
       tempLat = eq.lat || null; 
       tempLng = eq.lng || null;
       imagenesBase64Temp = eq.imagenes || [];
@@ -860,7 +862,7 @@
           <button class="delete-btn" data-id="${eq.id}" title="Eliminar">✖</button>
           <span class="asset-type-badge" title="${eq.tipo_equipo || 'Equipo'}">${eq.tipo_equipo || 'Equipo'}</span>
           <h3 class="asset-tag">${eq.nombre}</h3>
-          <span class="asset-days">⏱️ ${eq.textDias}</b>
+          <span class="asset-days">⏱️ ${eq.textDias}</span>
         </div>
       `).join('');
       
