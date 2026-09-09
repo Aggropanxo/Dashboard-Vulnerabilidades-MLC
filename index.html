@@ -7,103 +7,124 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-  /* --- Estilos Base con Fondo Operacional --- */
+  /* =========================================
+     VARIABLES GLOBALES (THEME ENGINE OPTIMIZADO)
+     ========================================= */
+  :root {
+    --bg-main: #0b1120;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    --bg-panel: rgba(15, 23, 42, 0.75);
+    --bg-panel-solid: rgba(15, 23, 42, 0.95);
+    --bg-card: rgba(15, 23, 42, 0.85);
+    --border-card: #334155;
+    --border-light: rgba(255,255,255,0.1);
+    --input-bg: rgba(30, 41, 59, 0.8);
+    --btn-bg: rgba(30, 41, 59, 0.8);
+    --btn-hover: rgba(51, 65, 85, 0.9);
+    --bg-modal: #0f172a;
+    --shadow-color: rgba(0,0,0,0.5);
+    --map-bg: linear-gradient(rgba(11, 17, 32, 0.88), rgba(11, 17, 32, 0.88)), url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/14/7424/10495');
+    --badge-bg: rgba(30, 41, 59, 0.8);
+    --card-days-bg: rgba(0,0,0,0.5);
+    --card-days-border: rgba(255,255,255,0.1);
+  }
+
+  body.light-mode {
+    --bg-main: #f1f5f9;
+    --text-main: #0f172a;
+    --text-muted: #475569;
+    --bg-panel: rgba(255, 255, 255, 0.85);
+    --bg-panel-solid: rgba(255, 255, 255, 0.95);
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --border-card: #cbd5e1;
+    --border-light: rgba(0,0,0,0.1);
+    --input-bg: rgba(248, 250, 252, 0.9);
+    --btn-bg: rgba(241, 245, 249, 0.9);
+    --btn-hover: #e2e8f0;
+    --bg-modal: #ffffff;
+    --shadow-color: transparent;
+    --map-bg: linear-gradient(rgba(241, 245, 249, 0.88), rgba(241, 245, 249, 0.88)), url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/14/7424/10495');
+    --badge-bg: rgba(255, 255, 255, 0.85);
+    --card-days-bg: rgba(241, 245, 249, 0.9);
+    --card-days-border: #cbd5e1;
+  }
+
+  /* --- Estilos Base --- */
   body { 
-    background-color: #0b1120; 
-    color: #e2e8f0; 
+    background-color: var(--bg-main); 
+    color: var(--text-main); 
     font-family: 'Inter', system-ui, sans-serif; 
     padding: 15px; 
     margin: 0; 
     transition: background-color 0.3s, color 0.3s;
-    background-image: linear-gradient(rgba(11, 17, 32, 0.88), rgba(11, 17, 32, 0.88)), url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/14/7424/10495');
+    background-image: var(--map-bg);
     background-size: cover;
     background-attachment: fixed;
   }
   
-  /* --- Encabezado Corporativo --- */
-  .header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
+  /* --- Layout & Encabezados --- */
+  .header { border-bottom: 1px solid var(--border-light); padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
   .header-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  
   .brand-badges { display: flex; gap: 6px; align-items: center; }
-  .brand-badge { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; font-weight: 800; font-size: 1rem; padding: 4px 10px; border-radius: 4px; letter-spacing: 1px; backdrop-filter: blur(5px); }
+  .brand-badge { background: var(--badge-bg); border: 1px solid var(--border-light); color: var(--text-main); font-weight: 800; font-size: 1rem; padding: 4px 10px; border-radius: 4px; letter-spacing: 1px; backdrop-filter: blur(5px); }
   .brand-badge.cpf { border-left: 4px solid #38bdf8; }
   .brand-badge.cmp { border-left: 4px solid #ef4444; }
-
-  .header-titles h1 { color: #ffffff; font-size: 1.3rem; margin: 0 0 2px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-  .header-titles p { color: #94a3b8; margin: 0; font-size: 0.8rem; }
+  .header-titles h1 { color: var(--text-main); font-size: 1.3rem; margin: 0 0 2px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px var(--shadow-color); }
+  .header-titles p { color: var(--text-muted); margin: 0; font-size: 0.8rem; }
   
-  .header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between; background: rgba(15, 23, 42, 0.75); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 12px; backdrop-filter: blur(8px); }
+  .header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between; background: var(--bg-panel); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 12px; backdrop-filter: blur(8px); }
   .header-controls-left { display: flex; gap: 10px; flex-grow: 1; max-width: 350px; }
   .header-controls-right { display: flex; gap: 6px; flex-wrap: wrap; }
   
-  /* Buscador Global */
-  .search-input { width: 100%; padding: 6px 12px; border-radius: 20px; border: 1px solid #38bdf8; background: rgba(30, 41, 59, 0.8); color: white; font-size: 0.85rem; outline: none; transition: box-shadow 0.3s; }
+  /* Inputs y Botones Globales */
+  .search-input { width: 100%; padding: 6px 12px; border-radius: 20px; border: 1px solid #38bdf8; background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; outline: none; transition: box-shadow 0.3s; }
   .search-input:focus { box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
-
-  .view-btn, .btn-lock { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.15); color: #94a3b8; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: 0.3s; backdrop-filter: blur(5px); }
+  .view-btn, .btn-lock { background: var(--btn-bg); border: 1px solid var(--border-light); color: var(--text-muted); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: 0.3s; backdrop-filter: blur(5px); }
   .view-btn.active { background: #0284c7; color: white; border-color: #0284c7; }
-  .view-btn:hover, .btn-lock:hover { background: rgba(51, 65, 85, 0.9); color: #fff; }
+  .view-btn:hover, .btn-lock:hover { background: var(--btn-hover); color: var(--text-main); }
 
-  /* --- Tarjetas KPI Superiores --- */
+  /* --- Tarjetas KPI --- */
   .kpi-container { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
-  .kpi-card { flex: 1; min-width: 110px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(8px); box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-  .kpi-label { font-size: 0.65rem; text-transform: uppercase; color: #94a3b8; font-weight: 800; margin-bottom: 3px; }
+  .kpi-card { flex: 1; min-width: 110px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(8px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  .kpi-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 3px; }
   .kpi-value { font-size: 1.8rem; font-weight: 900; line-height: 1; }
-  
   .kpi-total .kpi-value { color: #38bdf8; }
   .kpi-rojo .kpi-value { color: #ef4444; }
   .kpi-naranja .kpi-value { color: #f97316; }
   .kpi-amarillo .kpi-value { color: #eab308; }
   .kpi-verde .kpi-value { color: #22c55e; }
-  
-  /* --- Contenedor del Mapa --- */
-  #map-view { display: none; margin-bottom: 20px; }
-  .map-instruction { background: rgba(15, 23, 42, 0.85); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 0.85rem; display: none; backdrop-filter: blur(5px); }
-  body.admin-mode .map-instruction { display: block; }
-  #map-container { width: 100%; height: 550px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #000; z-index: 1;}
 
-  /* --- Panel Admin --- */
-  .admin-panel { display: none; background: rgba(15, 23, 42, 0.95); padding: 15px; border-radius: 8px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; border: 2px solid #38bdf8; backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(56, 189, 248, 0.3); }
+  /* --- Panel Admin & Mapa --- */
+  #map-view { display: none; margin-bottom: 20px; }
+  .map-instruction { background: var(--bg-card); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 0.85rem; display: none; backdrop-filter: blur(5px); }
+  #map-container { width: 100%; height: 550px; border-radius: 8px; border: 1px solid var(--border-light); background: #000; z-index: 1;}
+
+  .admin-panel { display: none; background: var(--bg-panel-solid); padding: 15px; border-radius: 8px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; border: 2px solid #38bdf8; backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(56, 189, 248, 0.2); }
   .admin-panel .input-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 140px; }
   .admin-panel label { font-size: 0.65rem; color: #38bdf8; font-weight: bold; margin-bottom: 2px; text-transform: uppercase; }
-  .admin-panel input, .admin-panel textarea, .admin-panel select { padding: 6px 8px; border-radius: 4px; border: 1px solid #334155; background: rgba(30, 41, 59, 0.8); color: white; width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.8rem; }
+  .admin-panel input, .admin-panel textarea, .admin-panel select { padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.8rem; }
   .admin-panel textarea { resize: vertical; min-height: 40px; }
-  .admin-panel .full-width { flex-basis: 100%; display: flex; gap: 8px; align-items: center; justify-content: space-between; margin-top: 3px; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; }
+  .admin-panel .full-width { flex-basis: 100%; display: flex; gap: 8px; align-items: center; justify-content: space-between; margin-top: 3px; flex-wrap: wrap; border-top: 1px solid var(--border-light); padding-top: 8px; }
   .admin-panel button { background: #0284c7; color: white; cursor: pointer; font-weight: bold; border: none; border-radius: 4px; padding: 6px 12px; font-size: 0.8rem; transition: background 0.3s; }
   .admin-panel button:hover { opacity: 0.9; }
-  
   .btn-upload { background: #10b981 !important; }
   .btn-danger { background: #ef4444 !important; }
   .btn-danger:hover { background: #dc2626 !important; }
-
   .upload-box { border: 1px dashed #10b981; padding: 8px; border-radius: 5px; display: flex; gap: 8px; align-items: center; background: rgba(16, 185, 129, 0.1); flex-grow: 1; }
 
-  /* --- Vista Cuadritos: Tarjetas Ultra-Compactas con Zoom e Información al Paso --- */
+  /* --- Tarjetas Grid (Ultra-Optimizadas) --- */
   #dashboard-view { display: block; }
-  .area-title { color: #38bdf8; font-size: 1rem; border-left: 3px solid #38bdf8; padding-left: 6px; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+  .area-title { color: #38bdf8; font-size: 1rem; border-left: 3px solid #38bdf8; padding-left: 6px; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px var(--shadow-color); }
   
   .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
   
   .card { 
-    background: rgba(15, 23, 42, 0.85); 
-    border: 2px solid #334155; 
-    border-radius: 6px; 
-    padding: 8px 4px; 
-    position: relative; 
-    cursor: pointer; 
-    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; 
-    min-height: 60px; 
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(6px);
-    overflow: visible;
+    background: var(--bg-card); border: 2px solid var(--border-card); border-radius: 6px; padding: 8px 4px; 
+    position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; 
+    min-height: 60px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(6px); overflow: visible;
   }
-  
-  .card:hover { 
-    transform: scale(1.12) translateY(-4px); 
-    z-index: 50; 
-    box-shadow: 0 10px 20px rgba(0,0,0,0.6);
-    filter: brightness(1.2);
-  }
+  .card:hover { transform: scale(1.12) translateY(-4px); z-index: 50; box-shadow: 0 10px 20px rgba(0,0,0,0.5); filter: brightness(1.1); }
   
   .sev-rojo { border-color: rgba(239, 68, 68, 0.9); animation: sirena-roja 1.2s ease-in-out infinite alternate; }
   @keyframes sirena-roja { 0% { box-shadow: 0 0 4px rgba(239, 68, 68, 0.2), inset 0 0 4px rgba(239, 68, 68, 0.1); } 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.9), inset 0 0 10px rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 1); } }
@@ -121,96 +142,54 @@
   .sev-verde .pulse-indicator { background-color: #22c55e; }
   .sev-plomo .pulse-indicator { background-color: #64748b; }
   
-  .delete-btn, .edit-btn { display: none; position: absolute; bottom: 2px; background: rgba(0,0,0,0.85); border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); font-size: 0.75rem; z-index: 100; padding: 2px 5px; cursor: pointer; }
+  .delete-btn, .edit-btn { display: none; position: absolute; bottom: 2px; background: rgba(0,0,0,0.8); border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); font-size: 0.75rem; z-index: 100; padding: 2px 5px; cursor: pointer; }
   .delete-btn { right: 2px; color: #ef4444; }
   .edit-btn { left: 2px; color: #38bdf8; }
   .delete-btn:hover, .edit-btn:hover { background: #334155; }
   
   .asset-type-badge { font-size: 0.55rem; color: #38bdf8; font-weight: 700; text-transform: uppercase; margin-bottom: 1px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95px; }
-  .asset-tag { color: #f8fafc; font-size: 0.85rem; font-weight: 800; margin: 0; letter-spacing: 0.5px; z-index: 2; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-  .asset-days { font-size: 0.48rem; font-weight: bold; margin-top: 3px; padding: 2px 4px; border-radius: 3px; background: rgba(0,0,0,0.5); z-index: 2; border: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; }
+  .asset-tag { color: var(--text-main); font-size: 0.85rem; font-weight: 800; margin: 0; letter-spacing: 0.5px; z-index: 2; text-shadow: 0 1px 3px var(--shadow-color); }
+  .asset-days { font-size: 0.48rem; font-weight: bold; margin-top: 3px; padding: 2px 4px; border-radius: 3px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; }
   
   .sev-rojo .asset-days { color: #fca5a5; }
   .sev-naranja .asset-days { color: #fdba74; }
   .sev-amarillo .asset-days { color: #fde047; }
   .sev-verde .asset-days { color: #86efac; }
-  .sev-plomo .asset-days { color: #cbd5e1; }
+  .sev-plomo .asset-days { color: var(--text-muted); }
 
   /* MODO ADMINISTRADOR ACTIVADO */
-  body.admin-mode .delete-btn { display: block !important; }
-  body.admin-mode .edit-btn { display: block !important; }
+  body.admin-mode .map-instruction, body.admin-mode .delete-btn, body.admin-mode .edit-btn { display: block !important; }
   body.admin-mode .admin-panel { display: flex; }
   body.admin-mode .btn-lock { background: #16a34a; color: white; border-color: #16a34a; }
 
   /* Modal Detallado */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
-  .modal-content { background: #0f172a; padding: 25px; border-radius: 8px; border: 1px solid #334155; width: 95%; max-width: 700px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
-  .modal-close { position: absolute; top: 10px; right: 15px; color: #94a3b8; font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
+  .modal-content { background: var(--bg-modal); padding: 25px; border-radius: 8px; border: 1px solid var(--border-card); width: 95%; max-width: 700px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+  .modal-close { position: absolute; top: 10px; right: 15px; color: var(--text-muted); font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
   .modal-close:hover { color: #ef4444; }
   
-  .modal-header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 10px; margin-bottom: 15px; }
-  .modal-title { color: #f8fafc; font-size: 1.3rem; margin: 0; text-transform: uppercase; }
-  .modal-sev-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; color: #000; margin-right: 30px;}
+  .modal-header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; margin-bottom: 15px; }
+  .modal-title { color: var(--text-main); font-size: 1.3rem; margin: 0; text-transform: uppercase; }
+  .modal-sev-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; color: #fff; margin-right: 30px;}
   
-  .modal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; background: #1e293b; padding: 15px; border-radius: 6px; }
+  .modal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; background: var(--bg-panel); padding: 15px; border-radius: 6px; }
   .modal-data-row { margin-bottom: 12px; }
-  .modal-label { color: #94a3b8; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; }
-  .modal-value { color: #e2e8f0; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.3; }
+  .modal-label { color: var(--text-muted); font-size: 0.65rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .modal-value { color: var(--text-main); font-size: 0.9rem; white-space: pre-wrap; line-height: 1.3; }
   
   .gallery-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-  .gallery-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid #334155; cursor: pointer; transition: transform 0.2s; }
+  .gallery-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-card); cursor: pointer; transition: transform 0.2s; }
   .gallery-thumb:hover { transform: scale(1.1); border-color: #38bdf8; }
 
   .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 3000; justify-content: center; align-items: center; }
   .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 4px; }
   .lightbox-close { position: absolute; top: 15px; right: 25px; color: #fff; font-size: 2.5rem; cursor: pointer; background: none; border: none; }
-
-  /* =========================================
-     MODO CLARO
-     ========================================= */
-  body.light-mode { 
-    background-color: #f1f5f9; 
-    color: #0f172a; 
-    background-image: linear-gradient(rgba(241, 245, 249, 0.88), rgba(241, 245, 249, 0.88)), url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/14/7424/10495');
-  }
-  body.light-mode .header { border-bottom-color: rgba(0,0,0,0.1); }
-  body.light-mode .header-titles h1 { color: #0f172a; text-shadow: none; }
-  body.light-mode .header-titles p { color: #475569; }
-  body.light-mode .brand-badge { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.15); color: #0f172a; }
-  body.light-mode .header-controls { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.1); backdrop-filter: blur(8px); }
-  body.light-mode .search-input { background: rgba(241, 245, 249, 0.9); border-color: #cbd5e1; color: #0f172a; }
-  body.light-mode .view-btn, body.light-mode .btn-lock { background: rgba(241, 245, 249, 0.9); border-color: #cbd5e1; color: #475569; }
-  body.light-mode .view-btn:hover, body.light-mode .btn-lock:hover { background: #e2e8f0; }
-  body.light-mode .view-btn.active { background: #0284c7; color: #fff; }
-  
-  body.light-mode .kpi-card { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.1); backdrop-filter: blur(8px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-  body.light-mode .kpi-label { color: #475569; }
-
-  body.light-mode .admin-panel { background: rgba(255, 255, 255, 0.95); border-color: #0284c7; backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(2, 132, 199, 0.2); }
-  body.light-mode .admin-panel input, body.light-mode .admin-panel textarea, body.light-mode .admin-panel select { background: rgba(248, 250, 252, 0.9); border-color: #cbd5e1; color: #0f172a; }
-  body.light-mode .map-instruction { background: rgba(240, 249, 2ff, 0.9); border-color: #38bdf8; color: #0284c7; }
-  body.light-mode .area-title { color: #0284c7; border-left-color: #0284c7; text-shadow: none; }
-  body.light-mode .card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(6px); border-color: #cbd5e1; }
-  body.light-mode .asset-tag { color: #0f172a; text-shadow: none; }
-  body.light-mode .asset-type-badge { color: #0284c7; }
-  
-  body.light-mode .sev-rojo .asset-days { background: #fee2e2; color: #991b1b !important; border-color: #fecaca; }
-  body.light-mode .sev-naranja .asset-days { background: #ffedd5; color: #9a3412 !important; border-color: #fed7aa; }
-  body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #fde047; }
-  body.light-mode .sev-verde .asset-days { background: #dcfce7; color: #166534 !important; border-color: #bbf7d0; }
-  body.light-mode .sev-plomo .asset-days { background: #f1f5f9; color: #334155 !important; border-color: #cbd5e1; }
-
-  body.light-mode .modal-content { background: #ffffff; border-color: #cbd5e1; }
-  body.light-mode .modal-grid { background: #f8fafc; }
-  body.light-mode .modal-title { color: #0f172a; }
-  body.light-mode .modal-value { color: #0f172a; }
-  body.light-mode .modal-label { color: #475569; }
-  body.light-mode .modal-close { color: #475569; }
 </style>
 </head>
 <body>
 
 <script>
+  // Carga ultra-rápida del tema
   if (localStorage.getItem('mlc_theme') === 'light') { document.body.classList.add('light-mode'); }
 </script>
 
@@ -243,23 +222,24 @@
     <div class="kpi-value" id="kpiTotal">0</div>
   </div>
   <div class="kpi-card kpi-rojo">
-    <span class="kpi-label">🔴 Críticos (Alto)</span>
+    <span class="kpi-label">🔴 Críticos</span>
     <div class="kpi-value" id="kpiRojo">0</div>
   </div>
   <div class="kpi-card kpi-naranja">
-    <span class="kpi-label">🟠 Alertas (Medio)</span>
+    <span class="kpi-label">🟠 Alertas</span>
     <div class="kpi-value" id="kpiNaranja">0</div>
   </div>
   <div class="kpi-card kpi-amarillo">
-    <span class="kpi-label">🟡 Monitoreo (Bajo)</span>
+    <span class="kpi-label">🟡 Monitoreo</span>
     <div class="kpi-value" id="kpiAmarillo">0</div>
   </div>
   <div class="kpi-card kpi-verde">
-    <span class="kpi-label">🟢 Operativos (Normal)</span>
+    <span class="kpi-label">🟢 Operativos</span>
     <div class="kpi-value" id="kpiVerde">0</div>
   </div>
 </div>
 
+<!-- PANEL ADMIN -->
 <div class="admin-panel" id="adminPanelForm">
   <div class="input-group">
     <label>Área Operacional</label>
@@ -343,6 +323,7 @@
   <div id="map-container"></div>
 </div>
 
+<!-- MODAL DETALLES -->
 <div id="evidenciaModal" class="modal-overlay" onclick="cerrarModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="cerrarModal()">&times;</button>
@@ -351,7 +332,7 @@
       <span id="modalSevBadge" class="modal-sev-badge">Color</span>
     </div>
     <div class="modal-grid">
-      <div><span class="modal-label">Tipo Equipo</span><span id="modalTipo" class="modal-value" style="font-weight:bold; color:#f8fafc;"></span></div>
+      <div><span class="modal-label">Tipo Equipo</span><span id="modalTipo" class="modal-value" style="font-weight:bold; color:#38bdf8;"></span></div>
       <div><span class="modal-label">Componente</span><span id="modalComponente" class="modal-value"></span></div>
       <div><span class="modal-label">Aviso SAP</span><span id="modalAviso" class="modal-value"></span></div>
       <div><span class="modal-label">OM SAP</span><span id="modalOm" class="modal-value"></span></div>
@@ -383,11 +364,9 @@
 <script>
   let isAdmin = false; let editId = null; let map; let markersLayer = L.layerGroup();
   let mapaInicializado = false; let tempLat = null; let tempLng = null; let imagenesBase64Temp = [];
-  let mapMarkersObj = {};
+  let mapMarkersObj = {}; let equipos = [];
 
-  if (localStorage.getItem('mlc_theme') === 'light') {
-    document.getElementById('btnTheme').innerText = '🌙 Modo Oscuro';
-  }
+  if (localStorage.getItem('mlc_theme') === 'light') { document.getElementById('btnTheme').innerText = '🌙 Modo Oscuro'; }
 
   function toggleTheme() {
     const body = document.body;
@@ -403,13 +382,31 @@
     }
   }
 
+  // --- DELEGACIÓN DE EVENTOS OPTIMIZADA ---
+  // Un solo controlador para clics en toda la matriz de tarjetas
+  document.getElementById('app-root').addEventListener('click', function(e) {
+    const editBtn = e.target.closest('.edit-btn');
+    const delBtn = e.target.closest('.delete-btn');
+    const card = e.target.closest('.card');
+
+    if (editBtn) {
+      e.stopPropagation();
+      editarEquipo(editBtn.getAttribute('data-id'));
+    } else if (delBtn) {
+      e.stopPropagation();
+      eliminarEquipo(delBtn.getAttribute('data-id'));
+    } else if (card) {
+      abrirModal(card.getAttribute('data-id'));
+    }
+  });
+
   document.getElementById('inImagenesFiles').addEventListener('change', function(e) {
     const files = e.target.files;
     if (files && files.length > 0) {
       imagenesBase64Temp = [];
       for (let i = 0; i < files.length; i++) {
         const reader = new FileReader();
-        reader.onload = function(uploadEvent) { imagenesBase64Temp.push(uploadEvent.target.result); };
+        reader.onload = function(evt) { imagenesBase64Temp.push(evt.target.result); };
         reader.readAsDataURL(files[i]);
       }
     }
@@ -419,102 +416,74 @@
     const texto = document.getElementById('buscador').value.toLowerCase().trim();
     renderDashboard(texto);
     if (texto.length > 1 && mapaInicializado && map) {
-      const eqEncontrado = equipos.find(eq => 
-        (eq.nombre.toLowerCase().includes(texto) || eq.area.toLowerCase().includes(texto) || (eq.tipo_equipo && eq.tipo_equipo.toLowerCase().includes(texto))) && eq.lat && eq.lng
-      );
-      if (eqEncontrado && mapMarkersObj[eqEncontrado.id]) {
-        map.flyTo([eqEncontrado.lat, eqEncontrado.lng], 18, { duration: 1.5 });
-        mapMarkersObj[eqEncontrado.id].openPopup();
+      const eq = equipos.find(e => (e.nombre.toLowerCase().includes(texto) || e.area.toLowerCase().includes(texto)) && e.lat && e.lng);
+      if (eq && mapMarkersObj[eq.id]) {
+        map.flyTo([eq.lat, eq.lng], 18, { duration: 1.5 });
+        mapMarkersObj[eq.id].openPopup();
       }
     }
   }
 
   function eliminarTodoMasivo() {
     if (!isAdmin) return;
-    if (confirm("⚠️ ADVERTENCIA: ¿Está seguro que desea BORRAR TODOS LOS ACTIVOS?\nEsta acción no se puede deshacer.")) {
-      equiposRef.remove()
-        .then(() => {
-          alert("🗑️ Base de datos limpiada correctamente.");
-          resetFormulario();
-        })
-        .catch(error => { alert("❌ Error: " + error.message); });
+    if (confirm("⚠️ ADVERTENCIA: ¿BORRAR TODOS LOS ACTIVOS?\nEsta acción no se puede deshacer.")) {
+      equiposRef.remove().then(() => { alert("🗑️ Base limpia."); resetFormulario(); }).catch(e => alert("❌ Error: " + e.message));
     }
   }
 
+  // --- LECTURA EXCEL ROBUSTA ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
-    if (!fileInput.files.length) { alert("Seleccione un archivo de Excel primero."); return; }
+    if (!fileInput.files.length) { alert("Seleccione un archivo Excel."); return; }
     
     const file = fileInput.files[0];
     const reader = new FileReader();
-    
     reader.onload = function(e) {
       try {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, {type: 'array'});
-        let agregadosTotales = 0;
+        const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+        let agregados = 0;
 
         workbook.SheetNames.forEach(sheetName => {
-          if (sheetName.toLowerCase().includes('2025') || sheetName.toLowerCase().includes('2026') || sheetName.toLowerCase().includes('grupos') || sheetName.toLowerCase().includes('reserva')) {
-            return;
-          }
-
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false, defval: ""});
-
+          if (sheetName.toLowerCase().match(/2025|2026|grupos|reserva/)) return;
+          const jsonRows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1, raw: false, defval: ""});
           if (jsonRows.length <= 1) return;
 
           for (let i = 1; i < jsonRows.length; i++) {
             let row = jsonRows[i];
             if (!row || row.length < 2) continue;
 
-            const areaVal = row[0] ? String(row[0]).trim() : '';
-            const equipoVal = row[1] ? String(row[1]).trim() : '';
+            const areaVal = String(row[0]||'').trim();
+            const eqVal = String(row[1]||'').trim();
+            if (!eqVal || eqVal.toLowerCase() === 'undefined' || eqVal.toLowerCase().includes('equipo')) continue;
+            if (!areaVal || areaVal.toLowerCase().includes('area')) continue;
 
-            if (!equipoVal || equipoVal === '' || equipoVal.toLowerCase() === 'undefined' || equipoVal.toLowerCase() === 'equipo' || equipoVal.toLowerCase() === 'equipos') continue;
-            if (areaVal === '' || areaVal.toLowerCase() === 'area' || areaVal.toLowerCase() === 'área') continue;
-
-            const tagLimpio = equipoVal.toUpperCase();
+            const tagLimpio = eqVal.toUpperCase();
             const eqId = tagLimpio.replace(/[.#$\[\]\s]/g, "_");
+            const fechaVal = String(row[3]||'').trim();
 
-            const updateData = {
-              area: areaVal,
-              nombre: tagLimpio,
-              tipo_equipo: row[2] ? String(row[2]).trim() : ""
-            };
-
-            const fechaVal = row[3] ? String(row[3]).trim() : '';
-            if (fechaVal && fechaVal !== '' && fechaVal !== 'undefined' && !fechaVal.includes('1900') && !fechaVal.toLowerCase().includes('nat')) {
+            const updateData = { area: areaVal, nombre: tagLimpio, tipo_equipo: String(row[2]||'').trim() };
+            
+            if (fechaVal && !fechaVal.includes('1900') && !fechaVal.toLowerCase().includes('nat') && fechaVal !== 'undefined') {
               updateData.ultima_medicion = fechaVal;
-            } else {
-              updateData.ultima_medicion = '';
-            }
+            } else { updateData.ultima_medicion = ''; }
 
-            const eqExistente = equipos.find(e => e.id === eqId);
-            if (!eqExistente) {
-              if (!updateData.ultima_medicion) {
-                updateData.severidad = "Plomo"; 
-              } else {
-                updateData.severidad = "Verde";
-              }
+            const eqExist = equipos.find(e => e.id === eqId);
+            if (!eqExist) {
+              updateData.severidad = updateData.ultima_medicion ? "Verde" : "Plomo";
               updateData.fecha = new Date().toISOString().split('T')[0];
             } else {
-              if (updateData.ultima_medicion && (!eqExistente.ultima_medicion || eqExistente.severidad === 'Plomo')) {
-                if (eqExistente.severidad === 'Plomo') updateData.severidad = 'Verde';
+              if (updateData.ultima_medicion && (!eqExist.ultima_medicion || eqExist.severidad === 'Plomo')) {
+                if (eqExist.severidad === 'Plomo') updateData.severidad = 'Verde';
               }
             }
-
             equiposRef.child(eqId).update(updateData);
-            agregadosTotales++;
+            agregados++;
           }
         });
-
-        alert(`✅ Carga masiva completada: ${agregadosTotales} registros procesados.`);
+        alert(`✅ ${agregados} registros procesados.`);
         fileInput.value = '';
-      } catch (error) { 
-        alert("❌ Error procesando Excel: " + error.message); 
-      }
+      } catch (err) { alert("❌ Error Excel: " + err.message); }
     };
     reader.readAsArrayBuffer(file);
   }
@@ -525,8 +494,7 @@
     document.getElementById('btnViewGrid').classList.toggle('active', vista === 'grid');
     document.getElementById('btnViewMap').classList.toggle('active', vista === 'map');
     if (vista === 'map') {
-      if (!mapaInicializado) { initMap(); mapaInicializado = true; } 
-      else { map.invalidateSize(); }
+      if (!mapaInicializado) { initMap(); mapaInicializado = true; } else { map.invalidateSize(); }
     }
   }
 
@@ -534,7 +502,6 @@
     map = L.map('map-container').setView([-28.2876, -70.8130], 14);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(map);
     markersLayer.addTo(map);
-
     map.on('click', function(e) {
       if (!isAdmin) return;
       tempLat = e.latlng.lat; tempLng = e.latlng.lng;
@@ -543,31 +510,25 @@
     renderizarMarcadoresMapa(equipos);
   }
 
-  function renderizarMarcadoresMapa(equiposList) {
+  function renderizarMarcadoresMapa(eqList) {
     if (!map) return;
     markersLayer.clearLayers();
     mapMarkersObj = {}; 
+    const cMap = { 'Rojo':'#ef4444', 'Naranja':'#f97316', 'Amarillo':'#eab308', 'Verde':'#22c55e', 'Plomo':'#64748b' };
+    const aMap = { 'Rojo':'sirena-roja 1.2s infinite alternate', 'Naranja':'sirena-naranja 2s infinite alternate', 'Amarillo':'respiracion-amarilla 3s infinite alternate' };
 
-    equiposList.forEach(eq => {
+    eqList.forEach(eq => {
       if (eq.lat && eq.lng) {
-        let colorHex = '#22c55e'; 
-        let animacionCSS = '';
-        
-        if (eq.severidad === 'Rojo') { colorHex = '#ef4444'; animacionCSS = 'animation: sirena-roja 1.2s infinite alternate;'; }
-        else if (eq.severidad === 'Naranja') { colorHex = '#f97316'; animacionCSS = 'animation: sirena-naranja 2s infinite alternate;'; }
-        else if (eq.severidad === 'Amarillo') { colorHex = '#eab308'; animacionCSS = 'animation: respiracion-amarilla 3s infinite alternate;'; }
-        else if (eq.severidad === 'Plomo') { colorHex = '#64748b'; }
-        
+        let color = cMap[eq.severidad] || '#64748b';
+        let anim = aMap[eq.severidad] ? `animation: ${aMap[eq.severidad]};` : '';
         const icon = L.divIcon({
           className: 'custom-map-marker',
-          html: `<div style="background-color: ${colorHex}; width:20px; height:20px; border-radius:50%; border:3px solid #fff; ${animacionCSS}"></div>`,
+          html: `<div style="background-color: ${color}; width:20px; height:20px; border-radius:50%; border:3px solid #fff; ${anim}"></div>`,
           iconSize: [20, 20]
         });
-        
         const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon });
         marker.on('click', () => abrirModal(eq.id));
-        marker.bindPopup(`<b>Tag: ${eq.nombre}</b><br>Área: ${eq.area}<br><b>Estado: ${eq.severidad}</b>`);
-        
+        marker.bindPopup(`<b>${eq.nombre}</b><br>${eq.area}<br>${eq.severidad}`);
         markersLayer.addLayer(marker);
         mapMarkersObj[eq.id] = marker; 
       }
@@ -596,24 +557,25 @@
   firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
   const equiposRef = database.ref('activos_criticos');
-  let equipos = [];
 
   equiposRef.on('value', (snapshot) => {
     const data = snapshot.val();
     equipos = data ? Object.values(data) : [];
-    const textoBuscador = document.getElementById('buscador').value.toLowerCase().trim();
-    renderDashboard(textoBuscador);
+    renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
     renderizarMarcadoresMapa(equipos);
   });
 
   function guardarEquipo() {
-    if (!isAdmin) { alert("Active el Modo Admin."); return; }
+    if (!isAdmin) return; 
     const area = document.getElementById('inArea').value.trim();
     const nombre = document.getElementById('inNombre').value.trim().toUpperCase();
-    if(!area || !nombre) { alert("Mínimo Área y Tag requeridos."); return; }
+    if(!area || !nombre) { alert("Área y Tag requeridos."); return; }
+
+    let eqId = editId || nombre.replace(/[.#$\[\]\s]/g, "_");
+    const eqOrig = equipos.find(e => e.id === eqId);
 
     const eqData = { 
-      area, nombre, 
+      id: eqId, area, nombre, 
       tipo_equipo: document.getElementById('inTipo').value.trim(),
       componente: document.getElementById('inComponente').value.trim(), 
       aviso: document.getElementById('inAviso').value.trim(), 
@@ -624,56 +586,36 @@
       estatus: document.getElementById('inEstatus').value.trim(),
       analisis: document.getElementById('inAnalisis').value.trim(), 
       recomendacion: document.getElementById('inRecomendacion').value.trim(),
-      imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (editId ? equipos.find(e=>e.id===editId).imagenes || [] : [])
+      imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : []),
+      lat: tempLat !== null ? tempLat : (eqOrig ? eqOrig.lat : null),
+      lng: tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null)
     };
-
-    let eqId = editId;
-    if (!eqId) {
-      eqId = nombre.replace(/[.#$\[\]\s]/g, "_");
-    }
-
-    eqData.id = eqId;
-    const eqOrig = equipos.find(e => e.id === eqId);
-    eqData.lat = tempLat !== null ? tempLat : (eqOrig ? eqOrig.lat : null);
-    eqData.lng = tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null);
     
-    equiposRef.child(eqId).update(eqData).then(() => {
-      alert("✅ Cambios guardados correctamente.");
-      resetFormulario();
-    });
+    equiposRef.child(eqId).update(eqData).then(resetFormulario);
   }
 
-  // --- FUNCIÓN DE EDICIÓN INFALIBLE ---
-  function editarEquipo(event, id) {
-    event.stopPropagation(); 
-    if (!isAdmin) {
-      alert("⚠️ Debe activar el Modo Admin para editar.");
-      return;
-    }
-    
+  function editarEquipo(id) {
+    if (!isAdmin) { alert("⚠️ Active el Modo Admin."); return; }
     const eq = equipos.find(i => i.id === id);
-    if (eq) {
-      document.getElementById('inArea').value = eq.area || '';
-      document.getElementById('inNombre').value = eq.nombre || '';
-      document.getElementById('inTipo').value = eq.tipo_equipo || '';
-      document.getElementById('inComponente').value = eq.componente || '';
-      document.getElementById('inAviso').value = eq.aviso || '';
-      document.getElementById('inOm').value = eq.om || '';
-      document.getElementById('inFecha').value = eq.fecha || '';
-      document.getElementById('inUltimaMedicion').value = eq.ultima_medicion || '';
-      document.getElementById('inSeveridad').value = eq.severidad || 'Plomo';
-      document.getElementById('inEstatus').value = eq.estatus || '';
-      document.getElementById('inAnalisis').value = eq.analisis || '';
-      document.getElementById('inRecomendacion').value = eq.recomendacion || '';
-      
-      editId = id; 
-      tempLat = eq.lat || null; 
-      tempLng = eq.lng || null;
-      imagenesBase64Temp = eq.imagenes || [];
-      
-      document.getElementById('btnSubmit').innerText = "💾 Guardar Cambios";
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    if (!eq) return;
+    
+    document.getElementById('inArea').value = eq.area || '';
+    document.getElementById('inNombre').value = eq.nombre || '';
+    document.getElementById('inTipo').value = eq.tipo_equipo || '';
+    document.getElementById('inComponente').value = eq.componente || '';
+    document.getElementById('inAviso').value = eq.aviso || '';
+    document.getElementById('inOm').value = eq.om || '';
+    document.getElementById('inFecha').value = eq.fecha || '';
+    document.getElementById('inUltimaMedicion').value = eq.ultima_medicion || '';
+    document.getElementById('inSeveridad').value = eq.severidad || 'Plomo';
+    document.getElementById('inEstatus').value = eq.estatus || '';
+    document.getElementById('inAnalisis').value = eq.analisis || '';
+    document.getElementById('inRecomendacion').value = eq.recomendacion || '';
+    
+    editId = id; tempLat = eq.lat || null; tempLng = eq.lng || null;
+    imagenesBase64Temp = eq.imagenes || [];
+    document.getElementById('btnSubmit').innerText = "💾 Guardar Cambios";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function resetFormulario() {
@@ -684,27 +626,16 @@
     document.getElementById('btnSubmit').innerText = "+ Guardar Activo";
   }
 
-  function eliminarEquipo(event, id) {
-    event.stopPropagation(); 
+  function eliminarEquipo(id) {
     if (!isAdmin) return;
-    if (confirm("⚠️ ¿Eliminar activo de la matriz?")) { 
+    if (confirm(`⚠️ ¿Eliminar activo permanentemente?`)) { 
       equiposRef.child(id).remove().then(() => { if (editId === id) resetFormulario(); }); 
     }
   }
 
-  function calcularDias(fechaStr) {
-    if (!fechaStr) return null;
-    const dateObj = new Date(fechaStr);
-    if (isNaN(dateObj)) return null;
-    return Math.max(0, Math.floor((new Date() - dateObj) / (1000 * 60 * 60 * 24)));
-  }
-
-  function valorSeveridad(color) {
-    if(color === 'Rojo') return 5;
-    if(color === 'Naranja') return 4;
-    if(color === 'Amarillo') return 3;
-    if(color === 'Verde') return 2;
-    return 1; 
+  function calcularDias(f) {
+    if (!f) return null;
+    const d = new Date(f); return isNaN(d) ? null : Math.max(0, Math.floor((new Date() - d) / 86400000));
   }
 
   function abrirModal(id) {
@@ -712,113 +643,97 @@
     if (!eq) return;
 
     document.getElementById('modalTitle').innerText = `${eq.nombre} - ${eq.area}`;
-    
     const badge = document.getElementById('modalSevBadge');
     badge.innerText = `Estado: ${eq.severidad || 'Plomo'}`;
-    let badgeColor = '#64748b'; 
-    if(eq.severidad === 'Rojo') badgeColor = '#ef4444';
-    else if(eq.severidad === 'Naranja') badgeColor = '#f97316';
-    else if(eq.severidad === 'Amarillo') badgeColor = '#facc15';
-    else if(eq.severidad === 'Verde') badgeColor = '#22c55e';
-    badge.style.backgroundColor = badgeColor;
+    const cMap = { 'Rojo':'#ef4444', 'Naranja':'#f97316', 'Amarillo':'#eab308', 'Verde':'#22c55e', 'Plomo':'#64748b' };
+    badge.style.backgroundColor = cMap[eq.severidad] || cMap['Plomo'];
+    badge.style.color = '#fff';
 
     document.getElementById('modalTipo').innerText = eq.tipo_equipo || '-';
     document.getElementById('modalComponente').innerText = eq.componente || '-';
     document.getElementById('modalAviso').innerText = eq.aviso || '-';
     document.getElementById('modalOm').innerText = eq.om || '-';
     document.getElementById('modalFecha').innerText = eq.fecha || '-';
+    document.getElementById('modalUltimaMedicion').innerText = eq.ultima_medicion || 'Sin Registrar';
     
-    const ultimaMedicion = eq.ultima_medicion || '';
-    document.getElementById('modalUltimaMedicion').innerText = ultimaMedicion || 'Sin Registrar';
-    
-    const dias = calcularDias(ultimaMedicion);
+    const dias = calcularDias(eq.ultima_medicion);
     document.getElementById('modalDias').innerText = dias !== null ? `${dias} días sin medir` : 'Sin Medición';
-    
     document.getElementById('modalEstatus').innerText = eq.estatus || 'No definido';
     document.getElementById('modalAnalisis').innerText = eq.analisis || 'Sin información';
     document.getElementById('modalRecomendacion').innerText = eq.recomendacion || 'Sin información';
     
     const gal = document.getElementById('modalGalleryContainer');
     gal.innerHTML = '';
-    if (eq.imagenes && eq.imagenes.length > 0) {
-      eq.imagenes.forEach(img => {
-        if(img) {
-          const t = document.createElement('img'); t.src = img; t.className = 'gallery-thumb';
-          t.onclick = () => abrirLightbox(img);
-          gal.appendChild(t);
-        }
-      });
-    } else { gal.innerHTML = `<span style="color:#94a3b8; font-size:0.8rem;">Sin evidencias.</span>`; }
+    (eq.imagenes || []).forEach(img => {
+      if(img) {
+        const t = document.createElement('img'); t.src = img; t.className = 'gallery-thumb';
+        t.onclick = () => { document.getElementById('lightboxImg').src = img; document.getElementById('lightboxOverlay').style.display = 'flex'; };
+        gal.appendChild(t);
+      }
+    });
+    if(!eq.imagenes || !eq.imagenes.length) gal.innerHTML = `<span style="color:var(--text-muted); font-size:0.8rem;">Sin evidencias.</span>`;
     document.getElementById('evidenciaModal').style.display = 'flex';
   }
   
   function cerrarModal(e) { if (e && e.target !== document.getElementById('evidenciaModal')) return; document.getElementById('evidenciaModal').style.display = 'none'; }
-  function abrirLightbox(url) { document.getElementById('lightboxImg').src = url; document.getElementById('lightboxOverlay').style.display = 'flex'; }
   function cerrarLightbox() { document.getElementById('lightboxOverlay').style.display = 'none'; }
 
+  // --- RENDERIZADO ÚNICO Y OPTIMIZADO DEL DOM ---
   function renderDashboard(filtro = '') {
-    const root = document.getElementById('app-root');
-    root.innerHTML = '';
+    const sevValor = { 'Rojo':5, 'Naranja':4, 'Amarillo':3, 'Verde':2, 'Plomo':1 };
+    let cRojo = 0, cNaranja = 0, cAmarillo = 0, cVerde = 0;
     
-    const equiposFiltrados = equipos.filter(eq => 
+    // 1. Procesar y Filtrar una sola vez
+    const eqProcesados = equipos.map(eq => {
+      const dias = calcularDias(eq.ultima_medicion);
+      const textDias = dias !== null ? `${dias} DÍAS SIN MEDIR` : 'SIN MEDIR';
+      let sevClass = `sev-${(eq.severidad || 'plomo').toLowerCase()}`;
+      return { ...eq, dias, textDias, sevClass, valOrd: sevValor[eq.severidad] || 1 };
+    }).filter(eq => 
       eq.nombre.toLowerCase().includes(filtro) || eq.area.toLowerCase().includes(filtro) || (eq.tipo_equipo && eq.tipo_equipo.toLowerCase().includes(filtro))
     );
 
-    let cRojo = 0, cNaranja = 0, cAmarillo = 0, cVerde = 0;
-    equiposFiltrados.forEach(eq => {
+    // 2. Contar KPIs
+    eqProcesados.forEach(eq => {
       if (eq.severidad === 'Rojo') cRojo++;
       else if (eq.severidad === 'Naranja') cNaranja++;
       else if (eq.severidad === 'Amarillo') cAmarillo++;
       else if (eq.severidad === 'Verde') cVerde++;
     });
 
-    document.getElementById('kpiTotal').innerText = equiposFiltrados.length;
+    document.getElementById('kpiTotal').innerText = eqProcesados.length;
     document.getElementById('kpiRojo').innerText = cRojo;
     document.getElementById('kpiNaranja').innerText = cNaranja;
     document.getElementById('kpiAmarillo').innerText = cAmarillo;
     document.getElementById('kpiVerde').innerText = cVerde;
 
-    const equiposPorArea = equiposFiltrados.reduce((acc, eq) => { (acc[eq.area] = acc[eq.area] || []).push(eq); return acc; }, {});
+    // 3. Agrupar por Área
+    const porArea = {};
+    eqProcesados.forEach(eq => { (porArea[eq.area] = porArea[eq.area] || []).push(eq); });
 
-    for (const [area, eqs] of Object.entries(equiposPorArea)) {
-      
+    // 4. Construir HTML masivo (Sin reflows del navegador)
+    let finalHTML = '';
+    for (const [area, eqs] of Object.entries(porArea)) {
       eqs.sort((a, b) => {
-        const sevDiff = valorSeveridad(b.severidad) - valorSeveridad(a.severidad);
-        if (sevDiff !== 0) return sevDiff;
-        
-        const diasB = calcularDias(b.ultima_medicion) || 0;
-        const diasA = calcularDias(a.ultima_medicion) || 0;
-        return diasB - diasA;
+        if (b.valOrd !== a.valOrd) return b.valOrd - a.valOrd;
+        return (b.dias || 0) - (a.dias || 0);
       });
 
-      const html = eqs.map(eq => {
-        const dias = calcularDias(eq.ultima_medicion);
-        let sevClass = 'sev-plomo';
-        let textoDias = 'SIN MEDIR';
-        
-        if(eq.severidad === 'Rojo') { sevClass = 'sev-rojo'; textoDias = dias !== null ? `${dias} DÍAS SIN MEDIR` : 'SIN MEDIR'; }
-        else if(eq.severidad === 'Naranja') { sevClass = 'sev-naranja'; textoDias = dias !== null ? `${dias} DÍAS SIN MEDIR` : 'SIN MEDIR'; }
-        else if(eq.severidad === 'Amarillo') { sevClass = 'sev-amarillo'; textoDias = dias !== null ? `${dias} DÍAS SIN MEDIR` : 'SIN MEDIR'; }
-        else if(eq.severidad === 'Verde') { sevClass = 'sev-verde'; textoDias = dias !== null ? `${dias} DÍAS SIN MEDIR` : 'SIN MEDIR'; }
-        else if(eq.severidad === 'Plomo') { sevClass = 'sev-plomo'; textoDias = 'SIN MEDIR'; }
-
-        const tipoTexto = eq.tipo_equipo ? eq.tipo_equipo : 'Equipo';
-        const safeId = JSON.stringify(eq.id); // Asegura que el ID se pase de forma segura sin romper comillas
-
-        return `
-          <div class="card ${sevClass}" onclick="abrirModal('${eq.id}')">
-            <div class="pulse-indicator"></div>
-            <button class="edit-btn" onclick="editarEquipo(event, ${safeId})" title="Editar">✏️</button>
-            <button class="delete-btn" onclick="eliminarEquipo(event, ${safeId})" title="Eliminar">✖</button>
-            <span class="asset-type-badge" title="${tipoTexto}">${tipoTexto}</span>
-            <h3 class="asset-tag">${eq.nombre}</h3>
-            <span class="asset-days">⏱️ ${textoDias}</span>
-          </div>
-        `;
-      }).join('');
+      const cardsHTML = eqs.map(eq => `
+        <div class="card ${eq.sevClass}" data-id="${eq.id}">
+          <div class="pulse-indicator"></div>
+          <button class="edit-btn" data-id="${eq.id}" title="Editar">✏️</button>
+          <button class="delete-btn" data-id="${eq.id}" title="Eliminar">✖</button>
+          <span class="asset-type-badge" title="${eq.tipo_equipo || 'Equipo'}">${eq.tipo_equipo || 'Equipo'}</span>
+          <h3 class="asset-tag">${eq.nombre}</h3>
+          <span class="asset-days">⏱️ ${eq.textDias}</span>
+        </div>
+      `).join('');
       
-      root.innerHTML += `<h2 class="area-title">${area}</h2><div class="critical-grid">${html}</div>`;
+      finalHTML += `<h2 class="area-title">${area}</h2><div class="critical-grid">${cardsHTML}</div>`;
     }
+    
+    document.getElementById('app-root').innerHTML = finalHTML;
   }
 </script>
 
