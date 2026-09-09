@@ -22,8 +22,14 @@
   .header-titles h1 { color: #ffffff; font-size: 1.5rem; margin: 0 0 3px 0; text-transform: uppercase; letter-spacing: 1px; }
   .header-titles p { color: #94a3b8; margin: 0; font-size: 0.85rem; }
   
-  .header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between; background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #1e293b;}
+  .header-controls-left { display: flex; gap: 10px; flex-grow: 1; max-width: 400px; }
+  .header-controls-right { display: flex; gap: 8px; }
   
+  /* Buscador Global */
+  .search-input { width: 100%; padding: 8px 15px; border-radius: 20px; border: 1px solid #38bdf8; background: #1e293b; color: white; font-size: 0.9rem; outline: none; transition: box-shadow 0.3s; }
+  .search-input:focus { box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
+
   .view-btn, .btn-lock { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: 0.3s; }
   .view-btn.active { background: #0284c7; color: white; border-color: #0284c7; }
   .view-btn:hover, .btn-lock:hover { background: #334155; color: #fff; }
@@ -32,7 +38,7 @@
   #map-view { display: none; margin-bottom: 20px; }
   .map-instruction { background: #1e293b; border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 0.85rem; display: none; }
   body.admin-mode .map-instruction { display: block; }
-  #map-container { width: 100%; height: 500px; border-radius: 8px; border: 1px solid #334155; background: #000; }
+  #map-container { width: 100%; height: 600px; border-radius: 8px; border: 1px solid #334155; background: #000; z-index: 1;}
 
   /* --- Panel Admin --- */
   .admin-panel { display: none; background: #0f172a; padding: 15px; border-radius: 6px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; border: 1px solid #334155; }
@@ -60,7 +66,7 @@
   }
   .card:hover { transform: translateY(-3px); }
   
-  /* Animaciones Sirena Suave */
+  /* Animaciones Sirena Suave (Compartida con el Mapa) */
   .sev-rojo { border-color: rgba(239, 68, 68, 0.8); animation: sirena-roja 1.2s ease-in-out infinite alternate; }
   @keyframes sirena-roja { 0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2), inset 0 0 5px rgba(239, 68, 68, 0.1); } 100% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.9), inset 0 0 15px rgba(239, 68, 68, 0.5); border-color: rgba(239, 68, 68, 1); } }
 
@@ -97,7 +103,7 @@
   body.admin-mode .btn-lock { background: #16a34a; color: white; border-color: #16a34a; }
 
   /* Modal Detallado */
-  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
   .modal-content { background: #0f172a; padding: 25px; border-radius: 8px; border: 1px solid #334155; width: 95%; max-width: 700px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
   .modal-close { position: absolute; top: 10px; right: 15px; color: #94a3b8; font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
   .modal-close:hover { color: #ef4444; }
@@ -115,7 +121,7 @@
   .gallery-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid #334155; cursor: pointer; transition: transform 0.2s; }
   .gallery-thumb:hover { transform: scale(1.1); border-color: #38bdf8; }
 
-  .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 2000; justify-content: center; align-items: center; }
+  .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 3000; justify-content: center; align-items: center; }
   .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 4px; }
   .lightbox-close { position: absolute; top: 15px; right: 25px; color: #fff; font-size: 2.5rem; cursor: pointer; background: none; border: none; }
 </style>
@@ -130,7 +136,14 @@
       <p>Gestión de Vulnerabilidades y Activos Críticos</p>
     </div>
   </div>
-  <div class="header-controls">
+</div>
+
+<!-- BARRA DE BÚSQUEDA Y CONTROLES -->
+<div class="header-controls">
+  <div class="header-controls-left">
+    <input type="text" id="buscador" class="search-input" placeholder="🔍 Buscar por Tag o Área (ej. MH4004)..." onkeyup="ejecutarBusqueda()">
+  </div>
+  <div class="header-controls-right">
     <button id="btnViewGrid" class="view-btn active" onclick="cambiarVista('grid')">📋 Matriz Activos</button>
     <button id="btnViewMap" class="view-btn" onclick="cambiarVista('map')">🗺️ Mapa Operacional</button>
     <button id="btnUnlock" class="btn-lock" onclick="solicitarClave()">🔒 Modo Lectura</button>
@@ -247,6 +260,7 @@
 <script>
   let isAdmin = false; let editId = null; let map; let markersLayer = L.layerGroup();
   let mapaInicializado = false; let tempLat = null; let tempLng = null; let imagenesBase64Temp = [];
+  let mapMarkersObj = {}; // Diccionario para rastrear los pines en el mapa
 
   document.getElementById('inImagenesFiles').addEventListener('change', function(e) {
     const files = e.target.files;
@@ -260,7 +274,28 @@
     }
   });
 
-  // NUEVA CARGA INTELIGENTE QUE LEE .XLSX DIRECTO A PRUEBA DE FALLOS
+  // BUSCADOR GLOBAL Y MAPA VUELO
+  function ejecutarBusqueda() {
+    const texto = document.getElementById('buscador').value.toLowerCase().trim();
+    
+    // 1. Filtrar tarjetas en el Dashboard
+    renderDashboard(texto);
+    
+    // 2. Vuelo dinámico en el Mapa
+    if (texto.length > 1 && mapaInicializado && map) {
+      const eqEncontrado = equipos.find(eq => 
+        (eq.nombre.toLowerCase().includes(texto) || eq.area.toLowerCase().includes(texto)) && eq.lat && eq.lng
+      );
+      
+      if (eqEncontrado && mapMarkersObj[eqEncontrado.id]) {
+        // Vuela hacia el equipo encontrado y abre su etiqueta
+        map.flyTo([eqEncontrado.lat, eqEncontrado.lng], 18, { duration: 1.5 });
+        mapMarkersObj[eqEncontrado.id].openPopup();
+      }
+    }
+  }
+
+  // CARGA MASIVA EXCEL
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -281,19 +316,13 @@
 
         for (let i = 0; i < jsonRows.length; i++) {
           let row = jsonRows[i];
-          
-          while(row.length > 0 && (row[0] === null || row[0] === undefined || String(row[0]).trim() === '')) {
-            row.shift();
-          }
+          while(row.length > 0 && (row[0] === null || row[0] === undefined || String(row[0]).trim() === '')) { row.shift(); }
 
           if (row.length < 2) continue;
           
-          // LA CORRECCIÓN CLAVE: Verifica que sea la palabra exacta Área o Tag, y no una frase como "AREA 49"
           const col0 = String(row[0]).toLowerCase().trim();
           const col1 = String(row[1]).toLowerCase().trim();
-          if (col0 === 'área' || col0 === 'area' || col1 === 'tag' || col1 === 'n° tag') {
-            continue;
-          }
+          if (col0 === 'área' || col0 === 'area' || col1 === 'tag' || col1 === 'n° tag') { continue; }
 
           const eqId = Date.now().toString() + i;
           let colorLeido = row[2] ? String(row[2]).toLowerCase() : "verde";
@@ -303,22 +332,16 @@
           if (colorLeido.includes("amarillo")) colorFinal = "Amarillo";
 
           const equipo = {
-            id: eqId,
-            area: row[0] ? String(row[0]).trim() : "Sin Área",
-            nombre: row[1] ? String(row[1]).trim() : "Desconocido",
-            severidad: colorFinal,
-            componente: "", aviso: "", om: "", fecha: new Date().toISOString().split('T')[0], 
+            id: eqId, area: row[0] ? String(row[0]).trim() : "Sin Área", nombre: row[1] ? String(row[1]).trim() : "Desconocido",
+            severidad: colorFinal, componente: "", aviso: "", om: "", fecha: new Date().toISOString().split('T')[0], 
             estatus: "", analisis: "", recomendacion: "", lat: null, lng: null, imagenes: []
           };
           equiposRef.child(eqId).set(equipo);
           agregados++;
         }
-        alert(`✅ Éxito total: ${agregados} equipos procesados desde Excel.`);
+        alert(`✅ Éxito total: ${agregados} equipos procesados.`);
         fileInput.value = '';
-      } catch (error) {
-        alert("❌ Error procesando Excel: Asegúrese de subir un archivo válido.");
-        console.error(error);
-      }
+      } catch (error) { alert("❌ Error procesando Excel."); }
     };
     reader.readAsArrayBuffer(file);
   }
@@ -350,21 +373,29 @@
   function renderizarMarcadoresMapa(equiposList) {
     if (!map) return;
     markersLayer.clearLayers();
+    mapMarkersObj = {}; // Reiniciar rastreador
+
     equiposList.forEach(eq => {
       if (eq.lat && eq.lng) {
-        let colorHex = '#22c55e'; 
-        if (eq.severidad === 'Rojo') colorHex = '#ef4444';
-        if (eq.severidad === 'Naranja') colorHex = '#f97316';
-        if (eq.severidad === 'Amarillo') colorHex = '#eab308';
+        let colorHex = '#22c55e'; // Verde
+        let animacionCSS = '';
+        
+        if (eq.severidad === 'Rojo') { colorHex = '#ef4444'; animacionCSS = 'animation: sirena-roja 1.2s infinite alternate;'; }
+        if (eq.severidad === 'Naranja') { colorHex = '#f97316'; animacionCSS = 'animation: sirena-naranja 2s infinite alternate;'; }
+        if (eq.severidad === 'Amarillo') { colorHex = '#eab308'; animacionCSS = 'animation: respiracion-amarilla 3s infinite alternate;'; }
         
         const icon = L.divIcon({
           className: 'custom-map-marker',
-          html: `<div style="background-color: ${colorHex}; width:14px; height:14px; border-radius:50%; border:2px solid #fff;"></div>`,
-          iconSize: [14, 14]
+          html: `<div style="background-color: ${colorHex}; width:20px; height:20px; border-radius:50%; border:3px solid #fff; ${animacionCSS}"></div>`,
+          iconSize: [20, 20]
         });
+        
         const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon });
         marker.on('click', () => abrirModal(eq.id));
+        marker.bindPopup(`<b>Tag: ${eq.nombre}</b><br>Área: ${eq.area}<br><b>Estado: ${eq.severidad}</b>`);
+        
         markersLayer.addLayer(marker);
+        mapMarkersObj[eq.id] = marker; // Guardar referencia para el vuelo en mapa
       }
     });
   }
@@ -396,7 +427,8 @@
   equiposRef.on('value', (snapshot) => {
     const data = snapshot.val();
     equipos = data ? Object.values(data) : [];
-    renderDashboard();
+    const textoBuscador = document.getElementById('buscador').value.toLowerCase().trim();
+    renderDashboard(textoBuscador);
     renderizarMarcadoresMapa(equipos);
   });
 
@@ -519,14 +551,18 @@
   function abrirLightbox(url) { document.getElementById('lightboxImg').src = url; document.getElementById('lightboxOverlay').style.display = 'flex'; }
   function cerrarLightbox() { document.getElementById('lightboxOverlay').style.display = 'none'; }
 
-  function renderDashboard() {
+  function renderDashboard(filtro = '') {
     const root = document.getElementById('app-root');
     root.innerHTML = '';
     
-    const equiposPorArea = equipos.reduce((acc, eq) => { (acc[eq.area] = acc[eq.area] || []).push(eq); return acc; }, {});
+    // Filtrar equipos antes de agruparlos
+    const equiposFiltrados = equipos.filter(eq => 
+      eq.nombre.toLowerCase().includes(filtro) || eq.area.toLowerCase().includes(filtro)
+    );
+
+    const equiposPorArea = equiposFiltrados.reduce((acc, eq) => { (acc[eq.area] = acc[eq.area] || []).push(eq); return acc; }, {});
 
     for (const [area, eqs] of Object.entries(equiposPorArea)) {
-      
       eqs.sort((a, b) => {
         const sevDiff = valorSeveridad(b.severidad) - valorSeveridad(a.severidad);
         if (sevDiff !== 0) return sevDiff;
