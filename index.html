@@ -206,7 +206,7 @@
   
   body.light-mode .sev-rojo .asset-days { background: #fee2e2; color: #991b1b !important; border-color: #f87171; }
   body.light-mode .sev-naranja .asset-days { background: #ffedd5; color: #9a3412 !important; border-color: #fb923c; }
-  body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #facc15; }
+  body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #fde047; }
   body.light-mode .sev-verde .asset-days { background: #dcfce7; color: #166534 !important; border-color: #4ade80; }
   body.light-mode .sev-plomo .asset-days { background: #e2e8f0; color: #0f172a !important; border-color: #94a3b8; }
 </style>
@@ -411,7 +411,7 @@
     }
   }
 
-  // --- CONTROLADOR DE CLICS BLINDADO (CORRECCIÓN TOTAL DE EDICIÓN) ---
+  // --- CONTROLADOR DE CLICS BLINDADO (SELECCIÓN EXACTA DE TARJETA) ---
   document.getElementById('app-root').addEventListener('click', function(e) {
     const delBtn = e.target.closest('.delete-btn');
     const card = e.target.closest('.card');
@@ -477,7 +477,7 @@
     }
   }
 
-  // --- LECTOR EXCEL ANTI-NULOS (LEE LAS 207 FILAS SIN CORTARSE) ---
+  // --- LECTOR EXCEL ANTI-NULOS / LECTURA COMPLETA DE 207 REGISTROS ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -497,33 +497,14 @@
           const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false, defval: ""});
           if (jsonRows.length <= 1) return;
 
-          let colIdxArea = 0, colIdxEquipo = 1, colIdxTipo = 2, colIdxFecha = 3;
-          let startRow = 1;
-
-          for (let r = 0; r < Math.min(3, jsonRows.length); r++) {
-            let rowStr = jsonRows[r].map(c => String(c).toLowerCase().trim());
-            let fa = rowStr.findIndex(c => c.includes('area') || c.includes('área'));
-            let fe = rowStr.findIndex(c => c.includes('equipo') || c.includes('tag') || c.includes('equipos'));
-            if (fa !== -1 && fe !== -1) {
-              startRow = r + 1;
-              colIdxArea = fa;
-              colIdxEquipo = fe;
-              let ft = rowStr.findIndex(c => c.includes('tipo') || c.includes('denominacion'));
-              if (ft !== -1) colIdxTipo = ft;
-              let ff = rowStr.findIndex(c => c.includes('fecha') || c.includes('ult') || c.includes('medicion'));
-              if (ff !== -1) colIdxFecha = ff;
-              break;
-            }
-          }
-
-          for (let i = startRow; i < jsonRows.length; i++) {
+          for (let i = 1; i < jsonRows.length; i++) {
             let row = jsonRows[i];
-            if (!row || row.length === 0) continue;
+            if (!row || row.length < 2) continue;
 
-            const areaVal = String(row[colIdxArea]||'').trim();
-            const eqVal = String(row[colIdxEquipo]||'').trim();
+            const areaVal = String(row[0]||'').trim();
+            const eqVal = String(row[1]||'').trim();
             
-            // FILTRO ESTRICTO ANTI-NULOS / ANTI-UNDEFINED
+            // FILTROS ESTRICTOS ANTI-NULOS E INVALIDACIONES
             if (!eqVal || eqVal === '' || eqVal.toLowerCase() === 'undefined' || eqVal.toLowerCase() === 'null') continue;
             if (!areaVal || areaVal === '' || areaVal.toLowerCase() === 'undefined' || areaVal.toLowerCase() === 'null') continue;
             if (eqVal.toLowerCase().includes('equipo') || areaVal.toLowerCase().includes('area')) continue;
@@ -532,8 +513,8 @@
             const eqId = tagLimpio.replace(/[.#$\[\]\s\/]/g, "_");
             tagsEnExcel.add(eqId);
 
-            const fechaVal = String(row[colIdxFecha]||'').trim();
-            const updateData = { area: areaVal, nombre: tagLimpio, tipo_equipo: String(row[colIdxTipo]||'').trim() };
+            const fechaVal = String(row[3]||'').trim();
+            const updateData = { area: areaVal, nombre: tagLimpio, tipo_equipo: String(row[2]||'').trim() };
             
             if (fechaVal && !fechaVal.includes('1900') && !fechaVal.toLowerCase().includes('nat') && fechaVal !== 'undefined') {
               updateData.ultima_medicion = fechaVal;
@@ -550,7 +531,7 @@
           }
         });
 
-        // PURGA AUTOMÁTICA: Eliminar equipos que ya no vienen en el Excel
+        // PURGA AUTOMÁTICA: Eliminar de Firebase los equipos retirados que ya no vienen en el Excel
         let eliminadosPorPurga = 0;
         equipos.forEach(eq => {
           if (!tagsEnExcel.has(String(eq.id))) {
@@ -730,7 +711,7 @@
       document.getElementById('inAnalisis').value = eq.analisis || '';
       document.getElementById('inRecomendacion').value = eq.recomendacion || '';
       
-      editId = eq.id; // ID exacto y limpio asignado para edición
+      editId = eq.id; // ID exacto inyectado en el formulario
       tempLat = eq.lat || null; 
       tempLng = eq.lng || null;
       imagenesBase64Temp = eq.imagenes || [];
