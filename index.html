@@ -14,7 +14,7 @@
     --bg-main: #0b1120;
     --text-main: #e2e8f0;
     --text-muted: #94a3b8;
-    --accent-color: #38bdf8; /* Azul claro brillante para modo oscuro */
+    --accent-color: #38bdf8;
     --bg-panel: rgba(15, 23, 42, 0.75);
     --bg-panel-solid: rgba(15, 23, 42, 0.95);
     --bg-card: rgba(15, 23, 42, 0.85);
@@ -33,9 +33,9 @@
 
   body.light-mode {
     --bg-main: #f1f5f9;
-    --text-main: #0f172a; /* Letra casi negra para contraste máximo */
+    --text-main: #0f172a; 
     --text-muted: #475569;
-    --accent-color: #0369a1; /* Azul marino muy oscuro para modo claro */
+    --accent-color: #0369a1; 
     --bg-panel: rgba(255, 255, 255, 0.92);
     --bg-panel-solid: rgba(255, 255, 255, 0.98);
     --bg-card: rgba(255, 255, 255, 0.92);
@@ -59,7 +59,6 @@
     background-image: var(--map-bg); background-size: cover; background-attachment: fixed;
   }
   
-  /* --- Clases de Ayuda Globales --- */
   .accent-text { color: var(--accent-color) !important; font-weight: bold; }
 
   /* --- Encabezado Corporativo --- */
@@ -95,7 +94,7 @@
 
   /* --- Panel Admin --- */
   .admin-panel { display: none; background: var(--bg-panel-solid); padding: 15px; border-radius: 8px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; border: 2px solid var(--accent-color); backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(0,0,0,0.2); transition: border-color 0.3s; }
-  .admin-panel.editing-mode { border-color: #f97316; box-shadow: 0 0 25px rgba(249, 115, 22, 0.4); } /* Brillo naranja al editar */
+  .admin-panel.editing-mode { border-color: #f97316; box-shadow: 0 0 25px rgba(249, 115, 22, 0.4); } 
   
   .admin-title-bar { flex-basis: 100%; border-bottom: 1px solid var(--border-light); margin-bottom: 5px; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
   .admin-title-bar span { color: var(--accent-color); font-weight: 800; font-size: 0.9rem; text-transform: uppercase; }
@@ -124,16 +123,16 @@
 
   /* --- Vista Cuadritos --- */
   #dashboard-view { display: block; }
-  .area-title { color: var(--accent-color); font-size: 1rem; border-left: 3px solid var(--accent-color); padding-left: 6px; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px var(--shadow-color); }
+  .area-title { color: var(--accent-color); font-size: 1.1rem; border-left: 3px solid var(--accent-color); padding-left: 6px; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px var(--shadow-color); font-weight: 900;}
   
-  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 10px; }
   
   .card { 
-    background: var(--bg-card); border: 2px solid var(--border-card); border-radius: 6px; padding: 8px 4px; 
+    background: var(--bg-card); border: 2px solid var(--border-card); border-radius: 6px; padding: 10px 4px; 
     position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; 
-    min-height: 60px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(6px); overflow: visible;
+    min-height: 65px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(6px); overflow: visible;
   }
-  .card:hover { transform: scale(1.12) translateY(-4px); z-index: 50; box-shadow: 0 10px 20px rgba(0,0,0,0.5); filter: brightness(1.1); }
+  .card:hover { transform: scale(1.12) translateY(-4px); z-index: 50; box-shadow: 0 10px 20px rgba(0,0,0,0.6); filter: brightness(1.15); }
   
   .sev-rojo { border-color: rgba(239, 68, 68, 0.9); animation: sirena-roja 1.2s ease-in-out infinite alternate; }
   @keyframes sirena-roja { 0% { box-shadow: 0 0 4px rgba(239, 68, 68, 0.2), inset 0 0 4px rgba(239, 68, 68, 0.1); } 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.9), inset 0 0 10px rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 1); } }
@@ -144,22 +143,25 @@
   .sev-verde { border-color: rgba(34, 197, 94, 0.6); box-shadow: 0 0 6px rgba(34, 197, 94, 0.2); }
   .sev-plomo { border-color: rgba(100, 116, 139, 0.6); box-shadow: 0 0 4px rgba(100, 116, 139, 0.2); }
 
-  .pulse-indicator { position: absolute; top: 4px; right: 4px; width: 5px; height: 5px; border-radius: 50%; }
+  .pulse-indicator { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; }
   .sev-rojo .pulse-indicator { background-color: #ef4444; }
   .sev-naranja .pulse-indicator { background-color: #f97316; }
   .sev-amarillo .pulse-indicator { background-color: #eab308; }
   .sev-verde .pulse-indicator { background-color: #22c55e; }
   .sev-plomo .pulse-indicator { background-color: #64748b; }
   
-  .delete-btn, .edit-btn { display: none; position: absolute; bottom: 2px; background: rgba(0,0,0,0.8); border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); font-size: 0.75rem; z-index: 100; padding: 4px 6px; cursor: pointer; }
-  .delete-btn { right: 2px; color: #ef4444; }
-  .edit-btn { left: 2px; color: #38bdf8; }
+  .delete-btn, .edit-btn { display: none; position: absolute; bottom: 3px; background: rgba(0,0,0,0.85); border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); font-size: 0.75rem; z-index: 100; padding: 2px 6px; cursor: pointer; }
+  .delete-btn { right: 3px; color: #ef4444; }
+  .edit-btn { left: 3px; color: #38bdf8; }
   .delete-btn:hover, .edit-btn:hover { background: #334155; }
   
-  .asset-type-badge { font-size: 0.55rem; color: var(--accent-color); font-weight: 800; text-transform: uppercase; margin-bottom: 1px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95px; }
-  .asset-tag { color: var(--text-main); font-size: 0.85rem; font-weight: 800; margin: 0; letter-spacing: 0.5px; z-index: 2; text-shadow: 0 1px 3px var(--shadow-color); }
-  .asset-days { font-size: 0.48rem; font-weight: bold; margin-top: 3px; padding: 2px 4px; border-radius: 3px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; }
+  .asset-type-badge { font-size: 0.65rem; color: var(--accent-color); font-weight: 800; text-transform: uppercase; margin-bottom: 2px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95px; }
+  .asset-tag { color: var(--text-main); font-size: 1rem; font-weight: 900; margin: 0; letter-spacing: 0.5px; z-index: 2; text-shadow: 0 1px 3px var(--shadow-color); }
   
+  /* MEJORA LECTURA DÍAS SIN MEDIR */
+  .asset-days { font-size: 0.60rem; font-weight: 900; margin-top: 5px; padding: 4px 6px; border-radius: 4px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; letter-spacing: 0.5px; }
+  
+  /* Colores Días Modo Oscuro */
   .sev-rojo .asset-days { color: #fca5a5; }
   .sev-naranja .asset-days { color: #fdba74; }
   .sev-amarillo .asset-days { color: #fde047; }
@@ -179,7 +181,7 @@
   .modal-close:hover { color: #ef4444; }
   
   .modal-header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; margin-bottom: 15px; }
-  .modal-title { color: var(--text-main); font-size: 1.3rem; margin: 0; text-transform: uppercase; }
+  .modal-title { color: var(--text-main); font-size: 1.3rem; margin: 0; text-transform: uppercase; font-weight: 900; }
   .modal-sev-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; color: #fff; margin-right: 30px;}
   
   .modal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; background: var(--bg-panel); padding: 15px; border-radius: 6px; }
@@ -194,6 +196,15 @@
   .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 3000; justify-content: center; align-items: center; }
   .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 4px; }
   .lightbox-close { position: absolute; top: 15px; right: 25px; color: #fff; font-size: 2.5rem; cursor: pointer; background: none; border: none; }
+
+  /* =========================================
+     AJUSTES ESPECÍFICOS MODO CLARO (ALTO CONTRASTE)
+     ========================================= */
+  body.light-mode .sev-rojo .asset-days { background: #fee2e2; color: #991b1b !important; border-color: #f87171; }
+  body.light-mode .sev-naranja .asset-days { background: #ffedd5; color: #9a3412 !important; border-color: #fb923c; }
+  body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #facc15; }
+  body.light-mode .sev-verde .asset-days { background: #dcfce7; color: #166534 !important; border-color: #4ade80; }
+  body.light-mode .sev-plomo .asset-days { background: #e2e8f0; color: #0f172a !important; border-color: #94a3b8; }
 </style>
 </head>
 <body>
@@ -231,19 +242,19 @@
     <div class="kpi-value" id="kpiTotal">0</div>
   </div>
   <div class="kpi-card kpi-rojo">
-    <span class="kpi-label">🔴 Críticos</span>
+    <span class="kpi-label">🔴 Críticos (Alto)</span>
     <div class="kpi-value" id="kpiRojo">0</div>
   </div>
   <div class="kpi-card kpi-naranja">
-    <span class="kpi-label">🟠 Alertas</span>
+    <span class="kpi-label">🟠 Alertas (Medio)</span>
     <div class="kpi-value" id="kpiNaranja">0</div>
   </div>
   <div class="kpi-card kpi-amarillo">
-    <span class="kpi-label">🟡 Monitoreo</span>
+    <span class="kpi-label">🟡 Monitoreo (Bajo)</span>
     <div class="kpi-value" id="kpiAmarillo">0</div>
   </div>
   <div class="kpi-card kpi-verde">
-    <span class="kpi-label">🟢 Operativos</span>
+    <span class="kpi-label">🟢 Operativos (Normal)</span>
     <div class="kpi-value" id="kpiVerde">0</div>
   </div>
 </div>
@@ -475,7 +486,7 @@
             if (!areaVal || areaVal.toLowerCase().includes('area')) continue;
 
             const tagLimpio = eqVal.toUpperCase();
-            const eqId = tagLimpio.replace(/[.#$\[\]\s\/]/g, "_"); // Evita rutas inválidas en Firebase
+            const eqId = tagLimpio.replace(/[.#$\[\]\s\/]/g, "_");
             const fechaVal = String(row[3]||'').trim();
 
             const updateData = { area: areaVal, nombre: tagLimpio, tipo_equipo: String(row[2]||'').trim() };
@@ -610,7 +621,7 @@
     equiposRef.child(eqId).update(eqData).then(resetFormulario);
   }
 
-  // --- EDICIÓN CON INDICADOR VISUAL ---
+  // --- EDICIÓN CON INDICADOR VISUAL (ARREGLADO) ---
   function editarEquipo(id) {
     if (!isAdmin) { alert("⚠️ Active el Modo Admin."); return; }
     const eq = equipos.find(i => i.id === id);
@@ -625,7 +636,6 @@
     document.getElementById('inFecha').value = eq.fecha || '';
     document.getElementById('inUltimaMedicion').value = eq.ultima_medicion || '';
     
-    // Validar coincidencia exacta en select (Rojo, Naranja, Amarillo, Verde, Plomo)
     const validSeverities = ['Rojo', 'Naranja', 'Amarillo', 'Verde', 'Plomo'];
     document.getElementById('inSeveridad').value = validSeverities.includes(eq.severidad) ? eq.severidad : 'Plomo';
     
@@ -636,10 +646,9 @@
     editId = id; tempLat = eq.lat || null; tempLng = eq.lng || null;
     imagenesBase64Temp = eq.imagenes || [];
     
-    // Cambios Visuales para modo edición
     document.getElementById('adminPanelForm').classList.add('editing-mode');
     document.getElementById('editStatusText').innerText = `✏️ Editando Activo: ${eq.nombre}`;
-    document.getElementById('uploadBoxCont').style.display = 'none'; // Ocultar carga excel al editar
+    document.getElementById('uploadBoxCont').style.display = 'none'; 
     document.getElementById('btnDeleteAll').style.display = 'none';
     document.getElementById('btnCancelEdit').style.display = 'block';
     
@@ -657,7 +666,6 @@
     
     editId = null; tempLat = null; tempLng = null; imagenesBase64Temp = [];
     
-    // Restaurar Visuales a modo normal
     document.getElementById('adminPanelForm').classList.remove('editing-mode');
     document.getElementById('editStatusText').innerText = `➕ Nuevo Registro / Carga Masiva`;
     document.getElementById('uploadBoxCont').style.display = 'flex';
@@ -690,7 +698,6 @@
     badge.innerText = `Estado: ${eq.severidad || 'Plomo'}`;
     const cMap = { 'Rojo':'#ef4444', 'Naranja':'#f97316', 'Amarillo':'#eab308', 'Verde':'#22c55e', 'Plomo':'#64748b' };
     badge.style.backgroundColor = cMap[eq.severidad] || cMap['Plomo'];
-    badge.style.color = '#fff';
 
     document.getElementById('modalTipo').innerText = eq.tipo_equipo || '-';
     document.getElementById('modalComponente').innerText = eq.componente || '-';
@@ -721,7 +728,6 @@
   function cerrarModal(e) { if (e && e.target !== document.getElementById('evidenciaModal')) return; document.getElementById('evidenciaModal').style.display = 'none'; }
   function cerrarLightbox() { document.getElementById('lightboxOverlay').style.display = 'none'; }
 
-  // --- RENDERIZADO ÚNICO Y OPTIMIZADO DEL DOM ---
   function renderDashboard(filtro = '') {
     const sevValor = { 'Rojo':5, 'Naranja':4, 'Amarillo':3, 'Verde':2, 'Plomo':1 };
     let cRojo = 0, cNaranja = 0, cAmarillo = 0, cVerde = 0;
