@@ -95,7 +95,7 @@
     min-height: 60px; 
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(6px);
-    overflow: hidden;
+    overflow: visible;
   }
   
   /* EFECTO ZOOM Y ELEVACIÓN AL PASAR EL MOUSE */
@@ -122,7 +122,7 @@
   .sev-verde .pulse-indicator { background-color: #22c55e; }
   .sev-plomo .pulse-indicator { background-color: #64748b; }
   
-  .delete-btn, .edit-btn { display: none; position: absolute; bottom: 2px; background: rgba(0,0,0,0.7); border-radius: 3px; border: none; font-size: 0.75rem; z-index: 100; padding: 2px 4px; cursor: pointer; }
+  .delete-btn, .edit-btn { display: none; position: absolute; bottom: 2px; background: rgba(0,0,0,0.8); border-radius: 3px; border: none; font-size: 0.75rem; z-index: 100; padding: 2px 5px; cursor: pointer; }
   .delete-btn { right: 2px; color: #ef4444; }
   .edit-btn { left: 2px; color: #38bdf8; }
   
@@ -641,7 +641,8 @@
   }
 
   function editarEquipo(event, id) {
-    event.stopPropagation(); if (!isAdmin) return;
+    event.stopPropagation(); // Evita que se abra el modal general
+    if (!isAdmin) return;
     const eq = equipos.find(i => i.id === id);
     if (eq) {
       document.getElementById('inArea').value = eq.area || '';
@@ -672,7 +673,8 @@
   }
 
   function eliminarEquipo(event, id) {
-    event.stopPropagation(); if (!isAdmin) return;
+    event.stopPropagation(); // Evita que se abra el modal general
+    if (!isAdmin) return;
     if (confirm("⚠️ ¿Eliminar activo de la matriz?")) { 
       equiposRef.child(id).remove().then(() => { if (editId === id) resetFormulario(); }); 
     }
