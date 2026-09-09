@@ -33,7 +33,7 @@
 
   body.light-mode {
     --bg-main: #f1f5f9;
-    --text-main: #020617; /* Letra casi negra para contraste extremo */
+    --text-main: #020617; 
     --text-muted: #334155;
     --accent-color: #0369a1; 
     --bg-panel: rgba(255, 255, 255, 0.92);
@@ -192,23 +192,6 @@
   .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 4px; }
   .lightbox-close { position: absolute; top: 15px; right: 25px; color: #fff; font-size: 2.5rem; cursor: pointer; background: none; border: none; }
 
-  /* =========================================
-     AJUSTES ESPECÍFICOS MODO CLARO (ALTO CONTRASTE)
-     ========================================= */
-  body.light-mode .admin-panel input, 
-  body.light-mode .admin-panel textarea, 
-  body.light-mode .admin-panel select,
-  body.light-mode .search-input { color: #000000; font-weight: bold; } /* Forzar negro fuerte */
-  
-  body.light-mode .area-title { color: #020617; border-left-color: #0369a1; text-shadow: none; font-weight: 900;}
-  body.light-mode .asset-tag { color: #000000; text-shadow: none; font-weight: 900; }
-  body.light-mode .asset-type-badge { color: #0369a1; font-weight: 900; }
-  
-  body.light-mode .sev-rojo .asset-days { background: #fee2e2; color: #991b1b !important; border-color: #f87171; }
-  body.light-mode .sev-naranja .asset-days { background: #ffedd5; color: #9a3412 !important; border-color: #fb923c; }
-  body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #facc15; }
-  body.light-mode .sev-verde .asset-days { background: #dcfce7; color: #166534 !important; border-color: #4ade80; }
-  body.light-mode .sev-plomo .asset-days { background: #e2e8f0; color: #0f172a !important; border-color: #94a3b8; }
 </style>
 </head>
 <body>
@@ -342,7 +325,7 @@
     <div style="display: flex; gap: 8px;">
       <button class="btn-danger" id="btnDeleteAll" onclick="eliminarTodoMasivo()" title="Borra todos los activos">🗑️ Borrar Todo</button>
       <button class="btn-cancel" id="btnCancelEdit" onclick="resetFormulario()">✖ Cancelar Edición</button>
-      <button id="btnSubmit" onclick="guardarBoton()" style="height: fit-content;">+ Guardar Activo</button>
+      <button id="btnSubmit" onclick="procesarGuardado()" style="height: fit-content;">+ Guardar Activo</button>
     </div>
   </div>
 </div>
@@ -411,35 +394,40 @@
     }
   }
 
-  // --- SEAMLESS EDITING: FLUJO CONTINUO DE EDICIÓN ---
+  // --- MOTOR DE EVENTOS Y EDICIÓN EN CALIENTE ---
   document.getElementById('app-root').addEventListener('click', function(e) {
     const delBtn = e.target.closest('.delete-btn');
     const card = e.target.closest('.card');
 
     if (delBtn) {
       e.stopPropagation();
-      const id = delBtn.getAttribute('data-id');
-      eliminarEquipo(id);
+      eliminarEquipo(delBtn.getAttribute('data-id'));
     } else if (card) {
       const id = card.getAttribute('data-id');
-      const eq = equipos.find(i => String(i.id) === String(id));
+      const eqTarget = equipos.find(i => String(i.id) === String(id));
       
       if (isAdmin) {
         if (editId && String(editId) !== String(id)) {
-          // ESTAMOS EDITANDO OTRO EQUIPO: Preguntar si guarda y salta al nuevo
-          if (confirm(`⚠️ EDICIÓN EN CURSO\n\nTiene cambios sin guardar.\n\n¿Desea GUARDAR los cambios y editar automáticamente el nuevo equipo: ${eq ? eq.nombre : ''}?`)) {
-            guardarEquipoYEditarNuevo(eq);
+          // ESTÁBAMOS EDITANDO UNO Y PRESIONAMOS OTRO
+          const eqActual = equipos.find(i => String(i.id) === String(editId));
+          const nombreActual = eqActual ? eqActual.nombre : 'actual';
+          
+          if (confirm(`⚠️ EDICIÓN EN CURSO\n\n¿Desea GUARDAR los cambios del equipo ${nombreActual} y pasar a editar el equipo ${eqTarget.nombre}?`)) {
+            procesarGuardado(eqTarget); // Guarda el actual y carga el nuevo automáticamente
           }
-        } else {
-          // NO ESTAMOS EDITANDO o TOCÓ EL MISMO:
-          if (confirm(`✏️ MODO EDICIÓN\n\n¿Desea modificar los datos del equipo ${eq ? eq.nombre : ''}?\n\n- [Aceptar] para Editar.\n- [Cancelar] para ver Detalles.`)) {
-            cargarDatosAlFormulario(eq);
+        } else if (!editId) {
+          // NO HAY NADA EN EDICIÓN, PREGUNTA NORMAL
+          if (confirm(`✏️ MODO EDICIÓN\n\n¿Desea editar los datos del equipo ${eqTarget.nombre}?\n\n- [Aceptar] para Editar.\n- [Cancelar] para ver Detalles.`)) {
+            cargarDatosAlFormulario(eqTarget);
           } else {
             abrirModal(id);
           }
+        } else {
+          // PRESIONÓ EL MISMO QUE YA ESTÁ EDITANDO, ABRIMOS MODAL
+          abrirModal(id);
         }
       } else {
-        abrirModal(id); // Si no es admin, solo abre modal
+        abrirModal(id);
       }
     }
   });
@@ -475,9 +463,8 @@
     }
   }
 
-  // --- LECTURA EXCEL ROBUSTA ---
   function procesarExcel() {
-    if (!isAdmin) { alert("Active el Modo Admin."); return; }
+    if (!isAdmin) return;
     const fileInput = document.getElementById('inExcelFile');
     if (!fileInput.files.length) { alert("Seleccione un archivo Excel."); return; }
     
@@ -609,13 +596,14 @@
     renderizarMarcadoresMapa(equipos);
   });
 
-  // --- FUNCIONES DE GUARDADO Y EDICIÓN ---
-  function guardarBoton() {
+  // --- FUNCIÓN ÚNICA Y BLINDADA DE GUARDADO ---
+  function procesarGuardado(siguienteEq = null) {
     if (!isAdmin) return; 
     const area = document.getElementById('inArea').value.trim();
     const nombre = document.getElementById('inNombre').value.trim().toUpperCase();
-    if(!area || !nombre) { alert("Área y Tag requeridos."); return; }
+    if(!area || !nombre) { alert("⚠️ Faltan datos de Área o Tag."); return; }
 
+    // Identifica el ID correcto (el que estamos editando o uno nuevo)
     let eqId = editId || nombre.replace(/[.#$\[\]\s\/]/g, "_");
     const eqOrig = equipos.find(e => String(e.id) === String(eqId));
 
@@ -637,43 +625,19 @@
     };
     
     equiposRef.child(eqId).update(eqData).then(() => {
-      alert("✅ Equipo guardado/actualizado correctamente.");
-      resetFormulario();
-    }).catch(err => alert("Error al guardar: " + err.message));
+      // SI HAY UN SIGUIENTE EQUIPO, LO CARGAMOS (SEAMLESS EDIT)
+      if (siguienteEq) {
+        imagenesBase64Temp = []; // Limpiamos caché de fotos
+        cargarDatosAlFormulario(siguienteEq);
+      } else {
+        // SI SE APRETÓ EL BOTÓN "GUARDAR CAMBIOS" NORMALMENTE
+        alert("✅ Cambios guardados correctamente.");
+        resetFormulario();
+      }
+    }).catch(err => alert("❌ Error al guardar en Firebase: " + err.message));
   }
 
-  // Permite saltar de un equipo a otro sin perder los cambios
-  function guardarEquipoYEditarNuevo(nuevoEq) {
-    const area = document.getElementById('inArea').value.trim();
-    const nombre = document.getElementById('inNombre').value.trim().toUpperCase();
-    if(!area || !nombre) { alert("Faltan datos para guardar el equipo anterior. Guardado cancelado."); return; }
-
-    let eqId = editId;
-    const eqOrig = equipos.find(e => String(e.id) === String(eqId));
-
-    const eqData = { 
-      id: eqId, area, nombre, 
-      tipo_equipo: document.getElementById('inTipo').value.trim(),
-      componente: document.getElementById('inComponente').value.trim(), 
-      aviso: document.getElementById('inAviso').value.trim(), 
-      om: document.getElementById('inOm').value.trim(), 
-      fecha: document.getElementById('inFecha').value || '', 
-      ultima_medicion: document.getElementById('inUltimaMedicion').value || '', 
-      severidad: document.getElementById('inSeveridad').value,
-      estatus: document.getElementById('inEstatus').value.trim(),
-      analisis: document.getElementById('inAnalisis').value.trim(), 
-      recomendacion: document.getElementById('inRecomendacion').value.trim(),
-      imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : []),
-      lat: tempLat !== null ? tempLat : (eqOrig ? eqOrig.lat : null),
-      lng: tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null)
-    };
-    
-    equiposRef.child(eqId).update(eqData).then(() => {
-      imagenesBase64Temp = []; // Limpiar caché de imágenes
-      cargarDatosAlFormulario(nuevoEq); // Carga el nuevo equipo automáticamente
-    }).catch(err => alert("Error al guardar: " + err.message));
-  }
-
+  // --- CARGA DE DATOS AL PANEL ---
   function cargarDatosAlFormulario(eq) {
     if (!eq) return;
     try {
