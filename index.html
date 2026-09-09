@@ -93,7 +93,7 @@
   .edit-btn { left: 4px; color: #38bdf8; }
   
   .asset-tag { color: #f8fafc; font-size: 1rem; font-weight: 800; margin: 0; letter-spacing: 0.5px; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-  .asset-days { font-size: 0.65rem; font-weight: bold; margin-top: 6px; padding: 3px 6px; border-radius: 4px; background: rgba(0,0,0,0.5); z-index: 2; border: 1px solid rgba(255,255,255,0.1); }
+  .asset-days { font-size: 0.55rem; font-weight: bold; margin-top: 6px; padding: 3px 6px; border-radius: 4px; background: rgba(0,0,0,0.5); z-index: 2; border: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; }
   
   .sev-rojo .asset-days { color: #fca5a5; }
   .sev-naranja .asset-days { color: #fdba74; }
@@ -158,7 +158,6 @@
   body.light-mode .card { background: #ffffff; }
   body.light-mode .asset-tag { color: #0f172a; text-shadow: none; }
   
-  /* Badges de días Modo Claro */
   body.light-mode .sev-rojo .asset-days { background: #fee2e2; color: #991b1b !important; border-color: #fecaca; }
   body.light-mode .sev-naranja .asset-days { background: #ffedd5; color: #9a3412 !important; border-color: #fed7aa; }
   body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #fde047; }
@@ -176,7 +175,6 @@
 <body>
 
 <script>
-  // Carga rápida del tema preferido antes de que se dibuje la pantalla (evita parpadeo)
   if (localStorage.getItem('mlc_theme') === 'light') { document.body.classList.add('light-mode'); }
 </script>
 
@@ -190,10 +188,9 @@
   </div>
 </div>
 
-<!-- BARRA DE BÚSQUEDA Y CONTROLES -->
 <div class="header-controls">
   <div class="header-controls-left">
-    <input type="text" id="buscador" class="search-input" placeholder="🔍 Buscar por Tag o Área (ej. MH4004)..." onkeyup="ejecutarBusqueda()">
+    <input type="text" id="buscador" class="search-input" placeholder="🔍 Buscar por Tag o Área..." onkeyup="ejecutarBusqueda()">
   </div>
   <div class="header-controls-right">
     <button id="btnTheme" class="view-btn" onclick="toggleTheme()">☀️ Modo Claro</button>
@@ -257,9 +254,14 @@
     <label>OM SAP</label>
     <input type="text" id="inOm">
   </div>
+  <!-- SEPARACIÓN: Hallazgo Histórico y Última Medición -->
   <div class="input-group">
-    <label>Fecha Hallazgo</label>
+    <label>Fecha de Hallazgo (Histórico)</label>
     <input type="date" id="inFecha">
+  </div>
+  <div class="input-group">
+    <label>Última Medición (Ruta)</label>
+    <input type="date" id="inUltimaMedicion">
   </div>
   
   <div class="input-group" style="flex-basis: 100%;">
@@ -311,7 +313,8 @@
       <div><span class="modal-label">Aviso SAP</span><span id="modalAviso" class="modal-value"></span></div>
       <div><span class="modal-label">OM SAP</span><span id="modalOm" class="modal-value"></span></div>
       <div><span class="modal-label">Fecha Hallazgo</span><span id="modalFecha" class="modal-value"></span></div>
-      <div><span class="modal-label">Tiempo Activo</span><span id="modalDias" class="modal-value" style="font-weight:bold; color:#38bdf8;"></span></div>
+      <div><span class="modal-label">Última Medición</span><span id="modalUltimaMedicion" class="modal-value"></span></div>
+      <div><span class="modal-label">Atraso Medición</span><span id="modalDias" class="modal-value" style="font-weight:bold; color:#38bdf8;"></span></div>
     </div>
     <div class="modal-data-row"><span class="modal-label">Estatus Operacional</span><span id="modalEstatus" class="modal-value"></span></div>
     <div class="modal-data-row"><span class="modal-label">Análisis Técnico</span><span id="modalAnalisis" class="modal-value"></span></div>
@@ -337,14 +340,12 @@
 <script>
   let isAdmin = false; let editId = null; let map; let markersLayer = L.layerGroup();
   let mapaInicializado = false; let tempLat = null; let tempLng = null; let imagenesBase64Temp = [];
-  let mapMarkersObj = {}; // Diccionario para el vuelo del mapa
+  let mapMarkersObj = {};
 
-  // Inicializar Botón de Tema si ya estaba en localStorage
   if (localStorage.getItem('mlc_theme') === 'light') {
     document.getElementById('btnTheme').innerText = '🌙 Modo Oscuro';
   }
 
-  // FUNCIÓN PARA ALTERNAR TEMA
   function toggleTheme() {
     const body = document.body;
     const btn = document.getElementById('btnTheme');
@@ -371,19 +372,13 @@
     }
   });
 
-  // BUSCADOR GLOBAL Y MAPA VUELO
   function ejecutarBusqueda() {
     const texto = document.getElementById('buscador').value.toLowerCase().trim();
-    
-    // 1. Filtrar tarjetas
     renderDashboard(texto);
-    
-    // 2. Vuelo dinámico en el Mapa
     if (texto.length > 1 && mapaInicializado && map) {
       const eqEncontrado = equipos.find(eq => 
         (eq.nombre.toLowerCase().includes(texto) || eq.area.toLowerCase().includes(texto)) && eq.lat && eq.lng
       );
-      
       if (eqEncontrado && mapMarkersObj[eqEncontrado.id]) {
         map.flyTo([eqEncontrado.lat, eqEncontrado.lng], 18, { duration: 1.5 });
         mapMarkersObj[eqEncontrado.id].openPopup();
@@ -391,7 +386,6 @@
     }
   }
 
-  // CARGA MASIVA EXCEL
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -429,7 +423,7 @@
 
           const equipo = {
             id: eqId, area: row[0] ? String(row[0]).trim() : "Sin Área", nombre: row[1] ? String(row[1]).trim() : "Desconocido",
-            severidad: colorFinal, componente: "", aviso: "", om: "", fecha: new Date().toISOString().split('T')[0], 
+            severidad: colorFinal, componente: "", aviso: "", om: "", fecha: "", ultima_medicion: new Date().toISOString().split('T')[0], 
             estatus: "", analisis: "", recomendacion: "", lat: null, lng: null, imagenes: []
           };
           equiposRef.child(eqId).set(equipo);
@@ -469,11 +463,11 @@
   function renderizarMarcadoresMapa(equiposList) {
     if (!map) return;
     markersLayer.clearLayers();
-    mapMarkersObj = {}; // Reiniciar rastreador
+    mapMarkersObj = {}; 
 
     equiposList.forEach(eq => {
       if (eq.lat && eq.lng) {
-        let colorHex = '#22c55e'; // Verde
+        let colorHex = '#22c55e'; 
         let animacionCSS = '';
         
         if (eq.severidad === 'Rojo') { colorHex = '#ef4444'; animacionCSS = 'animation: sirena-roja 1.2s infinite alternate;'; }
@@ -491,7 +485,7 @@
         marker.bindPopup(`<b>Tag: ${eq.nombre}</b><br>Área: ${eq.area}<br><b>Estado: ${eq.severidad}</b>`);
         
         markersLayer.addLayer(marker);
-        mapMarkersObj[eq.id] = marker; // Guardar referencia para el vuelo
+        mapMarkersObj[eq.id] = marker; 
       }
     });
   }
@@ -539,7 +533,8 @@
       componente: document.getElementById('inComponente').value.trim(), 
       aviso: document.getElementById('inAviso').value.trim(), 
       om: document.getElementById('inOm').value.trim(), 
-      fecha: document.getElementById('inFecha').value || new Date().toISOString().split('T')[0], 
+      fecha: document.getElementById('inFecha').value || '', 
+      ultima_medicion: document.getElementById('inUltimaMedicion').value || new Date().toISOString().split('T')[0], 
       severidad: document.getElementById('inSeveridad').value,
       estatus: document.getElementById('inEstatus').value.trim(),
       analisis: document.getElementById('inAnalisis').value.trim(), 
@@ -570,6 +565,7 @@
       document.getElementById('inAviso').value = eq.aviso || '';
       document.getElementById('inOm').value = eq.om || '';
       document.getElementById('inFecha').value = eq.fecha || '';
+      document.getElementById('inUltimaMedicion').value = eq.ultima_medicion || eq.fecha || '';
       document.getElementById('inSeveridad').value = eq.severidad || 'Verde';
       document.getElementById('inEstatus').value = eq.estatus || '';
       document.getElementById('inAnalisis').value = eq.analisis || '';
@@ -624,7 +620,11 @@
     document.getElementById('modalAviso').innerText = eq.aviso || '-';
     document.getElementById('modalOm').innerText = eq.om || '-';
     document.getElementById('modalFecha').innerText = eq.fecha || '-';
-    document.getElementById('modalDias').innerText = `${calcularDias(eq.fecha)} días`;
+    
+    const ultimaMedicion = eq.ultima_medicion || eq.fecha || '';
+    document.getElementById('modalUltimaMedicion').innerText = ultimaMedicion || '-';
+    document.getElementById('modalDias').innerText = `${calcularDias(ultimaMedicion)} días sin medir`;
+    
     document.getElementById('modalEstatus').innerText = eq.estatus || 'No definido';
     document.getElementById('modalAnalisis').innerText = eq.analisis || 'Sin información';
     document.getElementById('modalRecomendacion').innerText = eq.recomendacion || 'Sin información';
@@ -651,12 +651,10 @@
     const root = document.getElementById('app-root');
     root.innerHTML = '';
     
-    // FILTRADO DINÁMICO
     const equiposFiltrados = equipos.filter(eq => 
       eq.nombre.toLowerCase().includes(filtro) || eq.area.toLowerCase().includes(filtro)
     );
 
-    // ACTUALIZACIÓN DE INDICADORES KPI
     let cRojo = 0, cNaranja = 0, cAmarillo = 0, cVerde = 0;
     equiposFiltrados.forEach(eq => {
       if (eq.severidad === 'Rojo') cRojo++;
@@ -675,14 +673,20 @@
 
     for (const [area, eqs] of Object.entries(equiposPorArea)) {
       
+      // NUEVA LÓGICA DE ORDENAMIENTO (Por Color y por Días Sin Medir)
       eqs.sort((a, b) => {
         const sevDiff = valorSeveridad(b.severidad) - valorSeveridad(a.severidad);
         if (sevDiff !== 0) return sevDiff;
-        return calcularDias(b.fecha) - calcularDias(a.fecha);
+        
+        // Si tienen el mismo color, prioriza el que tiene más días sin medir
+        const fechaB = b.ultima_medicion || b.fecha;
+        const fechaA = a.ultima_medicion || a.fecha;
+        return calcularDias(fechaB) - calcularDias(fechaA);
       });
 
       const html = eqs.map(eq => {
-        const dias = calcularDias(eq.fecha);
+        const fechaParaCalcular = eq.ultima_medicion || eq.fecha;
+        const dias = calcularDias(fechaParaCalcular);
         let sevClass = 'sev-verde';
         if(eq.severidad === 'Rojo') sevClass = 'sev-rojo';
         if(eq.severidad === 'Naranja') sevClass = 'sev-naranja';
@@ -694,7 +698,7 @@
             <button class="edit-btn" onclick="editarEquipo(event, '${eq.id}')" title="Editar">✏️</button>
             <button class="delete-btn" onclick="eliminarEquipo(event, '${eq.id}')" title="Eliminar">✖</button>
             <h3 class="asset-tag">${eq.nombre}</h3>
-            <span class="asset-days">${dias} DÍAS</span>
+            <span class="asset-days">⏱️ ${dias} DÍAS SIN MEDIR</span>
           </div>
         `;
       }).join('');
