@@ -7,8 +7,8 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-  /* --- Estilos Base --- */
-  body { background-color: #0b1120; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; padding: 20px; margin: 0; }
+  /* --- Estilos Base (Modo Oscuro por defecto) --- */
+  body { background-color: #0b1120; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; padding: 20px; margin: 0; transition: background-color 0.3s, color 0.3s; }
   
   /* --- Encabezado Corporativo --- */
   .header { border-bottom: 1px solid #1e293b; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
@@ -22,9 +22,9 @@
   .header-titles h1 { color: #ffffff; font-size: 1.5rem; margin: 0 0 3px 0; text-transform: uppercase; letter-spacing: 1px; }
   .header-titles p { color: #94a3b8; margin: 0; font-size: 0.85rem; }
   
-  .header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between; background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #1e293b;}
+  .header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between; background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #1e293b; margin-bottom: 15px;}
   .header-controls-left { display: flex; gap: 10px; flex-grow: 1; max-width: 400px; }
-  .header-controls-right { display: flex; gap: 8px; }
+  .header-controls-right { display: flex; gap: 8px; flex-wrap: wrap; }
   
   /* Buscador Global */
   .search-input { width: 100%; padding: 8px 15px; border-radius: 20px; border: 1px solid #38bdf8; background: #1e293b; color: white; font-size: 0.9rem; outline: none; transition: box-shadow 0.3s; }
@@ -33,6 +33,18 @@
   .view-btn, .btn-lock { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: 0.3s; }
   .view-btn.active { background: #0284c7; color: white; border-color: #0284c7; }
   .view-btn:hover, .btn-lock:hover { background: #334155; color: #fff; }
+
+  /* --- Tarjetas KPI Superiores --- */
+  .kpi-container { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .kpi-card { flex: 1; min-width: 130px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+  .kpi-label { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 800; margin-bottom: 5px; }
+  .kpi-value { font-size: 2.2rem; font-weight: 900; line-height: 1; }
+  
+  .kpi-total .kpi-value { color: #38bdf8; }
+  .kpi-rojo .kpi-value { color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+  .kpi-naranja .kpi-value { color: #f97316; text-shadow: 0 0 10px rgba(249, 115, 22, 0.4); }
+  .kpi-amarillo .kpi-value { color: #eab308; text-shadow: 0 0 10px rgba(234, 179, 8, 0.4); }
+  .kpi-verde .kpi-value { color: #22c55e; }
   
   /* --- Contenedor del Mapa --- */
   #map-view { display: none; margin-bottom: 20px; }
@@ -59,23 +71,15 @@
   
   .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
   
-  .card { 
-    background: rgba(15, 23, 42, 0.9); border: 2px solid #334155; border-radius: 8px; padding: 12px 6px; 
-    position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; 
-    justify-content: center; text-align: center; min-height: 65px; transition: transform 0.2s ease;
-  }
+  .card { background: rgba(15, 23, 42, 0.9); border: 2px solid #334155; border-radius: 8px; padding: 12px 6px; position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 65px; transition: transform 0.2s ease; }
   .card:hover { transform: translateY(-3px); }
   
-  /* Animaciones Sirena Suave (Compartida con el Mapa) */
   .sev-rojo { border-color: rgba(239, 68, 68, 0.8); animation: sirena-roja 1.2s ease-in-out infinite alternate; }
   @keyframes sirena-roja { 0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2), inset 0 0 5px rgba(239, 68, 68, 0.1); } 100% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.9), inset 0 0 15px rgba(239, 68, 68, 0.5); border-color: rgba(239, 68, 68, 1); } }
-
   .sev-naranja { border-color: rgba(249, 115, 22, 0.8); animation: sirena-naranja 2s ease-in-out infinite alternate; }
   @keyframes sirena-naranja { 0% { box-shadow: 0 0 5px rgba(249, 115, 22, 0.1), inset 0 0 2px rgba(249, 115, 22, 0.05); } 100% { box-shadow: 0 0 18px rgba(249, 115, 22, 0.7), inset 0 0 10px rgba(249, 115, 22, 0.3); border-color: rgba(249, 115, 22, 1); } }
-
   .sev-amarillo { border-color: rgba(234, 179, 8, 0.6); animation: respiracion-amarilla 3s ease-in-out infinite alternate; }
   @keyframes respiracion-amarilla { 0% { box-shadow: 0 0 0px rgba(234, 179, 8, 0); } 100% { box-shadow: 0 0 12px rgba(234, 179, 8, 0.5), inset 0 0 5px rgba(234, 179, 8, 0.2); } }
-
   .sev-verde { border-color: rgba(34, 197, 94, 0.4); box-shadow: 0 0 8px rgba(34, 197, 94, 0.1); }
 
   .pulse-indicator { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; }
@@ -124,9 +128,57 @@
   .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 3000; justify-content: center; align-items: center; }
   .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 4px; }
   .lightbox-close { position: absolute; top: 15px; right: 25px; color: #fff; font-size: 2.5rem; cursor: pointer; background: none; border: none; }
+
+  /* =========================================
+     MODO CLARO (ILUMINACIÓN PARA TERRENO)
+     ========================================= */
+  body.light-mode { background-color: #f8fafc; color: #0f172a; }
+  body.light-mode .header { border-bottom-color: #cbd5e1; }
+  body.light-mode .header-titles h1 { color: #0f172a; }
+  body.light-mode .header-titles p { color: #475569; }
+  body.light-mode .brand-badge { background: #ffffff; border-color: #cbd5e1; color: #0f172a; }
+  body.light-mode .header-controls { background: #ffffff; border-color: #cbd5e1; }
+  body.light-mode .search-input { background: #f1f5f9; border-color: #cbd5e1; color: #0f172a; }
+  body.light-mode .view-btn, body.light-mode .btn-lock { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
+  body.light-mode .view-btn:hover, body.light-mode .btn-lock:hover { background: #e2e8f0; }
+  body.light-mode .view-btn.active { background: #0284c7; color: #fff; }
+  
+  /* KPIs Modo Claro */
+  body.light-mode .kpi-card { background: #ffffff; border-color: #cbd5e1; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+  body.light-mode .kpi-label { color: #475569; }
+  body.light-mode .kpi-rojo .kpi-value { text-shadow: none; }
+  body.light-mode .kpi-naranja .kpi-value { text-shadow: none; }
+  body.light-mode .kpi-amarillo .kpi-value { text-shadow: none; }
+
+  /* Panel y Tarjetas Modo Claro */
+  body.light-mode .admin-panel { background: #ffffff; border-color: #cbd5e1; }
+  body.light-mode .admin-panel input, body.light-mode .admin-panel textarea, body.light-mode .admin-panel select { background: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
+  body.light-mode .map-instruction { background: #f0f9ff; border-color: #38bdf8; color: #0284c7; }
+  body.light-mode .area-title { color: #0284c7; border-left-color: #0284c7; }
+  body.light-mode .card { background: #ffffff; }
+  body.light-mode .asset-tag { color: #0f172a; text-shadow: none; }
+  
+  /* Badges de días Modo Claro */
+  body.light-mode .sev-rojo .asset-days { background: #fee2e2; color: #991b1b !important; border-color: #fecaca; }
+  body.light-mode .sev-naranja .asset-days { background: #ffedd5; color: #9a3412 !important; border-color: #fed7aa; }
+  body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #fde047; }
+  body.light-mode .sev-verde .asset-days { background: #dcfce7; color: #166534 !important; border-color: #bbf7d0; }
+
+  /* Modal Modo Claro */
+  body.light-mode .modal-content { background: #ffffff; border-color: #cbd5e1; }
+  body.light-mode .modal-grid { background: #f8fafc; }
+  body.light-mode .modal-title { color: #0f172a; }
+  body.light-mode .modal-value { color: #0f172a; }
+  body.light-mode .modal-label { color: #475569; }
+  body.light-mode .modal-close { color: #475569; }
 </style>
 </head>
 <body>
+
+<script>
+  // Carga rápida del tema preferido antes de que se dibuje la pantalla (evita parpadeo)
+  if (localStorage.getItem('mlc_theme') === 'light') { document.body.classList.add('light-mode'); }
+</script>
 
 <div class="header">
   <div class="header-left">
@@ -144,9 +196,34 @@
     <input type="text" id="buscador" class="search-input" placeholder="🔍 Buscar por Tag o Área (ej. MH4004)..." onkeyup="ejecutarBusqueda()">
   </div>
   <div class="header-controls-right">
+    <button id="btnTheme" class="view-btn" onclick="toggleTheme()">☀️ Modo Claro</button>
     <button id="btnViewGrid" class="view-btn active" onclick="cambiarVista('grid')">📋 Matriz Activos</button>
     <button id="btnViewMap" class="view-btn" onclick="cambiarVista('map')">🗺️ Mapa Operacional</button>
     <button id="btnUnlock" class="btn-lock" onclick="solicitarClave()">🔒 Modo Lectura</button>
+  </div>
+</div>
+
+<!-- FILA DE INDICADORES KPI -->
+<div class="kpi-container" id="kpiContainer">
+  <div class="kpi-card kpi-total">
+    <span class="kpi-label">Total Activos</span>
+    <div class="kpi-value" id="kpiTotal">0</div>
+  </div>
+  <div class="kpi-card kpi-rojo">
+    <span class="kpi-label">🔴 Críticos (Alto)</span>
+    <div class="kpi-value" id="kpiRojo">0</div>
+  </div>
+  <div class="kpi-card kpi-naranja">
+    <span class="kpi-label">🟠 Alertas (Medio)</span>
+    <div class="kpi-value" id="kpiNaranja">0</div>
+  </div>
+  <div class="kpi-card kpi-amarillo">
+    <span class="kpi-label">🟡 Monitoreo (Bajo)</span>
+    <div class="kpi-value" id="kpiAmarillo">0</div>
+  </div>
+  <div class="kpi-card kpi-verde">
+    <span class="kpi-label">🟢 Operativos (Normal)</span>
+    <div class="kpi-value" id="kpiVerde">0</div>
   </div>
 </div>
 
@@ -260,7 +337,27 @@
 <script>
   let isAdmin = false; let editId = null; let map; let markersLayer = L.layerGroup();
   let mapaInicializado = false; let tempLat = null; let tempLng = null; let imagenesBase64Temp = [];
-  let mapMarkersObj = {}; // Diccionario para rastrear los pines en el mapa
+  let mapMarkersObj = {}; // Diccionario para el vuelo del mapa
+
+  // Inicializar Botón de Tema si ya estaba en localStorage
+  if (localStorage.getItem('mlc_theme') === 'light') {
+    document.getElementById('btnTheme').innerText = '🌙 Modo Oscuro';
+  }
+
+  // FUNCIÓN PARA ALTERNAR TEMA
+  function toggleTheme() {
+    const body = document.body;
+    const btn = document.getElementById('btnTheme');
+    if (body.classList.contains('light-mode')) {
+      body.classList.remove('light-mode');
+      btn.innerText = '☀️ Modo Claro';
+      localStorage.setItem('mlc_theme', 'dark');
+    } else {
+      body.classList.add('light-mode');
+      btn.innerText = '🌙 Modo Oscuro';
+      localStorage.setItem('mlc_theme', 'light');
+    }
+  }
 
   document.getElementById('inImagenesFiles').addEventListener('change', function(e) {
     const files = e.target.files;
@@ -278,7 +375,7 @@
   function ejecutarBusqueda() {
     const texto = document.getElementById('buscador').value.toLowerCase().trim();
     
-    // 1. Filtrar tarjetas en el Dashboard
+    // 1. Filtrar tarjetas
     renderDashboard(texto);
     
     // 2. Vuelo dinámico en el Mapa
@@ -288,7 +385,6 @@
       );
       
       if (eqEncontrado && mapMarkersObj[eqEncontrado.id]) {
-        // Vuela hacia el equipo encontrado y abre su etiqueta
         map.flyTo([eqEncontrado.lat, eqEncontrado.lng], 18, { duration: 1.5 });
         mapMarkersObj[eqEncontrado.id].openPopup();
       }
@@ -395,7 +491,7 @@
         marker.bindPopup(`<b>Tag: ${eq.nombre}</b><br>Área: ${eq.area}<br><b>Estado: ${eq.severidad}</b>`);
         
         markersLayer.addLayer(marker);
-        mapMarkersObj[eq.id] = marker; // Guardar referencia para el vuelo en mapa
+        mapMarkersObj[eq.id] = marker; // Guardar referencia para el vuelo
       }
     });
   }
@@ -555,14 +651,30 @@
     const root = document.getElementById('app-root');
     root.innerHTML = '';
     
-    // Filtrar equipos antes de agruparlos
+    // FILTRADO DINÁMICO
     const equiposFiltrados = equipos.filter(eq => 
       eq.nombre.toLowerCase().includes(filtro) || eq.area.toLowerCase().includes(filtro)
     );
 
+    // ACTUALIZACIÓN DE INDICADORES KPI
+    let cRojo = 0, cNaranja = 0, cAmarillo = 0, cVerde = 0;
+    equiposFiltrados.forEach(eq => {
+      if (eq.severidad === 'Rojo') cRojo++;
+      else if (eq.severidad === 'Naranja') cNaranja++;
+      else if (eq.severidad === 'Amarillo') cAmarillo++;
+      else cVerde++;
+    });
+
+    document.getElementById('kpiTotal').innerText = equiposFiltrados.length;
+    document.getElementById('kpiRojo').innerText = cRojo;
+    document.getElementById('kpiNaranja').innerText = cNaranja;
+    document.getElementById('kpiAmarillo').innerText = cAmarillo;
+    document.getElementById('kpiVerde').innerText = cVerde;
+
     const equiposPorArea = equiposFiltrados.reduce((acc, eq) => { (acc[eq.area] = acc[eq.area] || []).push(eq); return acc; }, {});
 
     for (const [area, eqs] of Object.entries(equiposPorArea)) {
+      
       eqs.sort((a, b) => {
         const sevDiff = valorSeveridad(b.severidad) - valorSeveridad(a.severidad);
         if (sevDiff !== 0) return sevDiff;
