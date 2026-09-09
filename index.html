@@ -63,7 +63,7 @@
   #map-container { width: 100%; height: 550px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #000; z-index: 1;}
 
   /* --- Panel Admin --- */
-  .admin-panel { display: none; background: rgba(15, 23, 42, 0.92); padding: 12px; border-radius: 8px; margin-bottom: 15px; flex-wrap: wrap; gap: 8px; border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px); }
+  .admin-panel { display: none; background: rgba(15, 23, 42, 0.95); padding: 15px; border-radius: 8px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; border: 2px solid #38bdf8; backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(56, 189, 248, 0.3); }
   .admin-panel .input-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 140px; }
   .admin-panel label { font-size: 0.65rem; color: #38bdf8; font-weight: bold; margin-bottom: 2px; text-transform: uppercase; }
   .admin-panel input, .admin-panel textarea, .admin-panel select { padding: 6px 8px; border-radius: 4px; border: 1px solid #334155; background: rgba(30, 41, 59, 0.8); color: white; width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.8rem; }
@@ -98,7 +98,6 @@
     overflow: visible;
   }
   
-  /* EFECTO ZOOM Y ELEVACIÓN AL PASAR EL MOUSE */
   .card:hover { 
     transform: scale(1.12) translateY(-4px); 
     z-index: 50; 
@@ -122,9 +121,10 @@
   .sev-verde .pulse-indicator { background-color: #22c55e; }
   .sev-plomo .pulse-indicator { background-color: #64748b; }
   
-  .delete-btn, .edit-btn { display: none; position: absolute; bottom: 2px; background: rgba(0,0,0,0.8); border-radius: 3px; border: none; font-size: 0.75rem; z-index: 100; padding: 2px 5px; cursor: pointer; }
+  .delete-btn, .edit-btn { display: none; position: absolute; bottom: 2px; background: rgba(0,0,0,0.85); border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); font-size: 0.75rem; z-index: 100; padding: 2px 5px; cursor: pointer; }
   .delete-btn { right: 2px; color: #ef4444; }
   .edit-btn { left: 2px; color: #38bdf8; }
+  .delete-btn:hover, .edit-btn:hover { background: #334155; }
   
   .asset-type-badge { font-size: 0.55rem; color: #38bdf8; font-weight: 700; text-transform: uppercase; margin-bottom: 1px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95px; }
   .asset-tag { color: #f8fafc; font-size: 0.85rem; font-weight: 800; margin: 0; letter-spacing: 0.5px; z-index: 2; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
@@ -186,7 +186,7 @@
   body.light-mode .kpi-card { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.1); backdrop-filter: blur(8px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
   body.light-mode .kpi-label { color: #475569; }
 
-  body.light-mode .admin-panel { background: rgba(255, 255, 255, 0.9); border-color: rgba(0,0,0,0.15); backdrop-filter: blur(10px); }
+  body.light-mode .admin-panel { background: rgba(255, 255, 255, 0.95); border-color: #0284c7; backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(2, 132, 199, 0.2); }
   body.light-mode .admin-panel input, body.light-mode .admin-panel textarea, body.light-mode .admin-panel select { background: rgba(248, 250, 252, 0.9); border-color: #cbd5e1; color: #0f172a; }
   body.light-mode .map-instruction { background: rgba(240, 249, 2ff, 0.9); border-color: #38bdf8; color: #0284c7; }
   body.light-mode .area-title { color: #0284c7; border-left-color: #0284c7; text-shadow: none; }
@@ -260,7 +260,7 @@
   </div>
 </div>
 
-<div class="admin-panel">
+<div class="admin-panel" id="adminPanelForm">
   <div class="input-group">
     <label>Área Operacional</label>
     <input type="text" id="inArea" placeholder="ej. Área 61" required>
@@ -640,9 +640,14 @@
     equiposRef.child(eqId).update(eqData).then(resetFormulario);
   }
 
+  // --- FUNCIÓN DE EDICIÓN AUTOMÁTICA EN EL PANEL ---
   function editarEquipo(event, id) {
-    event.stopPropagation(); // Evita que se abra el modal general
-    if (!isAdmin) return;
+    event.stopPropagation(); // Evita abrir el modal general
+    if (!isAdmin) {
+      alert("⚠️ Debe activar el Modo Admin para editar.");
+      return;
+    }
+    
     const eq = equipos.find(i => i.id === id);
     if (eq) {
       document.getElementById('inArea').value = eq.area || '';
@@ -653,13 +658,19 @@
       document.getElementById('inOm').value = eq.om || '';
       document.getElementById('inFecha').value = eq.fecha || '';
       document.getElementById('inUltimaMedicion').value = eq.ultima_medicion || '';
-      document.getElementById('inSeveridad').value = eq.severidad || 'Verde';
+      document.getElementById('inSeveridad').value = eq.severidad || 'Plomo';
       document.getElementById('inEstatus').value = eq.estatus || '';
       document.getElementById('inAnalisis').value = eq.analisis || '';
       document.getElementById('inRecomendacion').value = eq.recomendacion || '';
-      editId = id; tempLat = eq.lat || null; tempLng = eq.lng || null;
+      
+      editId = id; 
+      tempLat = eq.lat || null; 
+      tempLng = eq.lng || null;
       imagenesBase64Temp = eq.imagenes || [];
+      
       document.getElementById('btnSubmit').innerText = "💾 Guardar Cambios";
+      
+      // Auto-desplazar y enfocar el panel de administración
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
@@ -673,7 +684,7 @@
   }
 
   function eliminarEquipo(event, id) {
-    event.stopPropagation(); // Evita que se abra el modal general
+    event.stopPropagation(); 
     if (!isAdmin) return;
     if (confirm("⚠️ ¿Eliminar activo de la matriz?")) { 
       equiposRef.child(id).remove().then(() => { if (editId === id) resetFormulario(); }); 
