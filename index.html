@@ -63,6 +63,9 @@
   .admin-panel button:hover { opacity: 0.9; }
   
   .btn-upload { background: #10b981 !important; }
+  .btn-danger { background: #ef4444 !important; }
+  .btn-danger:hover { background: #dc2626 !important; }
+
   .upload-box { border: 1px dashed #10b981; padding: 10px; border-radius: 5px; display: flex; gap: 10px; align-items: center; background: rgba(16, 185, 129, 0.1); flex-grow: 1; }
 
   /* --- Vista Cuadritos --- */
@@ -285,11 +288,15 @@
   <div class="full-width">
     <div class="upload-box">
       <div style="flex-grow: 1;">
-        <label style="color:#10b981;">CARGA MASIVA EXCEL (Columnas: AREA | EQUIPO | Tipo equipo | ULTIMA FECHA)</label>
+        <label style="color:#10b981;">CARGA MASIVA EXCEL (Área | Equipo | Tipo equipo | Ultima Fecha)</label>
         <input type="file" id="inExcelFile" accept=".xlsx, .xls, .csv" style="background:transparent; border:none; padding:0; margin-top:5px;">
       </div>
       <button class="btn-upload" onclick="procesarExcel()">📥 Actualizar desde Excel</button>
     </div>
+    
+    <!-- BOTÓN DE ELIMINACIÓN MASIVA -->
+    <button class="btn-danger" onclick="eliminarTodoMasivo()" title="Borra todos los activos de Firebase">🗑️ Borrar Todos los Activos</button>
+
     <button id="btnSubmit" onclick="guardarEquipo()" style="height: fit-content;">+ Guardar Activo</button>
   </div>
 </div>
@@ -343,6 +350,10 @@
   let mapaInicializado = false; let tempLat = null; let tempLng = null; let imagenesBase64Temp = [];
   let mapMarkersObj = {};
 
+  if (localStorage.getItem('mlc_theme') === 'light') {
+    document.getElementById('btnTheme').innerText = '🌙 Modo Oscuro';
+  }
+
   function toggleTheme() {
     const body = document.body;
     const btn = document.getElementById('btnTheme');
@@ -383,7 +394,21 @@
     }
   }
 
-  // --- ACTUALIZACIÓN INTELIGENTE (4 COLUMNAS: AREA, EQUIPO, TIPO, FECHA) ---
+  // --- ELIMINAR TODO EN MASA ---
+  function eliminarTodoMasivo() {
+    if (!isAdmin) return;
+    if (confirm("⚠️ ADVERTENCIA: ¿Está seguro que desea BORRAR TODOS LOS ACTIVOS de la base de datos?\nEsta acción no se puede deshacer.")) {
+      equiposRef.remove()
+        .then(() => {
+          alert("🗑️ Base de datos limpiada correctamente.");
+          resetFormulario();
+        })
+        .catch(error => {
+          alert("❌ Error al limpiar la base de datos: " + error.message);
+        });
+    }
+  }
+
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -424,7 +449,6 @@
             updateData.ultima_medicion = String(row[3]).trim();
           }
 
-          // Si el equipo es nuevo, le damos Severidad Verde y Fecha Hallazgo por defecto
           const eqExistente = equipos.find(e => e.id === eqId);
           if (!eqExistente) {
             updateData.severidad = "Verde";
