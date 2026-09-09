@@ -285,7 +285,7 @@
   <div class="full-width">
     <div class="upload-box">
       <div style="flex-grow: 1;">
-        <label style="color:#10b981;">CARGA MASIVA EXCEL (Archivo .xlsx o .xls)</label>
+        <label style="color:#10b981;">CARGA MASIVA EXCEL (Columnas: Área, Tag, Color, Últ. Medición)</label>
         <input type="file" id="inExcelFile" accept=".xlsx, .xls, .csv" style="background:transparent; border:none; padding:0; margin-top:5px;">
       </div>
       <button class="btn-upload" onclick="procesarExcel()">📥 Subir Archivo Excel</button>
@@ -331,7 +331,7 @@
   <img id="lightboxImg" class="lightbox-content" src="" alt="Zoom">
 </div>
 
-<!-- LIBRERÍAS DE LECTURA DE EXCEL (SheetJS), LEAFLET y FIREBASE -->
+<!-- LIBRERÍAS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -386,6 +386,7 @@
     }
   }
 
+  // --- ACTUALIZACIÓN INTELIGENTE (UPSERT) VÍA EXCEL ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -401,35 +402,46 @@
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         
-        const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+        // raw: false asegura que las fechas se lean como texto formateado y no números enteros de Excel
+        const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false, dateNF: 'yyyy-mm-dd'});
         let agregados = 0;
 
         for (let i = 0; i < jsonRows.length; i++) {
           let row = jsonRows[i];
           while(row.length > 0 && (row[0] === null || row[0] === undefined || String(row[0]).trim() === '')) { row.shift(); }
-
           if (row.length < 2) continue;
           
           const col0 = String(row[0]).toLowerCase().trim();
           const col1 = String(row[1]).toLowerCase().trim();
           if (col0 === 'área' || col0 === 'area' || col1 === 'tag' || col1 === 'n° tag') { continue; }
 
-          const eqId = Date.now().toString() + i;
+          // LLAVE MAESTRA: Usamos el TAG como ID único (limpio de espacios y caracteres inválidos)
+          const tagLimpio = String(row[1]).trim().toUpperCase();
+          const eqId = tagLimpio.replace(/[.#$\[\]\s]/g, "_");
+
           let colorLeido = row[2] ? String(row[2]).toLowerCase() : "verde";
           let colorFinal = "Verde";
           if (colorLeido.includes("rojo")) colorFinal = "Rojo";
           if (colorLeido.includes("naranja")) colorFinal = "Naranja";
           if (colorLeido.includes("amarillo")) colorFinal = "Amarillo";
 
-          const equipo = {
-            id: eqId, area: row[0] ? String(row[0]).trim() : "Sin Área", nombre: row[1] ? String(row[1]).trim() : "Desconocido",
-            severidad: colorFinal, componente: "", aviso: "", om: "", fecha: "", ultima_medicion: new Date().toISOString().split('T')[0], 
-            estatus: "", analisis: "", recomendacion: "", lat: null, lng: null, imagenes: []
+          // Objeto con solo los datos que trae el Excel para NO sobreescribir imágenes ni análisis
+          const updateData = {
+            area: row[0] ? String(row[0]).trim() : "Sin Área",
+            nombre: tagLimpio,
+            severidad: colorFinal
           };
-          equiposRef.child(eqId).set(equipo);
+
+          // Si agregaste la 4ta columna de Fecha en el Excel, la captura
+          if (row[3]) {
+            updateData.ultima_medicion = String(row[3]).trim();
+          }
+
+          // Se usa .update() en lugar de .set() para actualizar sin borrar lo demás
+          equiposRef.child(eqId).update(updateData);
           agregados++;
         }
-        alert(`✅ Éxito total: ${agregados} equipos procesados.`);
+        alert(`✅ Carga procesada: ${agregados} equipos han sido actualizados/creados.`);
         fileInput.value = '';
       } catch (error) { alert("❌ Error procesando Excel."); }
     };
@@ -525,7 +537,7 @@
   function guardarEquipo() {
     if (!isAdmin) return; 
     const area = document.getElementById('inArea').value.trim();
-    const nombre = document.getElementById('inNombre').value.trim();
+    const nombre = document.getElementById('inNombre').value.trim().toUpperCase();
     if(!area || !nombre) { alert("Mínimo Área y Tag requeridos."); return; }
 
     const eqData = { 
@@ -542,17 +554,19 @@
       imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (editId ? equipos.find(e=>e.id===editId).imagenes || [] : [])
     };
 
-    if (editId) {
-      eqData.id = editId;
-      const eqOrig = equipos.find(e => e.id === editId);
-      eqData.lat = tempLat !== null ? tempLat : (eqOrig.lat || null);
-      eqData.lng = tempLng !== null ? tempLng : (eqOrig.lng || null);
-      equiposRef.child(editId).update(eqData).then(resetFormulario);
-    } else {
-      eqData.id = Date.now().toString();
-      eqData.lat = tempLat; eqData.lng = tempLng;
-      equiposRef.child(eqData.id).set(eqData).then(resetFormulario);
+    let eqId = editId;
+    if (!eqId) {
+      // Si es un ingreso manual nuevo, usamos el TAG como ID para mantener consistencia con el Excel
+      eqId = nombre.replace(/[.#$\[\]\s]/g, "_");
     }
+
+    eqData.id = eqId;
+    const eqOrig = equipos.find(e => e.id === eqId);
+    eqData.lat = tempLat !== null ? tempLat : (eqOrig ? eqOrig.lat : null);
+    eqData.lng = tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null);
+    
+    // Usamos update para no chocar
+    equiposRef.child(eqId).update(eqData).then(resetFormulario);
   }
 
   function editarEquipo(event, id) {
@@ -592,7 +606,9 @@
 
   function calcularDias(fechaStr) {
     if (!fechaStr) return 0;
-    return Math.max(0, Math.floor((new Date() - new Date(fechaStr)) / (1000 * 60 * 60 * 24)));
+    const dateObj = new Date(fechaStr);
+    if (isNaN(dateObj)) return 0; // Por si viene un formato raro del Excel
+    return Math.max(0, Math.floor((new Date() - dateObj) / (1000 * 60 * 60 * 24)));
   }
 
   function valorSeveridad(color) {
@@ -673,19 +689,17 @@
 
     for (const [area, eqs] of Object.entries(equiposPorArea)) {
       
-      // NUEVA LÓGICA DE ORDENAMIENTO (Por Color y por Días Sin Medir)
       eqs.sort((a, b) => {
         const sevDiff = valorSeveridad(b.severidad) - valorSeveridad(a.severidad);
         if (sevDiff !== 0) return sevDiff;
         
-        // Si tienen el mismo color, prioriza el que tiene más días sin medir
-        const fechaB = b.ultima_medicion || b.fecha;
-        const fechaA = a.ultima_medicion || a.fecha;
+        const fechaB = b.ultima_medicion || b.fecha || '';
+        const fechaA = a.ultima_medicion || a.fecha || '';
         return calcularDias(fechaB) - calcularDias(fechaA);
       });
 
       const html = eqs.map(eq => {
-        const fechaParaCalcular = eq.ultima_medicion || eq.fecha;
+        const fechaParaCalcular = eq.ultima_medicion || eq.fecha || '';
         const dias = calcularDias(fechaParaCalcular);
         let sevClass = 'sev-verde';
         if(eq.severidad === 'Rojo') sevClass = 'sev-rojo';
