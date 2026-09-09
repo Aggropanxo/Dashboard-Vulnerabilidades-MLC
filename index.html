@@ -317,7 +317,7 @@
   <div class="full-width">
     <div class="upload-box">
       <div style="flex-grow: 1;">
-        <label style="color:#10b981;">CARGA MASIVA EXCEL (Columnas fijas: Área | Equipo | Tipo | Fecha)</label>
+        <label style="color:#10b981;">CARGA MASIVA EXCEL (Lectura masiva de toda la hoja)</label>
         <input type="file" id="inExcelFile" accept=".xlsx, .xls, .csv" style="background:transparent; border:none; padding:0; margin-top:5px;">
       </div>
       <button class="btn-upload" onclick="procesarExcel()">📥 Actualizar desde Excel</button>
@@ -332,7 +332,7 @@
 <div id="dashboard-view"><div id="app-root"></div></div>
 
 <div id="map-view">
-  <div class="map-instruction">📍 <b>Modo Admin:</b> Clic en el mapa para asignar coordenadas geográficas al activo.</div>
+  <div class="map-instruction">📍 <b>Modo Admin:</b> Clic in the mapa para asignar coordenadas geográficas al activo.</div>
   <div id="map-container"></div>
 </div>
 
@@ -449,7 +449,7 @@
     return '🔧';
   }
 
-  // --- LECTURA DIRECTA Y ROBUSTA POR COLUMNAS FIJAS ---
+  // --- LECTOR EXCEL ULTRA-ROBUSTO (LEE TODAS LAS FILAS HASTA EL FINAL) ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -465,17 +465,17 @@
         let agregadosTotales = 0;
 
         workbook.SheetNames.forEach(sheetName => {
-          // Omitir hojas de años anteriores o agrupaciones que no sean matrices principales
-          if (sheetName.toLowerCase().includes('2025') || sheetName.toLowerCase().includes('2026') || sheetName.toLowerCase().includes('grupos')) {
+          // Omitir hojas secundarias
+          if (sheetName.toLowerCase().includes('2025') || sheetName.toLowerCase().includes('2026') || sheetName.toLowerCase().includes('grupos') || sheetName.toLowerCase().includes('reserva')) {
             return;
           }
 
           const worksheet = workbook.Sheets[sheetName];
-          const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false, dateNF: 'yyyy-mm-dd'});
+          const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false, defval: ""});
 
           if (jsonRows.length <= 1) return;
 
-          // Recorrer desde la segunda fila (asumiendo fila 1 como encabezado)
+          // Procesar CADA FILA de la hoja desde la fila 2 en adelante sin importar si hay celdas vacías
           for (let i = 1; i < jsonRows.length; i++) {
             let row = jsonRows[i];
             if (!row || row.length < 2) continue;
@@ -483,8 +483,9 @@
             const areaVal = row[0] ? String(row[0]).trim() : '';
             const equipoVal = row[1] ? String(row[1]).trim() : '';
 
-            if (!equipoVal || equipoVal === '' || equipoVal.toLowerCase() === 'undefined') continue;
-            if (areaVal === '' || areaVal.toLowerCase().includes('area') || areaVal.toLowerCase().includes('área')) continue;
+            // Si no hay equipo válido, saltar
+            if (!equipoVal || equipoVal === '' || equipoVal.toLowerCase() === 'undefined' || equipoVal.toLowerCase() === 'equipo' || equipoVal.toLowerCase() === 'equipos') continue;
+            if (areaVal === '' || areaVal.toLowerCase() === 'area' || areaVal.toLowerCase() === 'área') continue;
 
             const tagLimpio = equipoVal.toUpperCase();
             const eqId = tagLimpio.replace(/[.#$\[\]\s]/g, "_");
@@ -498,17 +499,20 @@
             const fechaVal = row[3] ? String(row[3]).trim() : '';
             if (fechaVal && fechaVal !== '' && fechaVal !== 'undefined' && !fechaVal.includes('1900') && !fechaVal.toLowerCase().includes('nat')) {
               updateData.ultima_medicion = fechaVal;
+            } else {
+              updateData.ultima_medicion = ''; // Asegurar que quede vacío si no hay fecha
             }
 
             const eqExistente = equipos.find(e => e.id === eqId);
             if (!eqExistente) {
               if (!updateData.ultima_medicion) {
-                updateData.severidad = "Plomo"; // Sin medición -> Color plomo
+                updateData.severidad = "Plomo"; // Sin medición inicial
               } else {
                 updateData.severidad = "Verde";
               }
               updateData.fecha = new Date().toISOString().split('T')[0];
             } else {
+              // Si ya existe pero el excel trae fecha nueva
               if (updateData.ultima_medicion && (!eqExistente.ultima_medicion || eqExistente.severidad === 'Plomo')) {
                 if (eqExistente.severidad === 'Plomo') updateData.severidad = 'Verde';
               }
@@ -519,7 +523,7 @@
           }
         });
 
-        alert(`✅ Carga masiva completada: ${agregadosTotales} registros procesados con éxito.`);
+        alert(`✅ Carga masiva completada con éxito: ${agregadosTotales} registros procesados.`);
         fileInput.value = '';
       } catch (error) { 
         alert("❌ Error procesando Excel: " + error.message); 
@@ -698,7 +702,7 @@
     if(color === 'Naranja') return 4;
     if(color === 'Amarillo') return 3;
     if(color === 'Verde') return 2;
-    return 1; 
+    return 1; // Plomo al fondo
   }
 
   function abrirModal(id) {
