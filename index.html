@@ -7,9 +7,6 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-  /* =========================================
-     VARIABLES GLOBALES (COLORES INTELIGENTES)
-     ========================================= */
   :root {
     --bg-main: #0b1120;
     --text-main: #e2e8f0;
@@ -52,7 +49,6 @@
     --card-days-border: #64748b;
   }
 
-  /* --- Estilos Base --- */
   body { 
     background-color: var(--bg-main); color: var(--text-main); font-family: 'Inter', system-ui, sans-serif; 
     padding: 15px; margin: 0; transition: background-color 0.3s, color 0.3s;
@@ -61,7 +57,6 @@
   
   .accent-text { color: var(--accent-color) !important; font-weight: bold; }
 
-  /* --- Encabezado Corporativo --- */
   .header { border-bottom: 1px solid var(--border-light); padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
   .header-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .brand-badges { display: flex; gap: 6px; align-items: center; }
@@ -81,7 +76,6 @@
   .view-btn.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
   .view-btn:hover, .btn-lock:hover { background: var(--btn-hover); color: var(--text-main); }
 
-  /* --- Tarjetas KPI --- */
   .kpi-container { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
   .kpi-card { flex: 1; min-width: 110px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(8px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
   .kpi-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 3px; }
@@ -92,7 +86,6 @@
   .kpi-amarillo .kpi-value { color: #eab308; }
   .kpi-verde .kpi-value { color: #22c55e; }
 
-  /* --- Panel Admin --- */
   .admin-panel { display: none; background: var(--bg-panel-solid); padding: 15px; border-radius: 8px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; border: 2px solid var(--accent-color); backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(0,0,0,0.2); transition: border-color 0.3s; }
   .admin-panel.editing-mode { border-color: #f97316; box-shadow: 0 0 25px rgba(249, 115, 22, 0.4); } 
   
@@ -115,13 +108,11 @@
 
   .upload-box { border: 1px dashed #10b981; padding: 8px; border-radius: 5px; display: flex; gap: 8px; align-items: center; background: rgba(16, 185, 129, 0.1); flex-grow: 1; }
 
-  /* --- Contenedor del Mapa --- */
   #map-view { display: none; margin-bottom: 20px; }
   .map-instruction { background: var(--bg-card); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 0.85rem; font-weight: bold; display: none; backdrop-filter: blur(5px); }
   body.admin-mode .map-instruction { display: block; }
   #map-container { width: 100%; height: 550px; border-radius: 8px; border: 1px solid var(--border-light); background: #000; z-index: 1;}
 
-  /* --- Vista Cuadritos --- */
   #dashboard-view { display: block; }
   .area-title { color: var(--accent-color); font-size: 1.1rem; border-left: 3px solid var(--accent-color); padding-left: 6px; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px var(--shadow-color); font-weight: 900;}
   
@@ -155,7 +146,6 @@
   
   .asset-type-badge { font-size: 0.65rem; color: var(--accent-color); font-weight: 800; text-transform: uppercase; margin-bottom: 2px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95px; }
   .asset-tag { color: var(--text-main); font-size: 1rem; font-weight: 900; margin: 0; letter-spacing: 0.5px; z-index: 2; text-shadow: 0 1px 3px var(--shadow-color); }
-  
   .asset-days { font-size: 0.60rem; font-weight: 900; margin-top: 5px; padding: 4px 6px; border-radius: 4px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; letter-spacing: 0.5px; }
   
   .sev-rojo .asset-days { color: #fca5a5; }
@@ -164,12 +154,10 @@
   .sev-verde .asset-days { color: #86efac; }
   .sev-plomo .asset-days { color: var(--text-muted); }
 
-  /* MODO ADMINISTRADOR ACTIVADO */
   body.admin-mode .delete-btn { display: block !important; }
   body.admin-mode .admin-panel { display: flex; }
   body.admin-mode .btn-lock { background: #16a34a; color: white; border-color: #16a34a; }
 
-  /* Modal Detallado */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
   .modal-content { background: var(--bg-modal); padding: 25px; border-radius: 8px; border: 1px solid var(--border-card); width: 95%; max-width: 700px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
   .modal-close { position: absolute; top: 10px; right: 15px; color: var(--text-muted); font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
@@ -192,9 +180,6 @@
   .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 4px; }
   .lightbox-close { position: absolute; top: 15px; right: 25px; color: #fff; font-size: 2.5rem; cursor: pointer; background: none; border: none; }
 
-  /* =========================================
-     AJUSTES ESPECÍFICOS MODO CLARO (ALTO CONTRASTE)
-     ========================================= */
   body.light-mode .admin-panel input, 
   body.light-mode .admin-panel textarea, 
   body.light-mode .admin-panel select,
@@ -206,7 +191,7 @@
   
   body.light-mode .sev-rojo .asset-days { background: #fee2e2; color: #991b1b !important; border-color: #f87171; }
   body.light-mode .sev-naranja .asset-days { background: #ffedd5; color: #9a3412 !important; border-color: #fb923c; }
-  body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #fde047; }
+  body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #facc15; }
   body.light-mode .sev-verde .asset-days { background: #dcfce7; color: #166534 !important; border-color: #4ade80; }
   body.light-mode .sev-plomo .asset-days { background: #e2e8f0; color: #0f172a !important; border-color: #94a3b8; }
 </style>
@@ -239,7 +224,6 @@
   </div>
 </div>
 
-<!-- FILA DE INDICADORES KPI -->
 <div class="kpi-container" id="kpiContainer">
   <div class="kpi-card kpi-total">
     <span class="kpi-label">Total Activos</span>
@@ -411,7 +395,7 @@
     }
   }
 
-  // --- CONTROLADOR DE CLICS BLINDADO (SELECCIÓN EXACTA DE TARJETA) ---
+  // --- CONTROLADOR DE CLICS MAESTRO (AISLAMIENTO ABSOLUTO DE IDS) ---
   document.getElementById('app-root').addEventListener('click', function(e) {
     const delBtn = e.target.closest('.delete-btn');
     const card = e.target.closest('.card');
@@ -477,7 +461,7 @@
     }
   }
 
-  // --- LECTOR EXCEL ANTI-NULOS / LECTURA COMPLETA DE 207 REGISTROS ---
+  // --- LECTOR EXCEL ULTRA-ROBUSTO (207 REGISTROS SEGUROS) ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -504,7 +488,6 @@
             const areaVal = String(row[0]||'').trim();
             const eqVal = String(row[1]||'').trim();
             
-            // FILTROS ESTRICTOS ANTI-NULOS E INVALIDACIONES
             if (!eqVal || eqVal === '' || eqVal.toLowerCase() === 'undefined' || eqVal.toLowerCase() === 'null') continue;
             if (!areaVal || areaVal === '' || areaVal.toLowerCase() === 'undefined' || areaVal.toLowerCase() === 'null') continue;
             if (eqVal.toLowerCase().includes('equipo') || areaVal.toLowerCase().includes('area')) continue;
@@ -531,7 +514,6 @@
           }
         });
 
-        // PURGA AUTOMÁTICA: Eliminar de Firebase los equipos retirados que ya no vienen en el Excel
         let eliminadosPorPurga = 0;
         equipos.forEach(eq => {
           if (!tagsEnExcel.has(String(eq.id))) {
@@ -624,7 +606,7 @@
     renderizarMarcadoresMapa(equipos);
   });
 
-  // --- MOTOR DE GUARDADO Y EDICIÓN ---
+  // --- MOTOR DE GUARDADO Y EDICIÓN LIMPIO Y DIRECTO ---
   function procesarGuardado() {
     if (!isAdmin) return; 
     const area = document.getElementById('inArea').value.trim();
@@ -711,7 +693,7 @@
       document.getElementById('inAnalisis').value = eq.analisis || '';
       document.getElementById('inRecomendacion').value = eq.recomendacion || '';
       
-      editId = eq.id; // ID exacto inyectado en el formulario
+      editId = eq.id; // Asignación limpia y directa del ID del equipo seleccionado
       tempLat = eq.lat || null; 
       tempLng = eq.lng || null;
       imagenesBase64Temp = eq.imagenes || [];
