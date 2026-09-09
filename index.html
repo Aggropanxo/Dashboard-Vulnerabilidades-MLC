@@ -317,7 +317,7 @@
   <div class="full-width">
     <div class="upload-box">
       <div style="flex-grow: 1;">
-        <label style="color:#10b981;">CARGA MASIVA EXCEL (Lee TODAS las pestañas de la planta)</label>
+        <label style="color:#10b981;">CARGA MASIVA EXCEL (Columnas fijas: Área | Equipo | Tipo | Fecha)</label>
         <input type="file" id="inExcelFile" accept=".xlsx, .xls, .csv" style="background:transparent; border:none; padding:0; margin-top:5px;">
       </div>
       <button class="btn-upload" onclick="procesarExcel()">📥 Actualizar desde Excel</button>
@@ -449,6 +449,7 @@
     return '🔧';
   }
 
+  // --- LECTURA DIRECTA Y ROBUSTA POR COLUMNAS FIJAS ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -464,6 +465,7 @@
         let agregadosTotales = 0;
 
         workbook.SheetNames.forEach(sheetName => {
+          // Omitir hojas de años anteriores o agrupaciones que no sean matrices principales
           if (sheetName.toLowerCase().includes('2025') || sheetName.toLowerCase().includes('2026') || sheetName.toLowerCase().includes('grupos')) {
             return;
           }
@@ -471,36 +473,15 @@
           const worksheet = workbook.Sheets[sheetName];
           const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false, dateNF: 'yyyy-mm-dd'});
 
-          if (jsonRows.length === 0) return;
+          if (jsonRows.length <= 1) return;
 
-          let headerRowIdx = 0;
-          let colIdxArea = 0;
-          let colIdxEquipo = 1;
-          let colIdxTipo = 2;
-          let colIdxFecha = 3;
-
-          for (let r = 0; r < Math.min(5, jsonRows.length); r++) {
-            let rowStr = jsonRows[r].map(c => String(c).toLowerCase().trim());
-            let foundArea = rowStr.findIndex(c => c.includes('area') || c.includes('área'));
-            let foundEq = rowStr.findIndex(c => c.includes('equipo') || c.includes('tag') || c.includes('equipos'));
-            if (foundArea !== -1 && foundEq !== -1) {
-              headerRowIdx = r;
-              colIdxArea = foundArea;
-              colIdxEquipo = foundEq;
-              let foundTipo = rowStr.findIndex(c => c.includes('tipo') || c.includes('denominacion') || c.includes('plan'));
-              if (foundTipo !== -1) colIdxTipo = foundTipo;
-              let foundFecha = rowStr.findIndex(c => c.includes('fecha') || c.includes('ult') || c.includes('medicion'));
-              if (foundFecha !== -1) colIdxFecha = foundFecha;
-              break;
-            }
-          }
-
-          for (let i = headerRowIdx + 1; i < jsonRows.length; i++) {
+          // Recorrer desde la segunda fila (asumiendo fila 1 como encabezado)
+          for (let i = 1; i < jsonRows.length; i++) {
             let row = jsonRows[i];
-            if (!row || row.length === 0) continue;
+            if (!row || row.length < 2) continue;
 
-            const areaVal = row[colIdxArea] ? String(row[colIdxArea]).trim() : '';
-            const equipoVal = row[colIdxEquipo] ? String(row[colIdxEquipo]).trim() : '';
+            const areaVal = row[0] ? String(row[0]).trim() : '';
+            const equipoVal = row[1] ? String(row[1]).trim() : '';
 
             if (!equipoVal || equipoVal === '' || equipoVal.toLowerCase() === 'undefined') continue;
             if (areaVal === '' || areaVal.toLowerCase().includes('area') || areaVal.toLowerCase().includes('área')) continue;
@@ -511,18 +492,18 @@
             const updateData = {
               area: areaVal,
               nombre: tagLimpio,
-              tipo_equipo: row[colIdxTipo] ? String(row[colIdxTipo]).trim() : ""
+              tipo_equipo: row[2] ? String(row[2]).trim() : ""
             };
 
-            const fechaVal = row[colIdxFecha] ? String(row[colIdxFecha]).trim() : '';
-            if (fechaVal && fechaVal !== '' && fechaVal !== 'undefined' && !fechaVal.includes('1900')) {
+            const fechaVal = row[3] ? String(row[3]).trim() : '';
+            if (fechaVal && fechaVal !== '' && fechaVal !== 'undefined' && !fechaVal.includes('1900') && !fechaVal.toLowerCase().includes('nat')) {
               updateData.ultima_medicion = fechaVal;
             }
 
             const eqExistente = equipos.find(e => e.id === eqId);
             if (!eqExistente) {
               if (!updateData.ultima_medicion) {
-                updateData.severidad = "Plomo"; 
+                updateData.severidad = "Plomo"; // Sin medición -> Color plomo
               } else {
                 updateData.severidad = "Verde";
               }
@@ -538,7 +519,7 @@
           }
         });
 
-        alert(`✅ Carga masiva completada: ${agregadosTotales} registros procesados correctamente.`);
+        alert(`✅ Carga masiva completada: ${agregadosTotales} registros procesados con éxito.`);
         fileInput.value = '';
       } catch (error) { 
         alert("❌ Error procesando Excel: " + error.message); 
