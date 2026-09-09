@@ -33,23 +33,23 @@
 
   body.light-mode {
     --bg-main: #f1f5f9;
-    --text-main: #0f172a; 
-    --text-muted: #475569;
+    --text-main: #020617; /* Letra casi negra para contraste extremo */
+    --text-muted: #334155;
     --accent-color: #0369a1; 
     --bg-panel: rgba(255, 255, 255, 0.92);
     --bg-panel-solid: rgba(255, 255, 255, 0.98);
     --bg-card: rgba(255, 255, 255, 0.92);
-    --border-card: #cbd5e1;
+    --border-card: #94a3b8;
     --border-light: rgba(0,0,0,0.15);
-    --input-bg: rgba(241, 245, 249, 0.9);
+    --input-bg: #ffffff;
     --btn-bg: rgba(226, 232, 240, 0.9);
     --btn-hover: #cbd5e1;
     --bg-modal: #ffffff;
     --shadow-color: transparent;
-    --map-bg: linear-gradient(rgba(241, 245, 249, 0.90), rgba(241, 245, 249, 0.90)), url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/14/7424/10495');
+    --map-bg: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/14/7424/10495');
     --badge-bg: rgba(255, 255, 255, 0.9);
     --card-days-bg: rgba(226, 232, 240, 0.9);
-    --card-days-border: #94a3b8;
+    --card-days-border: #64748b;
   }
 
   /* --- Estilos Base --- */
@@ -69,13 +69,13 @@
   .brand-badge.cpf { border-left: 4px solid var(--accent-color); }
   .brand-badge.cmp { border-left: 4px solid #ef4444; }
   .header-titles h1 { color: var(--text-main); font-size: 1.3rem; margin: 0 0 2px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px var(--shadow-color); }
-  .header-titles p { color: var(--text-muted); margin: 0; font-size: 0.8rem; }
+  .header-titles p { color: var(--text-muted); margin: 0; font-size: 0.8rem; font-weight: 600; }
   
   .header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between; background: var(--bg-panel); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 12px; backdrop-filter: blur(8px); }
   .header-controls-left { display: flex; gap: 10px; flex-grow: 1; max-width: 350px; }
   .header-controls-right { display: flex; gap: 6px; flex-wrap: wrap; }
   
-  .search-input { width: 100%; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--accent-color); background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; outline: none; transition: box-shadow 0.3s; }
+  .search-input { width: 100%; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--accent-color); background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; font-weight: 600; outline: none; transition: box-shadow 0.3s; }
   .search-input:focus { box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
   .view-btn, .btn-lock { background: var(--btn-bg); border: 1px solid var(--border-light); color: var(--text-muted); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: 0.3s; backdrop-filter: blur(5px); }
   .view-btn.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
@@ -85,7 +85,7 @@
   .kpi-container { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
   .kpi-card { flex: 1; min-width: 110px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(8px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
   .kpi-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 3px; }
-  .kpi-value { font-size: 1.8rem; font-weight: 900; line-height: 1; }
+  .kpi-value { font-size: 1.8rem; font-weight: 900; line-height: 1; text-shadow: 0 1px 3px var(--shadow-color); }
   .kpi-total .kpi-value { color: var(--accent-color); }
   .kpi-rojo .kpi-value { color: #ef4444; }
   .kpi-naranja .kpi-value { color: #f97316; }
@@ -97,12 +97,12 @@
   .admin-panel.editing-mode { border-color: #f97316; box-shadow: 0 0 25px rgba(249, 115, 22, 0.4); } 
   
   .admin-title-bar { flex-basis: 100%; border-bottom: 1px solid var(--border-light); margin-bottom: 5px; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-  .admin-title-bar span { color: var(--accent-color); font-weight: 800; font-size: 0.9rem; text-transform: uppercase; }
+  .admin-title-bar span { color: var(--accent-color); font-weight: 900; font-size: 0.95rem; text-transform: uppercase; }
   .admin-panel.editing-mode .admin-title-bar span { color: #f97316; }
   
   .admin-panel .input-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 140px; }
   .admin-panel label { font-size: 0.65rem; color: var(--accent-color); font-weight: bold; margin-bottom: 2px; text-transform: uppercase; }
-  .admin-panel input, .admin-panel textarea, .admin-panel select { padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.8rem; }
+  .admin-panel input, .admin-panel textarea, .admin-panel select { padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); font-weight: 600; width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.8rem; }
   .admin-panel textarea { resize: vertical; min-height: 40px; }
   .admin-panel .full-width { flex-basis: 100%; display: flex; gap: 8px; align-items: center; justify-content: space-between; margin-top: 3px; flex-wrap: wrap; border-top: 1px solid var(--border-light); padding-top: 8px; }
   
@@ -111,13 +111,13 @@
   .btn-upload { background: #10b981 !important; }
   .btn-danger { background: #ef4444 !important; }
   .btn-cancel { background: #64748b !important; display: none; }
-  .btn-save-edit { background: #f97316 !important; font-size: 0.95rem !important; padding: 8px 20px !important; }
+  .btn-save-edit { background: #f97316 !important; font-size: 0.95rem !important; padding: 8px 20px !important; box-shadow: 0 0 10px rgba(249, 115, 22, 0.5); }
 
   .upload-box { border: 1px dashed #10b981; padding: 8px; border-radius: 5px; display: flex; gap: 8px; align-items: center; background: rgba(16, 185, 129, 0.1); flex-grow: 1; }
 
   /* --- Contenedor del Mapa --- */
   #map-view { display: none; margin-bottom: 20px; }
-  .map-instruction { background: var(--bg-card); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 0.85rem; display: none; backdrop-filter: blur(5px); }
+  .map-instruction { background: var(--bg-card); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 0.85rem; font-weight: bold; display: none; backdrop-filter: blur(5px); }
   body.admin-mode .map-instruction { display: block; }
   #map-container { width: 100%; height: 550px; border-radius: 8px; border: 1px solid var(--border-light); background: #000; z-index: 1;}
 
@@ -156,7 +156,6 @@
   .asset-type-badge { font-size: 0.65rem; color: var(--accent-color); font-weight: 800; text-transform: uppercase; margin-bottom: 2px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95px; }
   .asset-tag { color: var(--text-main); font-size: 1rem; font-weight: 900; margin: 0; letter-spacing: 0.5px; z-index: 2; text-shadow: 0 1px 3px var(--shadow-color); }
   
-  /* MEJORA LECTURA DÍAS SIN MEDIR */
   .asset-days { font-size: 0.60rem; font-weight: 900; margin-top: 5px; padding: 4px 6px; border-radius: 4px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; letter-spacing: 0.5px; }
   
   .sev-rojo .asset-days { color: #fca5a5; }
@@ -183,7 +182,7 @@
   .modal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; background: var(--bg-panel); padding: 15px; border-radius: 6px; }
   .modal-data-row { margin-bottom: 12px; }
   .modal-label { color: var(--text-muted); font-size: 0.65rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; }
-  .modal-value { color: var(--text-main); font-size: 0.9rem; white-space: pre-wrap; line-height: 1.3; }
+  .modal-value { color: var(--text-main); font-weight: 600; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.3; }
   
   .gallery-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
   .gallery-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-card); cursor: pointer; transition: transform 0.2s; }
@@ -196,6 +195,15 @@
   /* =========================================
      AJUSTES ESPECÍFICOS MODO CLARO (ALTO CONTRASTE)
      ========================================= */
+  body.light-mode .admin-panel input, 
+  body.light-mode .admin-panel textarea, 
+  body.light-mode .admin-panel select,
+  body.light-mode .search-input { color: #000000; font-weight: bold; } /* Forzar negro fuerte */
+  
+  body.light-mode .area-title { color: #020617; border-left-color: #0369a1; text-shadow: none; font-weight: 900;}
+  body.light-mode .asset-tag { color: #000000; text-shadow: none; font-weight: 900; }
+  body.light-mode .asset-type-badge { color: #0369a1; font-weight: 900; }
+  
   body.light-mode .sev-rojo .asset-days { background: #fee2e2; color: #991b1b !important; border-color: #f87171; }
   body.light-mode .sev-naranja .asset-days { background: #ffedd5; color: #9a3412 !important; border-color: #fb923c; }
   body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #facc15; }
@@ -334,7 +342,7 @@
     <div style="display: flex; gap: 8px;">
       <button class="btn-danger" id="btnDeleteAll" onclick="eliminarTodoMasivo()" title="Borra todos los activos">🗑️ Borrar Todo</button>
       <button class="btn-cancel" id="btnCancelEdit" onclick="resetFormulario()">✖ Cancelar Edición</button>
-      <button id="btnSubmit" onclick="guardarEquipo()" style="height: fit-content;">+ Guardar Activo</button>
+      <button id="btnSubmit" onclick="guardarBoton()" style="height: fit-content;">+ Guardar Activo</button>
     </div>
   </div>
 </div>
@@ -403,7 +411,7 @@
     }
   }
 
-  // --- CONTROLADOR GLOBAL DE CLICS EN TARJETAS ---
+  // --- SEAMLESS EDITING: FLUJO CONTINUO DE EDICIÓN ---
   document.getElementById('app-root').addEventListener('click', function(e) {
     const delBtn = e.target.closest('.delete-btn');
     const card = e.target.closest('.card');
@@ -414,17 +422,24 @@
       eliminarEquipo(id);
     } else if (card) {
       const id = card.getAttribute('data-id');
-      const eq = equipos.find(i => i.id === id);
+      const eq = equipos.find(i => String(i.id) === String(id));
       
-      // Si el Modo Admin está activo, pregunta si quieres Editar o Ver. Si no, abre el Modal directo.
       if (isAdmin) {
-        if (confirm(`✏️ MODO EDICIÓN\n\n¿Desea modificar los datos del equipo ${eq ? eq.nombre : ''}?\n\n- [Aceptar] para Editar.\n- [Cancelar] para ver Detalles.`)) {
-          editarEquipo(id);
+        if (editId && String(editId) !== String(id)) {
+          // ESTAMOS EDITANDO OTRO EQUIPO: Preguntar si guarda y salta al nuevo
+          if (confirm(`⚠️ EDICIÓN EN CURSO\n\nTiene cambios sin guardar.\n\n¿Desea GUARDAR los cambios y editar automáticamente el nuevo equipo: ${eq ? eq.nombre : ''}?`)) {
+            guardarEquipoYEditarNuevo(eq);
+          }
         } else {
-          abrirModal(id);
+          // NO ESTAMOS EDITANDO o TOCÓ EL MISMO:
+          if (confirm(`✏️ MODO EDICIÓN\n\n¿Desea modificar los datos del equipo ${eq ? eq.nombre : ''}?\n\n- [Aceptar] para Editar.\n- [Cancelar] para ver Detalles.`)) {
+            cargarDatosAlFormulario(eq);
+          } else {
+            abrirModal(id);
+          }
         }
       } else {
-        abrirModal(id);
+        abrirModal(id); // Si no es admin, solo abre modal
       }
     }
   });
@@ -594,14 +609,15 @@
     renderizarMarcadoresMapa(equipos);
   });
 
-  function guardarEquipo() {
+  // --- FUNCIONES DE GUARDADO Y EDICIÓN ---
+  function guardarBoton() {
     if (!isAdmin) return; 
     const area = document.getElementById('inArea').value.trim();
     const nombre = document.getElementById('inNombre').value.trim().toUpperCase();
     if(!area || !nombre) { alert("Área y Tag requeridos."); return; }
 
     let eqId = editId || nombre.replace(/[.#$\[\]\s\/]/g, "_");
-    const eqOrig = equipos.find(e => e.id === eqId);
+    const eqOrig = equipos.find(e => String(e.id) === String(eqId));
 
     const eqData = { 
       id: eqId, area, nombre, 
@@ -623,45 +639,81 @@
     equiposRef.child(eqId).update(eqData).then(() => {
       alert("✅ Equipo guardado/actualizado correctamente.");
       resetFormulario();
-    });
+    }).catch(err => alert("Error al guardar: " + err.message));
   }
 
-  // --- CARGA DE DATOS AL PANEL ---
-  function editarEquipo(id) {
-    if (!isAdmin) { alert("⚠️ Active el Modo Admin."); return; }
-    const eq = equipos.find(i => i.id === id);
+  // Permite saltar de un equipo a otro sin perder los cambios
+  function guardarEquipoYEditarNuevo(nuevoEq) {
+    const area = document.getElementById('inArea').value.trim();
+    const nombre = document.getElementById('inNombre').value.trim().toUpperCase();
+    if(!area || !nombre) { alert("Faltan datos para guardar el equipo anterior. Guardado cancelado."); return; }
+
+    let eqId = editId;
+    const eqOrig = equipos.find(e => String(e.id) === String(eqId));
+
+    const eqData = { 
+      id: eqId, area, nombre, 
+      tipo_equipo: document.getElementById('inTipo').value.trim(),
+      componente: document.getElementById('inComponente').value.trim(), 
+      aviso: document.getElementById('inAviso').value.trim(), 
+      om: document.getElementById('inOm').value.trim(), 
+      fecha: document.getElementById('inFecha').value || '', 
+      ultima_medicion: document.getElementById('inUltimaMedicion').value || '', 
+      severidad: document.getElementById('inSeveridad').value,
+      estatus: document.getElementById('inEstatus').value.trim(),
+      analisis: document.getElementById('inAnalisis').value.trim(), 
+      recomendacion: document.getElementById('inRecomendacion').value.trim(),
+      imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : []),
+      lat: tempLat !== null ? tempLat : (eqOrig ? eqOrig.lat : null),
+      lng: tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null)
+    };
+    
+    equiposRef.child(eqId).update(eqData).then(() => {
+      imagenesBase64Temp = []; // Limpiar caché de imágenes
+      cargarDatosAlFormulario(nuevoEq); // Carga el nuevo equipo automáticamente
+    }).catch(err => alert("Error al guardar: " + err.message));
+  }
+
+  function cargarDatosAlFormulario(eq) {
     if (!eq) return;
-    
-    document.getElementById('inArea').value = eq.area || '';
-    document.getElementById('inNombre').value = eq.nombre || '';
-    document.getElementById('inTipo').value = eq.tipo_equipo || '';
-    document.getElementById('inComponente').value = eq.componente || '';
-    document.getElementById('inAviso').value = eq.aviso || '';
-    document.getElementById('inOm').value = eq.om || '';
-    document.getElementById('inFecha').value = eq.fecha || '';
-    document.getElementById('inUltimaMedicion').value = eq.ultima_medicion || '';
-    
-    const validSeverities = ['Rojo', 'Naranja', 'Amarillo', 'Verde', 'Plomo'];
-    document.getElementById('inSeveridad').value = validSeverities.includes(eq.severidad) ? eq.severidad : 'Plomo';
-    
-    document.getElementById('inEstatus').value = eq.estatus || '';
-    document.getElementById('inAnalisis').value = eq.analisis || '';
-    document.getElementById('inRecomendacion').value = eq.recomendacion || '';
-    
-    editId = id; tempLat = eq.lat || null; tempLng = eq.lng || null;
-    imagenesBase64Temp = eq.imagenes || [];
-    
-    document.getElementById('adminPanelForm').classList.add('editing-mode');
-    document.getElementById('editStatusText').innerText = `✏️ Editando Activo: ${eq.nombre}`;
-    document.getElementById('uploadBoxCont').style.display = 'none'; 
-    document.getElementById('btnDeleteAll').style.display = 'none';
-    document.getElementById('btnCancelEdit').style.display = 'block';
-    
-    const btnSubmit = document.getElementById('btnSubmit');
-    btnSubmit.innerText = "💾 Guardar Cambios";
-    btnSubmit.classList.add('btn-save-edit');
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    try {
+      document.getElementById('inArea').value = eq.area || '';
+      document.getElementById('inNombre').value = eq.nombre || '';
+      document.getElementById('inTipo').value = eq.tipo_equipo || '';
+      document.getElementById('inComponente').value = eq.componente || '';
+      document.getElementById('inAviso').value = eq.aviso || '';
+      document.getElementById('inOm').value = eq.om || '';
+      
+      const setFechaSegura = (idElemento, valor) => { try { document.getElementById(idElemento).value = valor || ''; } catch(e) {} };
+      setFechaSegura('inFecha', eq.fecha);
+      setFechaSegura('inUltimaMedicion', eq.ultima_medicion);
+      
+      const validSeverities = ['Rojo', 'Naranja', 'Amarillo', 'Verde', 'Plomo'];
+      document.getElementById('inSeveridad').value = validSeverities.includes(eq.severidad) ? eq.severidad : 'Plomo';
+      
+      document.getElementById('inEstatus').value = eq.estatus || '';
+      document.getElementById('inAnalisis').value = eq.analisis || '';
+      document.getElementById('inRecomendacion').value = eq.recomendacion || '';
+      
+      editId = eq.id; 
+      tempLat = eq.lat || null; 
+      tempLng = eq.lng || null;
+      imagenesBase64Temp = eq.imagenes || [];
+      
+      document.getElementById('adminPanelForm').classList.add('editing-mode');
+      document.getElementById('editStatusText').innerText = `✏️ Editando Activo: ${eq.nombre}`;
+      document.getElementById('uploadBoxCont').style.display = 'none'; 
+      document.getElementById('btnDeleteAll').style.display = 'none';
+      document.getElementById('btnCancelEdit').style.display = 'block';
+      
+      const btnSubmit = document.getElementById('btnSubmit');
+      btnSubmit.innerText = "💾 Guardar Cambios";
+      btnSubmit.classList.add('btn-save-edit');
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      alert("⚠️ Error cargando datos: " + err.message);
+    }
   }
 
   function resetFormulario() {
@@ -695,7 +747,7 @@
   }
 
   function abrirModal(id) {
-    const eq = equipos.find(i => i.id === id);
+    const eq = equipos.find(i => String(i.id) === String(id));
     if (!eq) return;
 
     document.getElementById('modalTitle').innerText = `${eq.nombre} - ${eq.area}`;
