@@ -411,7 +411,7 @@
     }
   }
 
-  // --- CONTROLADOR GLOBAL DE CLICS (SEAMLESS EDIT & CADENA) ---
+  // --- CONTROLADOR DE CLICS INFALIBLE (CORRECCIÓN DE ID) ---
   document.getElementById('app-root').addEventListener('click', function(e) {
     const delBtn = e.target.closest('.delete-btn');
     const card = e.target.closest('.card');
@@ -424,19 +424,11 @@
       const eqTarget = equipos.find(i => String(i.id) === String(id));
       
       if (isAdmin) {
-        if (editId && String(editId) !== String(id)) {
-          const eqActual = equipos.find(i => String(i.id) === String(editId));
-          const nombreActual = eqActual ? eqActual.nombre : 'actual';
-          
-          if (confirm(`⚠️ EDICIÓN EN CURSO\n\n¿Desea GUARDAR los cambios del equipo ${nombreActual} y pasar a editar el equipo ${eqTarget.nombre}?`)) {
-            guardarEquipoYEditarNuevo(eqTarget);
-          }
+        // Carga DIRECTAMENTE el equipo en el que hiciste clic sin confusiones
+        if (confirm(`✏️ MODO EDICIÓN\n\n¿Desea editar los datos del equipo ${eqTarget ? eqTarget.nombre : id}?\n\n- [Aceptar] para Editar arriba en el panel.\n- [Cancelar] para ver Detalles.`)) {
+          cargarDatosAlFormulario(eqTarget);
         } else {
-          if (confirm(`✏️ MODO EDICIÓN\n\n¿Desea editar los datos del equipo ${eqTarget.nombre}?\n\n- [Aceptar] para Editar.\n- [Cancelar] para ver Detalles.`)) {
-            cargarDatosAlFormulario(eqTarget);
-          } else {
-            abrirModal(id);
-          }
+          abrirModal(id);
         }
       } else {
         abrirModal(id);
@@ -475,7 +467,7 @@
     }
   }
 
-  // --- LECTOR EXCEL ULTRA-BLINDADO (LEE TODAS LAS FILAS DE LA HOJA) ---
+  // --- LECTOR EXCEL ROBUSTO ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -494,7 +486,6 @@
           const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false, defval: ""});
           if (jsonRows.length <= 1) return;
 
-          // Detectar dinámicamente las columnas buscando los encabezados principales
           let colIdxArea = 0, colIdxEquipo = 1, colIdxTipo = 2, colIdxFecha = 3;
           let startRow = 1;
 
@@ -538,17 +529,14 @@
             if (!eqExist) {
               updateData.severidad = updateData.ultima_medicion ? "Verde" : "Plomo";
               updateData.fecha = new Date().toISOString().split('T')[0];
-            } else {
-              // Mantiene la severidad y notas que ya tenía en Firebase para no sobreescribir con verde por defecto
-              if (updateData.ultima_medicion && (!eqExist.ultima_medicion || eqExist.severidad === 'Plomo')) {
-                if (eqExist.severidad === 'Plomo') updateData.severidad = 'Verde';
-              }
             }
+            // Si ya existe, NO pisamos la severidad ni comentarios manuales del usuario.
+            
             equiposRef.child(eqId).update(updateData);
             agregados++;
           }
         });
-        alert(`✅ Carga masiva completada con éxito: ${agregados} activos leídos.`);
+        alert(`✅ Carga masiva completada: ${agregados} activos leídos.`);
         fileInput.value = '';
       } catch (err) { alert("❌ Error procesando Excel: " + err.message); }
     };
@@ -632,7 +620,7 @@
     renderizarMarcadoresMapa(equipos);
   });
 
-  // --- MOTOR DE GUARDADO Y EDICIÓN EN LÍNEA ---
+  // --- MOTOR DE GUARDADO Y EDICIÓN LIMPIO ---
   function procesarGuardado() {
     if (!isAdmin) return; 
     const area = document.getElementById('inArea').value.trim();
@@ -665,39 +653,6 @@
     }).catch(err => alert("❌ Error al guardar: " + err.message));
   }
 
-  function guardarEquipoYEditarNuevo(nuevoEq) {
-    if (!editId) { cargarDatosAlFormulario(nuevoEq); return; }
-    
-    const area = document.getElementById('inArea').value.trim();
-    const nombre = document.getElementById('inNombre').value.trim().toUpperCase();
-    if(!area || !nombre) { alert("⚠️ Faltan datos en el equipo actual."); return; }
-
-    let eqId = editId;
-    const eqOrig = equipos.find(e => String(e.id) === String(eqId));
-
-    const eqData = { 
-      id: eqId, area, nombre, 
-      tipo_equipo: document.getElementById('inTipo').value.trim(),
-      componente: document.getElementById('inComponente').value.trim(), 
-      aviso: document.getElementById('inAviso').value.trim(), 
-      om: document.getElementById('inOm').value.trim(), 
-      fecha: document.getElementById('inFecha').value || '', 
-      ultima_medicion: document.getElementById('inUltimaMedicion').value || '', 
-      severidad: document.getElementById('inSeveridad').value,
-      estatus: document.getElementById('inEstatus').value.trim(),
-      analisis: document.getElementById('inAnalisis').value.trim(), 
-      recomendacion: document.getElementById('inRecomendacion').value.trim(),
-      imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : []),
-      lat: tempLat !== null ? tempLat : (eqOrig ? eqOrig.lat : null),
-      lng: tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null)
-    };
-    
-    equiposRef.child(eqId).update(eqData).then(() => {
-      imagenesBase64Temp = [];
-      cargarDatosAlFormulario(nuevoEq);
-    }).catch(err => alert("❌ Error al actualizar: " + err.message));
-  }
-
   function cargarDatosAlFormulario(eq) {
     if (!eq) return;
     try {
@@ -719,7 +674,7 @@
       document.getElementById('inAnalisis').value = eq.analisis || '';
       document.getElementById('inRecomendacion').value = eq.recomendacion || '';
       
-      editId = eq.id; 
+      editId = eq.id; // Asignamos el ID exacto del equipo que estamos tocando
       tempLat = eq.lat || null; 
       tempLng = eq.lng || null;
       imagenesBase64Temp = eq.imagenes || [];
@@ -761,7 +716,7 @@
   function eliminarEquipo(id) {
     if (!isAdmin) return;
     if (confirm(`⚠️ ¿Eliminar activo permanentemente?`)) { 
-      equiposRef.child(id).remove().then(() => { if (editId === id) resetFormulario(); }); 
+      equiposRef.child(id).remove().then(() => { if (String(editId) === String(id)) resetFormulario(); }); 
     }
   }
 
