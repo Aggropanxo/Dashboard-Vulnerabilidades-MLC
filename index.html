@@ -8,12 +8,13 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   /* =========================================
-     VARIABLES GLOBALES (THEME ENGINE OPTIMIZADO)
+     VARIABLES GLOBALES (COLORES INTELIGENTES)
      ========================================= */
   :root {
     --bg-main: #0b1120;
     --text-main: #e2e8f0;
     --text-muted: #94a3b8;
+    --accent-color: #38bdf8; /* Azul claro brillante para modo oscuro */
     --bg-panel: rgba(15, 23, 42, 0.75);
     --bg-panel-solid: rgba(15, 23, 42, 0.95);
     --bg-card: rgba(15, 23, 42, 0.85);
@@ -32,43 +33,41 @@
 
   body.light-mode {
     --bg-main: #f1f5f9;
-    --text-main: #0f172a;
+    --text-main: #0f172a; /* Letra casi negra para contraste máximo */
     --text-muted: #475569;
-    --bg-panel: rgba(255, 255, 255, 0.85);
-    --bg-panel-solid: rgba(255, 255, 255, 0.95);
-    --bg-card: rgba(255, 255, 255, 0.85);
+    --accent-color: #0369a1; /* Azul marino muy oscuro para modo claro */
+    --bg-panel: rgba(255, 255, 255, 0.92);
+    --bg-panel-solid: rgba(255, 255, 255, 0.98);
+    --bg-card: rgba(255, 255, 255, 0.92);
     --border-card: #cbd5e1;
-    --border-light: rgba(0,0,0,0.1);
-    --input-bg: rgba(248, 250, 252, 0.9);
-    --btn-bg: rgba(241, 245, 249, 0.9);
-    --btn-hover: #e2e8f0;
+    --border-light: rgba(0,0,0,0.15);
+    --input-bg: rgba(241, 245, 249, 0.9);
+    --btn-bg: rgba(226, 232, 240, 0.9);
+    --btn-hover: #cbd5e1;
     --bg-modal: #ffffff;
     --shadow-color: transparent;
-    --map-bg: linear-gradient(rgba(241, 245, 249, 0.88), rgba(241, 245, 249, 0.88)), url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/14/7424/10495');
-    --badge-bg: rgba(255, 255, 255, 0.85);
-    --card-days-bg: rgba(241, 245, 249, 0.9);
-    --card-days-border: #cbd5e1;
+    --map-bg: linear-gradient(rgba(241, 245, 249, 0.90), rgba(241, 245, 249, 0.90)), url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/14/7424/10495');
+    --badge-bg: rgba(255, 255, 255, 0.9);
+    --card-days-bg: rgba(226, 232, 240, 0.9);
+    --card-days-border: #94a3b8;
   }
 
   /* --- Estilos Base --- */
   body { 
-    background-color: var(--bg-main); 
-    color: var(--text-main); 
-    font-family: 'Inter', system-ui, sans-serif; 
-    padding: 15px; 
-    margin: 0; 
-    transition: background-color 0.3s, color 0.3s;
-    background-image: var(--map-bg);
-    background-size: cover;
-    background-attachment: fixed;
+    background-color: var(--bg-main); color: var(--text-main); font-family: 'Inter', system-ui, sans-serif; 
+    padding: 15px; margin: 0; transition: background-color 0.3s, color 0.3s;
+    background-image: var(--map-bg); background-size: cover; background-attachment: fixed;
   }
   
-  /* --- Layout & Encabezados --- */
+  /* --- Clases de Ayuda Globales --- */
+  .accent-text { color: var(--accent-color) !important; font-weight: bold; }
+
+  /* --- Encabezado Corporativo --- */
   .header { border-bottom: 1px solid var(--border-light); padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
   .header-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .brand-badges { display: flex; gap: 6px; align-items: center; }
   .brand-badge { background: var(--badge-bg); border: 1px solid var(--border-light); color: var(--text-main); font-weight: 800; font-size: 1rem; padding: 4px 10px; border-radius: 4px; letter-spacing: 1px; backdrop-filter: blur(5px); }
-  .brand-badge.cpf { border-left: 4px solid #38bdf8; }
+  .brand-badge.cpf { border-left: 4px solid var(--accent-color); }
   .brand-badge.cmp { border-left: 4px solid #ef4444; }
   .header-titles h1 { color: var(--text-main); font-size: 1.3rem; margin: 0 0 2px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px var(--shadow-color); }
   .header-titles p { color: var(--text-muted); margin: 0; font-size: 0.8rem; }
@@ -77,11 +76,10 @@
   .header-controls-left { display: flex; gap: 10px; flex-grow: 1; max-width: 350px; }
   .header-controls-right { display: flex; gap: 6px; flex-wrap: wrap; }
   
-  /* Inputs y Botones Globales */
-  .search-input { width: 100%; padding: 6px 12px; border-radius: 20px; border: 1px solid #38bdf8; background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; outline: none; transition: box-shadow 0.3s; }
+  .search-input { width: 100%; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--accent-color); background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; outline: none; transition: box-shadow 0.3s; }
   .search-input:focus { box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
   .view-btn, .btn-lock { background: var(--btn-bg); border: 1px solid var(--border-light); color: var(--text-muted); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: 0.3s; backdrop-filter: blur(5px); }
-  .view-btn.active { background: #0284c7; color: white; border-color: #0284c7; }
+  .view-btn.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
   .view-btn:hover, .btn-lock:hover { background: var(--btn-hover); color: var(--text-main); }
 
   /* --- Tarjetas KPI --- */
@@ -89,33 +87,44 @@
   .kpi-card { flex: 1; min-width: 110px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(8px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
   .kpi-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 3px; }
   .kpi-value { font-size: 1.8rem; font-weight: 900; line-height: 1; }
-  .kpi-total .kpi-value { color: #38bdf8; }
+  .kpi-total .kpi-value { color: var(--accent-color); }
   .kpi-rojo .kpi-value { color: #ef4444; }
   .kpi-naranja .kpi-value { color: #f97316; }
   .kpi-amarillo .kpi-value { color: #eab308; }
   .kpi-verde .kpi-value { color: #22c55e; }
 
-  /* --- Panel Admin & Mapa --- */
-  #map-view { display: none; margin-bottom: 20px; }
-  .map-instruction { background: var(--bg-card); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 0.85rem; display: none; backdrop-filter: blur(5px); }
-  #map-container { width: 100%; height: 550px; border-radius: 8px; border: 1px solid var(--border-light); background: #000; z-index: 1;}
-
-  .admin-panel { display: none; background: var(--bg-panel-solid); padding: 15px; border-radius: 8px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; border: 2px solid #38bdf8; backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(56, 189, 248, 0.2); }
+  /* --- Panel Admin --- */
+  .admin-panel { display: none; background: var(--bg-panel-solid); padding: 15px; border-radius: 8px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; border: 2px solid var(--accent-color); backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(0,0,0,0.2); transition: border-color 0.3s; }
+  .admin-panel.editing-mode { border-color: #f97316; box-shadow: 0 0 25px rgba(249, 115, 22, 0.4); } /* Brillo naranja al editar */
+  
+  .admin-title-bar { flex-basis: 100%; border-bottom: 1px solid var(--border-light); margin-bottom: 5px; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .admin-title-bar span { color: var(--accent-color); font-weight: 800; font-size: 0.9rem; text-transform: uppercase; }
+  .admin-panel.editing-mode .admin-title-bar span { color: #f97316; }
+  
   .admin-panel .input-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 140px; }
-  .admin-panel label { font-size: 0.65rem; color: #38bdf8; font-weight: bold; margin-bottom: 2px; text-transform: uppercase; }
+  .admin-panel label { font-size: 0.65rem; color: var(--accent-color); font-weight: bold; margin-bottom: 2px; text-transform: uppercase; }
   .admin-panel input, .admin-panel textarea, .admin-panel select { padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.8rem; }
   .admin-panel textarea { resize: vertical; min-height: 40px; }
   .admin-panel .full-width { flex-basis: 100%; display: flex; gap: 8px; align-items: center; justify-content: space-between; margin-top: 3px; flex-wrap: wrap; border-top: 1px solid var(--border-light); padding-top: 8px; }
-  .admin-panel button { background: #0284c7; color: white; cursor: pointer; font-weight: bold; border: none; border-radius: 4px; padding: 6px 12px; font-size: 0.8rem; transition: background 0.3s; }
-  .admin-panel button:hover { opacity: 0.9; }
+  
+  .admin-panel button { background: var(--accent-color); color: white; cursor: pointer; font-weight: bold; border: none; border-radius: 4px; padding: 6px 12px; font-size: 0.85rem; transition: 0.3s; }
+  .admin-panel button:hover { filter: brightness(1.1); }
   .btn-upload { background: #10b981 !important; }
   .btn-danger { background: #ef4444 !important; }
-  .btn-danger:hover { background: #dc2626 !important; }
+  .btn-cancel { background: #64748b !important; display: none; }
+  .btn-save-edit { background: #f97316 !important; font-size: 0.95rem !important; padding: 8px 20px !important; }
+
   .upload-box { border: 1px dashed #10b981; padding: 8px; border-radius: 5px; display: flex; gap: 8px; align-items: center; background: rgba(16, 185, 129, 0.1); flex-grow: 1; }
 
-  /* --- Tarjetas Grid (Ultra-Optimizadas) --- */
+  /* --- Contenedor del Mapa --- */
+  #map-view { display: none; margin-bottom: 20px; }
+  .map-instruction { background: var(--bg-card); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 0.85rem; display: none; backdrop-filter: blur(5px); }
+  body.admin-mode .map-instruction { display: block; }
+  #map-container { width: 100%; height: 550px; border-radius: 8px; border: 1px solid var(--border-light); background: #000; z-index: 1;}
+
+  /* --- Vista Cuadritos --- */
   #dashboard-view { display: block; }
-  .area-title { color: #38bdf8; font-size: 1rem; border-left: 3px solid #38bdf8; padding-left: 6px; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px var(--shadow-color); }
+  .area-title { color: var(--accent-color); font-size: 1rem; border-left: 3px solid var(--accent-color); padding-left: 6px; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px var(--shadow-color); }
   
   .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
   
@@ -142,12 +151,12 @@
   .sev-verde .pulse-indicator { background-color: #22c55e; }
   .sev-plomo .pulse-indicator { background-color: #64748b; }
   
-  .delete-btn, .edit-btn { display: none; position: absolute; bottom: 2px; background: rgba(0,0,0,0.8); border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); font-size: 0.75rem; z-index: 100; padding: 2px 5px; cursor: pointer; }
+  .delete-btn, .edit-btn { display: none; position: absolute; bottom: 2px; background: rgba(0,0,0,0.8); border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); font-size: 0.75rem; z-index: 100; padding: 4px 6px; cursor: pointer; }
   .delete-btn { right: 2px; color: #ef4444; }
   .edit-btn { left: 2px; color: #38bdf8; }
   .delete-btn:hover, .edit-btn:hover { background: #334155; }
   
-  .asset-type-badge { font-size: 0.55rem; color: #38bdf8; font-weight: 700; text-transform: uppercase; margin-bottom: 1px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95px; }
+  .asset-type-badge { font-size: 0.55rem; color: var(--accent-color); font-weight: 800; text-transform: uppercase; margin-bottom: 1px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95px; }
   .asset-tag { color: var(--text-main); font-size: 0.85rem; font-weight: 800; margin: 0; letter-spacing: 0.5px; z-index: 2; text-shadow: 0 1px 3px var(--shadow-color); }
   .asset-days { font-size: 0.48rem; font-weight: bold; margin-top: 3px; padding: 2px 4px; border-radius: 3px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; }
   
@@ -158,7 +167,8 @@
   .sev-plomo .asset-days { color: var(--text-muted); }
 
   /* MODO ADMINISTRADOR ACTIVADO */
-  body.admin-mode .map-instruction, body.admin-mode .delete-btn, body.admin-mode .edit-btn { display: block !important; }
+  body.admin-mode .delete-btn { display: block !important; }
+  body.admin-mode .edit-btn { display: block !important; }
   body.admin-mode .admin-panel { display: flex; }
   body.admin-mode .btn-lock { background: #16a34a; color: white; border-color: #16a34a; }
 
@@ -179,7 +189,7 @@
   
   .gallery-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
   .gallery-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-card); cursor: pointer; transition: transform 0.2s; }
-  .gallery-thumb:hover { transform: scale(1.1); border-color: #38bdf8; }
+  .gallery-thumb:hover { transform: scale(1.1); border-color: var(--accent-color); }
 
   .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 3000; justify-content: center; align-items: center; }
   .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 4px; }
@@ -189,7 +199,6 @@
 <body>
 
 <script>
-  // Carga ultra-rápida del tema
   if (localStorage.getItem('mlc_theme') === 'light') { document.body.classList.add('light-mode'); }
 </script>
 
@@ -241,6 +250,10 @@
 
 <!-- PANEL ADMIN -->
 <div class="admin-panel" id="adminPanelForm">
+  <div class="admin-title-bar">
+    <span id="editStatusText">➕ Nuevo Registro / Carga Masiva</span>
+  </div>
+
   <div class="input-group">
     <label>Área Operacional</label>
     <input type="text" id="inArea" placeholder="ej. Área 61" required>
@@ -303,7 +316,7 @@
   </div>
   
   <div class="full-width">
-    <div class="upload-box">
+    <div class="upload-box" id="uploadBoxCont">
       <div style="flex-grow: 1;">
         <label style="color:#10b981;">CARGA MASIVA EXCEL</label>
         <input type="file" id="inExcelFile" accept=".xlsx, .xls, .csv" style="background:transparent; border:none; padding:0; margin-top:3px;">
@@ -311,8 +324,11 @@
       <button class="btn-upload" onclick="procesarExcel()">📥 Actualizar desde Excel</button>
     </div>
     
-    <button class="btn-danger" onclick="eliminarTodoMasivo()" title="Borra todos los activos">🗑️ Borrar Todo</button>
-    <button id="btnSubmit" onclick="guardarEquipo()" style="height: fit-content;">+ Guardar Activo</button>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn-danger" id="btnDeleteAll" onclick="eliminarTodoMasivo()" title="Borra todos los activos">🗑️ Borrar Todo</button>
+      <button class="btn-cancel" id="btnCancelEdit" onclick="resetFormulario()">✖ Cancelar Edición</button>
+      <button id="btnSubmit" onclick="guardarEquipo()" style="height: fit-content;">+ Guardar Activo</button>
+    </div>
   </div>
 </div>
 
@@ -332,13 +348,13 @@
       <span id="modalSevBadge" class="modal-sev-badge">Color</span>
     </div>
     <div class="modal-grid">
-      <div><span class="modal-label">Tipo Equipo</span><span id="modalTipo" class="modal-value" style="font-weight:bold; color:#38bdf8;"></span></div>
+      <div><span class="modal-label">Tipo Equipo</span><span id="modalTipo" class="modal-value accent-text"></span></div>
       <div><span class="modal-label">Componente</span><span id="modalComponente" class="modal-value"></span></div>
       <div><span class="modal-label">Aviso SAP</span><span id="modalAviso" class="modal-value"></span></div>
       <div><span class="modal-label">OM SAP</span><span id="modalOm" class="modal-value"></span></div>
       <div><span class="modal-label">Fecha Hallazgo</span><span id="modalFecha" class="modal-value"></span></div>
       <div><span class="modal-label">Última Medición</span><span id="modalUltimaMedicion" class="modal-value"></span></div>
-      <div><span class="modal-label">Estado Medición</span><span id="modalDias" class="modal-value" style="font-weight:bold; color:#38bdf8;"></span></div>
+      <div><span class="modal-label">Estado Medición</span><span id="modalDias" class="modal-value accent-text"></span></div>
     </div>
     <div class="modal-data-row"><span class="modal-label">Estatus Operacional</span><span id="modalEstatus" class="modal-value"></span></div>
     <div class="modal-data-row"><span class="modal-label">Análisis Técnico</span><span id="modalAnalisis" class="modal-value"></span></div>
@@ -366,8 +382,6 @@
   let mapaInicializado = false; let tempLat = null; let tempLng = null; let imagenesBase64Temp = [];
   let mapMarkersObj = {}; let equipos = [];
 
-  if (localStorage.getItem('mlc_theme') === 'light') { document.getElementById('btnTheme').innerText = '🌙 Modo Oscuro'; }
-
   function toggleTheme() {
     const body = document.body;
     const btn = document.getElementById('btnTheme');
@@ -382,8 +396,7 @@
     }
   }
 
-  // --- DELEGACIÓN DE EVENTOS OPTIMIZADA ---
-  // Un solo controlador para clics en toda la matriz de tarjetas
+  // --- DELEGACIÓN DE EVENTOS INFALIBLE ---
   document.getElementById('app-root').addEventListener('click', function(e) {
     const editBtn = e.target.closest('.edit-btn');
     const delBtn = e.target.closest('.delete-btn');
@@ -391,12 +404,15 @@
 
     if (editBtn) {
       e.stopPropagation();
-      editarEquipo(editBtn.getAttribute('data-id'));
+      const id = editBtn.getAttribute('data-id');
+      editarEquipo(id);
     } else if (delBtn) {
       e.stopPropagation();
-      eliminarEquipo(delBtn.getAttribute('data-id'));
+      const id = delBtn.getAttribute('data-id');
+      eliminarEquipo(id);
     } else if (card) {
-      abrirModal(card.getAttribute('data-id'));
+      const id = card.getAttribute('data-id');
+      abrirModal(id);
     }
   });
 
@@ -459,7 +475,7 @@
             if (!areaVal || areaVal.toLowerCase().includes('area')) continue;
 
             const tagLimpio = eqVal.toUpperCase();
-            const eqId = tagLimpio.replace(/[.#$\[\]\s]/g, "_");
+            const eqId = tagLimpio.replace(/[.#$\[\]\s\/]/g, "_"); // Evita rutas inválidas en Firebase
             const fechaVal = String(row[3]||'').trim();
 
             const updateData = { area: areaVal, nombre: tagLimpio, tipo_equipo: String(row[2]||'').trim() };
@@ -571,7 +587,7 @@
     const nombre = document.getElementById('inNombre').value.trim().toUpperCase();
     if(!area || !nombre) { alert("Área y Tag requeridos."); return; }
 
-    let eqId = editId || nombre.replace(/[.#$\[\]\s]/g, "_");
+    let eqId = editId || nombre.replace(/[.#$\[\]\s\/]/g, "_");
     const eqOrig = equipos.find(e => e.id === eqId);
 
     const eqData = { 
@@ -594,6 +610,7 @@
     equiposRef.child(eqId).update(eqData).then(resetFormulario);
   }
 
+  // --- EDICIÓN CON INDICADOR VISUAL ---
   function editarEquipo(id) {
     if (!isAdmin) { alert("⚠️ Active el Modo Admin."); return; }
     const eq = equipos.find(i => i.id === id);
@@ -607,14 +624,29 @@
     document.getElementById('inOm').value = eq.om || '';
     document.getElementById('inFecha').value = eq.fecha || '';
     document.getElementById('inUltimaMedicion').value = eq.ultima_medicion || '';
-    document.getElementById('inSeveridad').value = eq.severidad || 'Plomo';
+    
+    // Validar coincidencia exacta en select (Rojo, Naranja, Amarillo, Verde, Plomo)
+    const validSeverities = ['Rojo', 'Naranja', 'Amarillo', 'Verde', 'Plomo'];
+    document.getElementById('inSeveridad').value = validSeverities.includes(eq.severidad) ? eq.severidad : 'Plomo';
+    
     document.getElementById('inEstatus').value = eq.estatus || '';
     document.getElementById('inAnalisis').value = eq.analisis || '';
     document.getElementById('inRecomendacion').value = eq.recomendacion || '';
     
     editId = id; tempLat = eq.lat || null; tempLng = eq.lng || null;
     imagenesBase64Temp = eq.imagenes || [];
-    document.getElementById('btnSubmit').innerText = "💾 Guardar Cambios";
+    
+    // Cambios Visuales para modo edición
+    document.getElementById('adminPanelForm').classList.add('editing-mode');
+    document.getElementById('editStatusText').innerText = `✏️ Editando Activo: ${eq.nombre}`;
+    document.getElementById('uploadBoxCont').style.display = 'none'; // Ocultar carga excel al editar
+    document.getElementById('btnDeleteAll').style.display = 'none';
+    document.getElementById('btnCancelEdit').style.display = 'block';
+    
+    const btnSubmit = document.getElementById('btnSubmit');
+    btnSubmit.innerText = "💾 Guardar Cambios";
+    btnSubmit.classList.add('btn-save-edit');
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -622,8 +654,19 @@
     document.querySelectorAll('.admin-panel input[type="text"], .admin-panel input[type="date"], .admin-panel textarea').forEach(i => i.value = '');
     document.getElementById('inSeveridad').value = 'Rojo';
     document.getElementById('inImagenesFiles').value = '';
+    
     editId = null; tempLat = null; tempLng = null; imagenesBase64Temp = [];
-    document.getElementById('btnSubmit').innerText = "+ Guardar Activo";
+    
+    // Restaurar Visuales a modo normal
+    document.getElementById('adminPanelForm').classList.remove('editing-mode');
+    document.getElementById('editStatusText').innerText = `➕ Nuevo Registro / Carga Masiva`;
+    document.getElementById('uploadBoxCont').style.display = 'flex';
+    document.getElementById('btnDeleteAll').style.display = 'block';
+    document.getElementById('btnCancelEdit').style.display = 'none';
+    
+    const btnSubmit = document.getElementById('btnSubmit');
+    btnSubmit.innerText = "+ Guardar Activo";
+    btnSubmit.classList.remove('btn-save-edit');
   }
 
   function eliminarEquipo(id) {
@@ -683,7 +726,6 @@
     const sevValor = { 'Rojo':5, 'Naranja':4, 'Amarillo':3, 'Verde':2, 'Plomo':1 };
     let cRojo = 0, cNaranja = 0, cAmarillo = 0, cVerde = 0;
     
-    // 1. Procesar y Filtrar una sola vez
     const eqProcesados = equipos.map(eq => {
       const dias = calcularDias(eq.ultima_medicion);
       const textDias = dias !== null ? `${dias} DÍAS SIN MEDIR` : 'SIN MEDIR';
@@ -693,7 +735,6 @@
       eq.nombre.toLowerCase().includes(filtro) || eq.area.toLowerCase().includes(filtro) || (eq.tipo_equipo && eq.tipo_equipo.toLowerCase().includes(filtro))
     );
 
-    // 2. Contar KPIs
     eqProcesados.forEach(eq => {
       if (eq.severidad === 'Rojo') cRojo++;
       else if (eq.severidad === 'Naranja') cNaranja++;
@@ -707,11 +748,9 @@
     document.getElementById('kpiAmarillo').innerText = cAmarillo;
     document.getElementById('kpiVerde').innerText = cVerde;
 
-    // 3. Agrupar por Área
     const porArea = {};
     eqProcesados.forEach(eq => { (porArea[eq.area] = porArea[eq.area] || []).push(eq); });
 
-    // 4. Construir HTML masivo (Sin reflows del navegador)
     let finalHTML = '';
     for (const [area, eqs] of Object.entries(porArea)) {
       eqs.sort((a, b) => {
