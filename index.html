@@ -357,7 +357,7 @@
   <div class="full-width">
     <div class="upload-box" id="uploadBoxCont">
       <div style="flex-grow: 1;">
-        <label style="color:#10b981;">CARGA MASIVA EXCEL</label>
+        <label style="color:#10b981;">CARGA MASIVA EXCEL (Flexible Total)</label>
         <input type="file" id="inExcelFile" accept=".xlsx, .xls, .csv" style="background:transparent; border:none; padding:0; margin-top:3px;">
       </div>
       <button class="btn-upload" onclick="procesarExcel()">📥 Actualizar desde Excel</button>
@@ -473,15 +473,14 @@
     }, 800);
   }
 
-  // --- MOTOR DE SELECCIÓN DE TARJETAS BLINDADO Y CORREGIDO ---
+  // --- MOTOR DE SELECCIÓN DE TARJETAS BLINDADO ---
   document.getElementById('app-root').addEventListener('click', function(e) {
     const delBtn = e.target.closest('.delete-btn');
     const card = e.target.closest('.card');
 
     if (delBtn) {
       e.stopPropagation();
-      const idEliminar = delBtn.getAttribute('data-id');
-      eliminarEquipo(idEliminar);
+      eliminarEquipo(delBtn.getAttribute('data-id'));
       return;
     } 
     
@@ -561,7 +560,7 @@
     }
   }
 
-  // --- LECTOR EXCEL CON ID FORZADO (CORRECCIÓN CRÍTICA) ---
+  // --- LECTOR EXCEL ULTRA-ROBUSTO Y FLEXIBLE (LEE TODAS LAS FILAS) ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -576,35 +575,45 @@
         let tagsEnExcel = new Set();
 
         workbook.SheetNames.forEach(sheetName => {
-          if (sheetName.toLowerCase().match(/2025|2026|grupos|reserva/)) return;
           const worksheet = workbook.Sheets[sheetName];
           const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false, defval: ""});
-          if (jsonRows.length <= 1) return;
+          if (jsonRows.length === 0) return;
 
-          for (let i = 1; i < jsonRows.length; i++) {
+          // Detectar columnas automáticamente o usar índices por defecto (0: Área, 1: Tag, 2: Tipo, 3: Fecha)
+          for (let i = 0; i < jsonRows.length; i++) {
             let row = jsonRows[i];
             if (!row || row.length < 2) continue;
 
-            const areaVal = String(row[0]||'').trim();
-            const eqVal = String(row[1]||'').trim();
-            
-            if (!eqVal || eqVal === '' || eqVal.toLowerCase() === 'undefined' || eqVal.toLowerCase() === 'null') continue;
-            if (!areaVal || areaVal === '' || areaVal.toLowerCase() === 'undefined' || areaVal.toLowerCase() === 'null') continue;
-            if (eqVal.toLowerCase().includes('equipo') || areaVal.toLowerCase().includes('area')) continue;
+            // Buscar celdas que contengan texto válido y no sean cabeceras de título
+            let areaVal = String(row[0] || '').trim();
+            let eqVal = String(row[1] || '').trim();
+            let tipoVal = String(row[2] || '').trim();
+            let fechaVal = String(row[3] || '').trim();
+
+            // Si la segunda columna está vacía o dice "EQUIPO", saltar
+            if (!eqVal || eqVal.toLowerCase() === 'tag' || eqVal.toLowerCase() === 'equipo' || eqVal.toLowerCase() === 'undefined') continue;
+            if (!areaVal || areaVal.toLowerCase() === 'area' || areaVal.toLowerCase() === 'área') {
+              areaVal = "Área General";
+            }
 
             const tagLimpio = eqVal.toUpperCase();
             const eqId = tagLimpio.replace(/[.#$\[\]\s\/]/g, "_");
             tagsEnExcel.add(eqId);
 
-            const fechaVal = String(row[3]||'').trim();
-            // SE FUERZA explícitamente el id dentro del objeto para que nunca sea undefined
-            const updateData = { id: eqId, area: areaVal, nombre: tagLimpio, tipo_equipo: String(row[2]||'').trim() };
+            const updateData = { 
+              id: eqId, 
+              area: areaVal, 
+              nombre: tagLimpio, 
+              tipo_equipo: tipoVal || 'Equipo' 
+            };
             
-            if (fechaVal && !fechaVal.includes('1900') && !fechaVal.toLowerCase().includes('nat') && fechaVal !== 'undefined') {
+            if (fechaVal && !fechaVal.includes('1900') && !fechaVal.toLowerCase().includes('nat')) {
               updateData.ultima_medicion = fechaVal;
-            } else { updateData.ultima_medicion = ''; }
+            } else { 
+              updateData.ultima_medicion = ''; 
+            }
 
-            const eqExist = equipos.find(e => String(e.id) === String(eqId));
+            const eqExist = equipos.find(item => String(item.id) === String(eqId));
             if (!eqExist) {
               updateData.severidad = updateData.ultima_medicion ? "Verde" : "Plomo";
               updateData.fecha = new Date().toISOString().split('T')[0];
@@ -616,15 +625,7 @@
           }
         });
 
-        let eliminadosPorPurga = 0;
-        equipos.forEach(eq => {
-          if (!tagsEnExcel.has(String(eq.id))) {
-            equiposRef.child(eq.id).remove();
-            eliminadosPorPurga++;
-          }
-        });
-
-        alert(`✅ Sincronización V2.5 completada:\n- ${agregados} activos procesados.\n- ${eliminadosPorPurga} activos retirados eliminados.`);
+        alert(`✅ Sincronización masiva exitosa:\n- Se procesaron ${agregados} registros correctamente.`);
         fileInput.value = '';
       } catch (err) { alert("❌ Error procesando Excel: " + err.message); }
     };
@@ -708,7 +709,6 @@
     renderizarMarcadoresMapa(equipos);
   });
 
-  // --- MOTOR DE GUARDADO CON ID FORZADO ---
   function procesarGuardado() {
     if (!isAdmin) return; 
     const area = document.getElementById('inArea').value.trim();
