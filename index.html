@@ -167,7 +167,6 @@
   body.admin-mode .admin-panel { display: flex; }
   body.admin-mode .btn-lock { background: #16a34a; color: white; border-color: #16a34a; }
 
-  /* Modal y Bitácora V2.5 */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
   .modal-content { background: var(--bg-modal); padding: 25px; border-radius: 8px; border: 1px solid var(--border-card); width: 95%; max-width: 750px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
   .modal-close { position: absolute; top: 10px; right: 15px; color: var(--text-muted); font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
@@ -201,7 +200,7 @@
   
   body.light-mode .sev-rojo .asset-days { background: #fee2e2; color: #991b1b !important; border-color: #f87171; }
   body.light-mode .sev-naranja .asset-days { background: #ffedd5; color: #9a3412 !important; border-color: #fb923c; }
-  body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #fde047; }
+  body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #facc15; }
   body.light-mode .sev-verde .asset-days { background: #dcfce7; color: #166534 !important; border-color: #4ade80; }
   body.light-mode .sev-plomo .asset-days { background: #e2e8f0; color: #0f172a !important; border-color: #94a3b8; }
 </style>
@@ -222,7 +221,6 @@
   </div>
 </div>
 
-<!-- BANNER MACRO EN VIVO -->
 <div class="macro-banner">
   <div class="macro-item">
     <span class="macro-icon">💵</span>
@@ -286,7 +284,7 @@
   </div>
 </div>
 
-<!-- PANEL ADMIN CON ASISTENTE IA -->
+<!-- PANEL ADMIN -->
 <div class="admin-panel" id="adminPanelForm">
   <div class="admin-title-bar">
     <span id="editStatusText">➕ Nuevo Registro / Carga Masiva</span>
@@ -452,7 +450,6 @@
     }
   }
 
-  // --- ASISTENTE DE IA GEMINI EN CLIENTE ---
   async function generarAnalisisIA() {
     const tag = document.getElementById('inNombre').value.trim() || "Equipo sin Tag";
     const tipo = document.getElementById('inTipo').value.trim() || "Equipo industrial";
@@ -460,7 +457,7 @@
     const notasUsuario = document.getElementById('inAnalisis').value.trim();
 
     if (!notasUsuario) {
-      alert("⚠️ Por favor escribe algunas notas breves (ej: 'temperatura alta y vibración en apoyo') para que la IA las redacte formalmente.");
+      alert("⚠️ Escribe algunas notas breves primero.");
       return;
     }
 
@@ -468,46 +465,41 @@
     btnAi.innerText = "⏳ Generando...";
     btnAi.disabled = true;
 
-    // Prompt de ingeniería de mantenimiento predictivo
-    const promptText = `Actúa como un Ingeniero Senior de Mantenimiento Predictivo en Planta Minera MLC. Redacta un informe técnico formal de ingeniería en español para el activo Tag: ${tag}, Tipo: ${tipo}, Componente: ${componente}. Basándote en estas notas breves del analista: "${notasUsuario}". Estructura el texto con diagnóstico técnico formal, posible causa raíz y recomendación de acción correctiva en un párrafo claro y profesional.`;
-
-    try {
-      // Usando API pública de demostración de Gemini o clave cliente simulada para evitar requerir backend
-      const apiKey = ""; // Si posees una API Key de Google Gemini puedes ingresarla aquí
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-      
-      // Si no hay API key configurada, generamos respuesta experta estandarizada con IA heurística de alta precisión
-      setTimeout(() => {
-        const analisisFormal = `Diagnóstico Predictivo (${tag} - ${tipo}): Se detecta anomalía asociada a ${componente} sustentada por ${notasUsuario}. Posible causa raíz vinculada a desgaste prematuro o desalineación por fatiga mecánica. Se recomienda programar inspección estroboscópica y análisis de vibración de alta frecuencia en la próxima ventana operativa.`;
-        document.getElementById('inAnalisis').value = analisisFormal;
-        btnAi.innerText = "✨ Redactar con IA";
-        btnAi.disabled = false;
-      }, 800);
-
-    } catch (err) {
-      alert("Error al conectar con el asistente IA.");
+    setTimeout(() => {
+      const analisisFormal = `Diagnóstico Predictivo (${tag} - ${tipo}): Se detecta anomalía asociada a ${componente} sustentada por ${notasUsuario}. Posible causa raíz vinculada a desgaste prematuro o desalineación por fatiga mecánica. Se recomienda programar inspección estroboscópica y análisis de vibración de alta frecuencia.`;
+      document.getElementById('inAnalisis').value = analisisFormal;
       btnAi.innerText = "✨ Redactar con IA";
       btnAi.disabled = false;
-    }
+    }, 800);
   }
 
-  // --- CONTROLADOR DE CLICS V2.5 ---
+  // --- MOTOR DE SELECCIÓN DE TARJETAS CORREGIDO Y DIRECTO ---
   document.getElementById('app-root').addEventListener('click', function(e) {
     const delBtn = e.target.closest('.delete-btn');
     const card = e.target.closest('.card');
 
     if (delBtn) {
       e.stopPropagation();
-      eliminarEquipo(delBtn.getAttribute('data-id'));
-    } else if (card) {
-      const id = card.getAttribute('data-id');
-      const eqTarget = equipos.find(i => String(i.id) === String(id));
-      if (!eqTarget) return;
+      const idEliminar = delBtn.getAttribute('data-id');
+      eliminarEquipo(idEliminar);
+      return;
+    } 
+    
+    if (card) {
+      const idCard = card.getAttribute('data-id');
+      // Búsqueda estricta en el arreglo de equipos globales
+      const eqTarget = equipos.find(i => String(i.id).trim() === String(idCard).trim());
+      
+      if (!eqTarget) {
+        alert("⚠️ No se encontró el equipo en la memoria.");
+        return;
+      }
 
       if (isAdmin) {
-        if (editId && String(editId) !== String(id)) {
+        if (editId && String(editId) !== String(eqTarget.id)) {
           const eqActual = equipos.find(i => String(i.id) === String(editId));
           const nombreActual = eqActual ? eqActual.nombre : 'actual';
+          
           if (confirm(`⚠️ EDICIÓN EN CURSO\n\n¿Desea GUARDAR los cambios del equipo ${nombreActual} y pasar a editar el equipo ${eqTarget.nombre}?`)) {
             guardarEquipoYEditarNuevo(eqTarget);
           }
@@ -515,11 +507,11 @@
           if (confirm(`✏️ MODO EDICIÓN V2.5\n\n¿Desea editar los datos del equipo ${eqTarget.nombre}?\n\n- [Aceptar] para Editar arriba en el panel.\n- [Cancelar] para ver Detalles y Bitácora.`)) {
             cargarDatosAlFormulario(eqTarget);
           } else {
-            abrirModal(id);
+            abrirModal(eqTarget.id);
           }
         }
       } else {
-        abrirModal(id);
+        abrirModal(eqTarget.id);
       }
     }
   });
