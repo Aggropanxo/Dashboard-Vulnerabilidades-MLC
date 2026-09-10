@@ -473,7 +473,7 @@
     }, 800);
   }
 
-  // --- MOTOR DE SELECCIÓN DE TARJETAS CORREGIDO Y DIRECTO ---
+  // --- MOTOR DE SELECCIÓN DE TARJETAS BLINDADO Y CORREGIDO ---
   document.getElementById('app-root').addEventListener('click', function(e) {
     const delBtn = e.target.closest('.delete-btn');
     const card = e.target.closest('.card');
@@ -487,7 +487,6 @@
     
     if (card) {
       const idCard = card.getAttribute('data-id');
-      // Búsqueda estricta en el arreglo de equipos globales
       const eqTarget = equipos.find(i => String(i.id).trim() === String(idCard).trim());
       
       if (!eqTarget) {
@@ -562,6 +561,7 @@
     }
   }
 
+  // --- LECTOR EXCEL CON ID FORZADO (CORRECCIÓN CRÍTICA) ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -597,7 +597,8 @@
             tagsEnExcel.add(eqId);
 
             const fechaVal = String(row[3]||'').trim();
-            const updateData = { area: areaVal, nombre: tagLimpio, tipo_equipo: String(row[2]||'').trim() };
+            // SE FUERZA explícitamente el id dentro del objeto para que nunca sea undefined
+            const updateData = { id: eqId, area: areaVal, nombre: tagLimpio, tipo_equipo: String(row[2]||'').trim() };
             
             if (fechaVal && !fechaVal.includes('1900') && !fechaVal.toLowerCase().includes('nat') && fechaVal !== 'undefined') {
               updateData.ultima_medicion = fechaVal;
@@ -707,7 +708,7 @@
     renderizarMarcadoresMapa(equipos);
   });
 
-  // --- MOTOR DE GUARDADO CON BITÁCORA V2.5 ---
+  // --- MOTOR DE GUARDADO CON ID FORZADO ---
   function procesarGuardado() {
     if (!isAdmin) return; 
     const area = document.getElementById('inArea').value.trim();
