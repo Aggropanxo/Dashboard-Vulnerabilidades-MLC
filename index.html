@@ -3,206 +3,229 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DASHBOARD OPERACIONAL V2.5 + IA - PLANTA MLC | CPF & CMP</title>
+<title>INDUSTRIA 4.0 | DASHBOARD PREDICTIVO - PLANTA MLC</title>
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-main: #0b1120;
-    --text-main: #e2e8f0;
-    --text-muted: #94a3b8;
-    --accent-color: #38bdf8;
+    --bg-main: #020617;
+    --text-main: #f1f5f9;
+    --text-muted: #64748b;
+    --accent-color: #06b6d4; /* Cian industrial 4.0 */
+    --accent-glow: rgba(6, 182, 212, 0.25);
     --bg-panel: rgba(15, 23, 42, 0.75);
-    --bg-panel-solid: rgba(15, 23, 42, 0.95);
+    --bg-panel-solid: rgba(11, 19, 38, 0.96);
     --bg-card: rgba(15, 23, 42, 0.85);
-    --border-card: #334155;
-    --border-light: rgba(255,255,255,0.1);
-    --input-bg: rgba(30, 41, 59, 0.8);
-    --btn-bg: rgba(30, 41, 59, 0.8);
-    --btn-hover: rgba(51, 65, 85, 0.9);
-    --bg-modal: #0f172a;
-    --shadow-color: rgba(0,0,0,0.5);
-    --map-bg: linear-gradient(rgba(11, 17, 32, 0.88), rgba(11, 17, 32, 0.88)), url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/14/7424/10495');
+    --border-card: rgba(56, 189, 248, 0.2);
+    --border-light: rgba(255, 255, 255, 0.08);
+    --input-bg: rgba(3, 7, 18, 0.9);
+    --btn-bg: rgba(30, 41, 59, 0.85);
+    --btn-hover: rgba(51, 65, 85, 0.95);
+    --bg-modal: #070d1a;
+    --shadow-color: rgba(0, 0, 0, 0.8);
     --badge-bg: rgba(30, 41, 59, 0.8);
-    --card-days-bg: rgba(0,0,0,0.5);
-    --card-days-border: rgba(255,255,255,0.1);
+    --card-days-bg: rgba(3, 7, 18, 0.8);
+    --card-days-border: rgba(255, 255, 255, 0.08);
   }
 
   body.light-mode {
     --bg-main: #f1f5f9;
-    --text-main: #020617; 
-    --text-muted: #334155;
-    --accent-color: #0369a1; 
-    --bg-panel: rgba(255, 255, 255, 0.92);
+    --text-main: #0f172a; 
+    --text-muted: #475569;
+    --accent-color: #0891b2; 
+    --accent-glow: rgba(8, 145, 178, 0.2);
+    --bg-panel: rgba(255, 255, 255, 0.9);
     --bg-panel-solid: rgba(255, 255, 255, 0.98);
     --bg-card: rgba(255, 255, 255, 0.92);
-    --border-card: #94a3b8;
-    --border-light: rgba(0,0,0,0.15);
+    --border-card: #cbd5e1;
+    --border-light: rgba(0, 0, 0, 0.1);
     --input-bg: #ffffff;
     --btn-bg: rgba(226, 232, 240, 0.9);
-    --btn-hover: #cbd5e1;
+    --btn-hover: #e2e8f0;
     --bg-modal: #ffffff;
-    --shadow-color: transparent;
-    --map-bg: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/14/7424/10495');
-    --badge-bg: rgba(255, 255, 255, 0.9);
-    --card-days-bg: rgba(226, 232, 240, 0.9);
-    --card-days-border: #64748b;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --badge-bg: rgba(241, 245, 249, 0.9);
+    --card-days-bg: rgba(241, 245, 249, 0.9);
+    --card-days-border: #cbd5e1;
   }
 
   body { 
-    background-color: var(--bg-main); color: var(--text-main); font-family: 'Inter', system-ui, sans-serif; 
-    padding: 15px; margin: 0; transition: background-color 0.3s, color 0.3s;
-    background-image: var(--map-bg); background-size: cover; background-attachment: fixed;
+    background-color: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; 
+    padding: 16px; margin: 0; transition: background-color 0.3s, color 0.3s;
+    /* Retícula geométrica SCADA tipo Industria 4.0 */
+    background-image: 
+      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.08) 0%, transparent 60%);
+    background-size: 24px 24px, 24px 24px, 100% 100%;
+    background-attachment: fixed;
   }
   
-  .accent-text { color: var(--accent-color) !important; font-weight: bold; }
+  .code-font { font-family: 'Share Tech Mono', monospace; letter-spacing: 0.5px; }
+  .accent-text { color: var(--accent-color) !important; font-weight: 700; }
 
-  .header { border-bottom: 1px solid var(--border-light); padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
-  .header-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  /* Encabezado Industrial 4.0 */
+  .header { border-bottom: 2px solid var(--border-light); padding-bottom: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
+  .header-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   .brand-badges { display: flex; gap: 6px; align-items: center; }
-  .brand-badge { background: var(--badge-bg); border: 1px solid var(--border-light); color: var(--text-main); font-weight: 800; font-size: 1rem; padding: 4px 10px; border-radius: 4px; letter-spacing: 1px; backdrop-filter: blur(5px); }
-  .brand-badge.cpf { border-left: 4px solid var(--accent-color); }
-  .brand-badge.cmp { border-left: 4px solid #ef4444; }
-  .header-titles h1 { color: var(--text-main); font-size: 1.3rem; margin: 0 0 2px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px var(--shadow-color); }
-  .header-titles p { color: var(--text-muted); margin: 0; font-size: 0.8rem; font-weight: 600; }
+  .brand-badge { background: var(--badge-bg); border: 1px solid var(--border-light); color: var(--text-main); font-weight: 800; font-size: 0.85rem; padding: 4px 10px; border-radius: 4px; letter-spacing: 1px; backdrop-filter: blur(8px); }
+  .brand-badge.cpf { border-left: 4px solid var(--accent-color); box-shadow: 0 0 10px var(--accent-glow); }
+  .brand-badge.cmp { border-left: 4px solid #f43f5e; box-shadow: 0 0 10px rgba(244, 63, 94, 0.3); }
+  .header-titles h1 { color: var(--text-main); font-size: 1.35rem; margin: 0 0 2px 0; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 900; text-shadow: 0 2px 8px var(--shadow-color); }
+  .header-titles p { color: var(--text-muted); margin: 0; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
   
-  .macro-banner { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-  .macro-item { flex: 1; min-width: 140px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 8px 12px; display: flex; align-items: center; gap: 10px; backdrop-filter: blur(8px); }
+  /* Macro Banner 4.0 */
+  .macro-banner { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .macro-item { flex: 1; min-width: 150px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
   .macro-icon { font-size: 1.3rem; }
-  .macro-label { font-size: 0.58rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; display: block; }
+  .macro-label { font-size: 0.55rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; display: block; letter-spacing: 0.8px; }
   .macro-val { font-size: 0.95rem; font-weight: 900; color: var(--text-main); }
 
-  .header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between; background: var(--bg-panel); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 12px; backdrop-filter: blur(8px); }
+  .header-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between; background: var(--bg-panel); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 15px; backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
   .header-controls-left { display: flex; gap: 10px; flex-grow: 1; max-width: 320px; }
   .header-controls-right { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   
-  .search-input { width: 100%; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--accent-color); background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; font-weight: 600; outline: none; transition: box-shadow 0.3s; }
-  .search-input:focus { box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
+  .search-input { width: 100%; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--accent-color); background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; font-weight: 600; outline: none; transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+  .search-input:focus { box-shadow: 0 0 15px var(--accent-glow), inset 0 2px 4px rgba(0,0,0,0.5); }
   
-  .view-btn, .btn-lock, .filter-chip { background: var(--btn-bg); border: 1px solid var(--border-light); color: var(--text-muted); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: 0.3s; backdrop-filter: blur(5px); }
-  .view-btn.active, .filter-chip.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
-  .view-btn:hover, .btn-lock:hover, .filter-chip:hover { background: var(--btn-hover); color: var(--text-main); }
+  .view-btn, .btn-lock, .filter-chip { background: var(--btn-bg); border: 1px solid var(--border-light); color: var(--text-muted); padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: 700; font-size: 0.78rem; transition: 0.25s; text-transform: uppercase; letter-spacing: 0.5px; }
+  .view-btn.active, .filter-chip.active { background: var(--accent-color); color: #020617; border-color: var(--accent-color); box-shadow: 0 0 12px var(--accent-glow); font-weight: 900; }
+  .view-btn:hover, .btn-lock:hover, .filter-chip:hover { background: var(--btn-hover); color: var(--text-main); border-color: var(--accent-color); }
   .btn-report { background: #059669 !important; color: white !important; border-color: #059669 !important; }
-  .btn-ai { background: #7c3aed !important; color: white !important; border-color: #7c3aed !important; }
+  .btn-ai { background: #7c3aed !important; color: white !important; border-color: #7c3aed !important; box-shadow: 0 0 10px rgba(124, 58, 237, 0.4); }
 
-  .kpi-container { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
-  .kpi-card { flex: 1; min-width: 110px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(8px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-  .kpi-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 3px; }
-  .kpi-value { font-size: 1.8rem; font-weight: 900; line-height: 1; text-shadow: 0 1px 3px var(--shadow-color); }
+  /* KPIs 4.0 */
+  .kpi-container { display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .kpi-card { flex: 1; min-width: 120px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 12px; text-align: center; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(12px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); position: relative; overflow: hidden; }
+  .kpi-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; }
+  .kpi-total::after { background: var(--accent-color); }
+  .kpi-rojo::after { background: #f43f5e; }
+  .kpi-naranja::after { background: #f97316; }
+  .kpi-amarillo::after { background: #eab308; }
+  .kpi-verde::after { background: #10b981; }
+
+  .kpi-label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 4px; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 2rem; font-weight: 900; line-height: 1; text-shadow: 0 2px 4px var(--shadow-color); }
   .kpi-total .kpi-value { color: var(--accent-color); }
-  .kpi-rojo .kpi-value { color: #ef4444; }
+  .kpi-rojo .kpi-value { color: #f43f5e; }
   .kpi-naranja .kpi-value { color: #f97316; }
   .kpi-amarillo .kpi-value { color: #eab308; }
-  .kpi-verde .kpi-value { color: #22c55e; }
+  .kpi-verde .kpi-value { color: #10b981; }
 
-  .admin-panel { display: none; background: var(--bg-panel-solid); padding: 15px; border-radius: 8px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; border: 2px solid var(--accent-color); backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(0,0,0,0.2); transition: border-color 0.3s; }
-  .admin-panel.editing-mode { border-color: #f97316; box-shadow: 0 0 25px rgba(249, 115, 22, 0.4); } 
+  /* Admin Panel 4.0 */
+  .admin-panel { display: none; background: var(--bg-panel-solid); padding: 18px; border-radius: 8px; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; border: 2px solid var(--accent-color); backdrop-filter: blur(16px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: border-color 0.3s; }
+  .admin-panel.editing-mode { border-color: #f97316; box-shadow: 0 10px 30px rgba(249, 115, 22, 0.4); } 
   
-  .admin-title-bar { flex-basis: 100%; border-bottom: 1px solid var(--border-light); margin-bottom: 5px; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-  .admin-title-bar span { color: var(--accent-color); font-weight: 900; font-size: 0.95rem; text-transform: uppercase; }
+  .admin-title-bar { flex-basis: 100%; border-bottom: 1px solid var(--border-light); margin-bottom: 6px; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .admin-title-bar span { color: var(--accent-color); font-weight: 900; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
   .admin-panel.editing-mode .admin-title-bar span { color: #f97316; }
   
-  .admin-panel .input-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 140px; }
-  .admin-panel label { font-size: 0.65rem; color: var(--accent-color); font-weight: bold; margin-bottom: 2px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
-  .admin-panel input, .admin-panel textarea, .admin-panel select { padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); font-weight: 600; width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.8rem; }
-  .admin-panel textarea { resize: vertical; min-height: 40px; }
-  .admin-panel .full-width { flex-basis: 100%; display: flex; gap: 8px; align-items: center; justify-content: space-between; margin-top: 3px; flex-wrap: wrap; border-top: 1px solid var(--border-light); padding-top: 8px; }
+  .admin-panel .input-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 150px; }
+  .admin-panel label { font-size: 0.62rem; color: var(--accent-color); font-weight: 800; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; }
+  .admin-panel input, .admin-panel textarea, .admin-panel select { padding: 7px 10px; border-radius: 5px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); font-weight: 600; width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.8rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
+  .admin-panel textarea { resize: vertical; min-height: 45px; }
+  .admin-panel .full-width { flex-basis: 100%; display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-top: 5px; flex-wrap: wrap; border-top: 1px solid var(--border-light); padding-top: 10px; }
   
-  .admin-panel button { background: var(--accent-color); color: white; cursor: pointer; font-weight: bold; border: none; border-radius: 4px; padding: 6px 12px; font-size: 0.85rem; transition: 0.3s; }
-  .admin-panel button:hover { filter: brightness(1.1); }
-  .btn-upload { background: #10b981 !important; }
-  .btn-danger { background: #ef4444 !important; }
-  .btn-cancel { background: #64748b !important; display: none; }
-  .btn-save-edit { background: #f97316 !important; font-size: 0.95rem !important; padding: 8px 20px !important; box-shadow: 0 0 10px rgba(249, 115, 22, 0.5); }
+  .admin-panel button { background: var(--accent-color); color: #020617; cursor: pointer; font-weight: 800; border: none; border-radius: 5px; padding: 7px 14px; font-size: 0.82rem; transition: 0.25s; text-transform: uppercase; letter-spacing: 0.5px; }
+  .admin-panel button:hover { filter: brightness(1.15); box-shadow: 0 0 12px var(--accent-glow); }
+  .btn-upload { background: #10b981 !important; color: white !important; }
+  .btn-danger { background: #f43f5e !important; color: white !important; }
+  .btn-cancel { background: #64748b !important; color: white !important; display: none; }
+  .btn-save-edit { background: #f97316 !important; color: white !important; font-size: 0.9rem !important; padding: 8px 22px !important; box-shadow: 0 0 15px rgba(249, 115, 22, 0.6); }
 
-  .upload-box { border: 1px dashed #10b981; padding: 8px; border-radius: 5px; display: flex; gap: 8px; align-items: center; background: rgba(16, 185, 129, 0.1); flex-grow: 1; }
+  .upload-box { border: 1px dashed #10b981; padding: 8px 12px; border-radius: 6px; display: flex; gap: 10px; align-items: center; background: rgba(16, 185, 129, 0.08); flex-grow: 1; }
 
   #map-view { display: none; margin-bottom: 20px; }
-  .map-instruction { background: var(--bg-card); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 0.85rem; font-weight: bold; display: none; backdrop-filter: blur(5px); }
+  .map-instruction { background: var(--bg-card); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; font-size: 0.85rem; font-weight: bold; display: none; backdrop-filter: blur(8px); }
   body.admin-mode .map-instruction { display: block; }
   #map-container { width: 100%; height: 550px; border-radius: 8px; border: 1px solid var(--border-light); background: #000; z-index: 1;}
 
   #dashboard-view { display: block; }
-  .area-title { color: var(--accent-color); font-size: 1.1rem; border-left: 3px solid var(--accent-color); padding-left: 6px; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px var(--shadow-color); font-weight: 900;}
+  .area-title { color: var(--accent-color); font-size: 1.15rem; border-left: 4px solid var(--accent-color); padding-left: 10px; margin: 20px 0 10px 0; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 900; text-shadow: 0 2px 4px var(--shadow-color); background: linear-gradient(90deg, rgba(6,182,212,0.15) 0%, transparent 100%); padding-top: 4px; padding-bottom: 4px; border-radius: 0 6px 6px 0; }
   
-  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 10px; }
+  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); gap: 10px; }
   
+  /* Tarjetas Industria 4.0 Digital Twin */
   .card { 
-    background: var(--bg-card); border: 2px solid var(--border-card); border-radius: 6px; padding: 10px 4px; 
+    background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 6px; padding: 12px 6px; 
     position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; 
-    min-height: 65px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(6px); overflow: visible;
+    min-height: 75px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(8px); overflow: visible;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
-  .card:hover { transform: scale(1.12) translateY(-4px); z-index: 50; box-shadow: 0 10px 20px rgba(0,0,0,0.6); filter: brightness(1.15); }
+  .card:hover { transform: scale(1.08) translateY(-3px); z-index: 50; box-shadow: 0 12px 30px rgba(0,0,0,0.7), 0 0 15px var(--accent-glow); border-color: var(--accent-color); }
   
-  .sev-rojo { border-color: rgba(239, 68, 68, 0.9); animation: sirena-roja 1.2s ease-in-out infinite alternate; }
-  @keyframes sirena-roja { 0% { box-shadow: 0 0 4px rgba(239, 68, 68, 0.2), inset 0 0 4px rgba(239, 68, 68, 0.1); } 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.9), inset 0 0 10px rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 1); } }
-  .sev-naranja { border-color: rgba(249, 115, 22, 0.9); animation: sirena-naranja 2s ease-in-out infinite alternate; }
-  @keyframes sirena-naranja { 0% { box-shadow: 0 0 4px rgba(249, 115, 22, 0.1), inset 0 0 2px rgba(249, 115, 22, 0.05); } 100% { box-shadow: 0 0 15px rgba(249, 115, 22, 0.7), inset 0 0 8px rgba(249, 115, 22, 0.3); border-color: rgba(249, 115, 22, 1); } }
-  .sev-amarillo { border-color: rgba(234, 179, 8, 0.8); animation: respiracion-amarilla 3s ease-in-out infinite alternate; }
-  @keyframes respiracion-amarilla { 0% { box-shadow: 0 0 0px rgba(234, 179, 8, 0); } 100% { box-shadow: 0 0 10px rgba(234, 179, 8, 0.5), inset 0 0 4px rgba(234, 179, 8, 0.2); } }
-  .sev-verde { border-color: rgba(34, 197, 94, 0.6); box-shadow: 0 0 6px rgba(34, 197, 94, 0.2); }
-  .sev-plomo { border-color: rgba(100, 116, 139, 0.6); box-shadow: 0 0 4px rgba(100, 116, 139, 0.2); }
+  .sev-rojo { border-color: rgba(244, 63, 94, 0.8); background: linear-gradient(135deg, rgba(244, 63, 94, 0.15) 0%, var(--bg-card) 60%); animation: sirena-roja 1.2s ease-in-out infinite alternate; }
+  @keyframes sirena-roja { 0% { box-shadow: 0 0 6px rgba(244, 63, 94, 0.3); } 100% { box-shadow: 0 0 22px rgba(244, 63, 94, 0.9), inset 0 0 10px rgba(244, 63, 94, 0.4); border-color: rgba(244, 63, 94, 1); } }
+  
+  .sev-naranja { border-color: rgba(249, 115, 22, 0.8); background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, var(--bg-card) 60%); animation: sirena-naranja 2s ease-in-out infinite alternate; }
+  @keyframes sirena-naranja { 0% { box-shadow: 0 0 6px rgba(249, 115, 22, 0.2); } 100% { box-shadow: 0 0 18px rgba(249, 115, 22, 0.8), inset 0 0 8px rgba(249, 115, 22, 0.3); border-color: rgba(249, 115, 22, 1); } }
+  
+  .sev-amarillo { border-color: rgba(234, 179, 8, 0.7); background: linear-gradient(135deg, rgba(234, 179, 8, 0.12) 0%, var(--bg-card) 60%); }
+  .sev-verde { border-color: rgba(16, 185, 129, 0.6); background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, var(--bg-card) 60%); }
+  .sev-plomo { border-color: rgba(100, 116, 139, 0.5); }
 
-  .pulse-indicator { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; }
-  .sev-rojo .pulse-indicator { background-color: #ef4444; }
-  .sev-naranja .pulse-indicator { background-color: #f97316; }
-  .sev-amarillo .pulse-indicator { background-color: #eab308; }
-  .sev-verde .pulse-indicator { background-color: #22c55e; }
+  .pulse-indicator { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; }
+  .sev-rojo .pulse-indicator { background-color: #f43f5e; box-shadow: 0 0 8px #f43f5e; }
+  .sev-naranja .pulse-indicator { background-color: #f97316; box-shadow: 0 0 8px #f97316; }
+  .sev-amarillo .pulse-indicator { background-color: #eab308; box-shadow: 0 0 6px #eab308; }
+  .sev-verde .pulse-indicator { background-color: #10b981; box-shadow: 0 0 6px #10b981; }
   .sev-plomo .pulse-indicator { background-color: #64748b; }
   
-  .delete-btn { display: none; position: absolute; top: 2px; left: 2px; background: rgba(0,0,0,0.85); border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); font-size: 0.75rem; z-index: 100; padding: 2px 6px; cursor: pointer; color: #ef4444; }
-  .delete-btn:hover { background: #334155; }
+  .delete-btn { display: none; position: absolute; top: 2px; left: 2px; background: rgba(0,0,0,0.85); border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); font-size: 0.7rem; z-index: 100; padding: 2px 6px; cursor: pointer; color: #f43f5e; }
+  .delete-btn:hover { background: #1e293b; }
   
-  .asset-type-badge { font-size: 0.65rem; color: var(--accent-color); font-weight: 800; text-transform: uppercase; margin-bottom: 2px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95px; }
-  .asset-tag { color: var(--text-main); font-size: 1rem; font-weight: 900; margin: 0; letter-spacing: 0.5px; z-index: 2; text-shadow: 0 1px 3px var(--shadow-color); }
-  .asset-days { font-size: 0.60rem; font-weight: 900; margin-top: 5px; padding: 4px 6px; border-radius: 4px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; letter-spacing: 0.5px; }
+  .asset-type-badge { font-size: 0.58rem; color: var(--accent-color); font-weight: 800; text-transform: uppercase; margin-bottom: 2px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 98px; letter-spacing: 0.5px; }
+  .asset-tag { color: var(--text-main); font-size: 1.05rem; font-weight: 900; margin: 0; letter-spacing: 0.8px; z-index: 2; text-shadow: 0 1px 3px var(--shadow-color); }
+  .asset-days { font-size: 0.58rem; font-weight: 800; margin-top: 6px; padding: 3px 6px; border-radius: 4px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; letter-spacing: 0.5px; }
   
-  .sev-rojo .asset-days { color: #fca5a5; }
-  .sev-naranja .asset-days { color: #fdba74; }
-  .sev-amarillo .asset-days { color: #fde047; }
-  .sev-verde .asset-days { color: #86efac; }
+  .sev-rojo .asset-days { color: #fecdd3; border-color: rgba(244,63,94,0.4); }
+  .sev-naranja .asset-days { color: #ffedd5; border-color: rgba(249,115,22,0.4); }
+  .sev-amarillo .asset-days { color: #fef08a; }
+  .sev-verde .asset-days { color: #a7f3d0; }
   .sev-plomo .asset-days { color: var(--text-muted); }
 
   body.admin-mode .delete-btn { display: block !important; }
   body.admin-mode .admin-panel { display: flex; }
-  body.admin-mode .btn-lock { background: #16a34a; color: white; border-color: #16a34a; }
+  body.admin-mode .btn-lock { background: #10b981; color: white; border-color: #10b981; }
 
-  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
-  .modal-content { background: var(--bg-modal); padding: 25px; border-radius: 8px; border: 1px solid var(--border-card); width: 95%; max-width: 750px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-  .modal-close { position: absolute; top: 10px; right: 15px; color: var(--text-muted); font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
-  .modal-close:hover { color: #ef4444; }
+  /* Modal 4.0 Glass */
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(6px); }
+  .modal-content { background: var(--bg-modal); padding: 25px; border-radius: 10px; border: 1px solid var(--accent-color); width: 95%; max-width: 750px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 25px var(--accent-glow); }
+  .modal-close { position: absolute; top: 12px; right: 18px; color: var(--text-muted); font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
+  .modal-close:hover { color: #f43f5e; }
   
-  .modal-header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; margin-bottom: 15px; }
-  .modal-title { color: var(--text-main); font-size: 1.3rem; margin: 0; text-transform: uppercase; font-weight: 900; }
-  .modal-sev-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; color: #fff; margin-right: 30px;}
+  .modal-header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 15px; }
+  .modal-title { color: var(--text-main); font-size: 1.35rem; margin: 0; text-transform: uppercase; font-weight: 900; letter-spacing: 0.8px; }
+  .modal-sev-badge { padding: 5px 12px; border-radius: 5px; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; color: #fff; margin-right: 35px; letter-spacing: 0.5px; }
   
-  .modal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; background: var(--bg-panel); padding: 15px; border-radius: 6px; }
+  .modal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; background: var(--bg-panel); padding: 15px; border-radius: 6px; border: 1px solid var(--border-light); }
   .modal-data-row { margin-bottom: 12px; }
-  .modal-label { color: var(--text-muted); font-size: 0.65rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; }
-  .modal-value { color: var(--text-main); font-weight: 600; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.3; }
+  .modal-label { color: var(--text-muted); font-size: 0.62rem; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 3px; letter-spacing: 0.8px; }
+  .modal-value { color: var(--text-main); font-weight: 600; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.4; }
   
-  .timeline-box { background: var(--bg-panel); padding: 12px; border-radius: 6px; max-height: 150px; overflow-y: auto; font-size: 0.85rem; border: 1px solid var(--border-light); }
-  .timeline-item { border-left: 3px solid var(--accent-color); padding-left: 8px; margin-bottom: 8px; }
-  .timeline-date { font-size: 0.65rem; color: var(--text-muted); font-weight: bold; }
+  .timeline-box { background: var(--bg-panel); padding: 12px; border-radius: 6px; max-height: 150px; overflow-y: auto; font-size: 0.82rem; border: 1px solid var(--border-light); }
+  .timeline-item { border-left: 3px solid var(--accent-color); padding-left: 10px; margin-bottom: 8px; }
+  .timeline-date { font-size: 0.62rem; color: var(--text-muted); font-weight: 700; }
 
   .gallery-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-  .gallery-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-card); cursor: pointer; transition: transform 0.2s; }
-  .gallery-thumb:hover { transform: scale(1.1); border-color: var(--accent-color); }
+  .gallery-thumb { width: 75px; height: 75px; object-fit: cover; border-radius: 5px; border: 1px solid var(--border-card); cursor: pointer; transition: transform 0.2s; }
+  .gallery-thumb:hover { transform: scale(1.1); border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-glow); }
 
   .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 3000; justify-content: center; align-items: center; }
-  .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 4px; }
+  .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 6px; }
   .lightbox-close { position: absolute; top: 15px; right: 25px; color: #fff; font-size: 2.5rem; cursor: pointer; background: none; border: none; }
 
-  body.light-mode .admin-panel input, body.light-mode .admin-panel textarea, body.light-mode .admin-panel select, body.light-mode .search-input { color: #000000; font-weight: bold; } 
-  body.light-mode .area-title { color: #020617; border-left-color: #0369a1; text-shadow: none; font-weight: 900;}
-  body.light-mode .asset-tag { color: #000000; text-shadow: none; font-weight: 900; }
-  body.light-mode .asset-type-badge { color: #0369a1; font-weight: 900; }
+  body.light-mode .admin-panel input, body.light-mode .admin-panel textarea, body.light-mode .admin-panel select, body.light-mode .search-input { color: #0f172a; font-weight: 700; } 
+  body.light-mode .area-title { color: #0f172a; background: linear-gradient(90deg, rgba(8,145,178,0.12) 0%, transparent 100%); }
+  body.light-mode .asset-tag { color: #0f172a; text-shadow: none; }
+  body.light-mode .asset-type-badge { color: #0891b2; }
   
-  body.light-mode .sev-rojo .asset-days { background: #fee2e2; color: #991b1b !important; border-color: #f87171; }
-  body.light-mode .sev-naranja .asset-days { background: #ffedd5; color: #9a3412 !important; border-color: #fb923c; }
-  body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #facc15; }
-  body.light-mode .sev-verde .asset-days { background: #dcfce7; color: #166534 !important; border-color: #4ade80; }
-  body.light-mode .sev-plomo .asset-days { background: #e2e8f0; color: #0f172a !important; border-color: #94a3b8; }
+  body.light-mode .sev-rojo .asset-days { background: #ffe4e6; color: #9f1239 !important; border-color: #fda4af; }
+  body.light-mode .sev-naranja .asset-days { background: #ffedd5; color: #9a3412 !important; border-color: #fdba74; }
+  body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #fde047; }
+  body.light-mode .sev-verde .asset-days { background: #d1fae5; color: #065f46 !important; border-color: #6ee7b7; }
+  body.light-mode .sev-plomo .asset-days { background: #e2e8f0; color: #1e293b !important; border-color: #cbd5e1; }
 </style>
 </head>
 <body>
@@ -215,8 +238,8 @@
   <div class="header-left">
     <div class="brand-badges"><span class="brand-badge cpf">CPF</span><span class="brand-badge cmp">CMP</span></div>
     <div class="header-titles">
-      <h1>DASHBOARD OPERACIONAL V2.5 + IA - MLC</h1>
-      <p>Gestión Inteligente de Confiabilidad y Predictivo</p>
+      <h1>CENTRO DE CONTROL PREDICTIVO - MLC</h1>
+      <p class="code-font">INDUSTRIA 4.0 // DIGITAL TWIN MONITORING</p>
     </div>
   </div>
 </div>
@@ -226,28 +249,28 @@
     <span class="macro-icon">💵</span>
     <div>
       <span class="macro-label">Dólar (USD/CLP)</span>
-      <span class="macro-val" id="valDolar">Cargando...</span>
+      <span class="macro-val code-font" id="valDolar">Cargando...</span>
     </div>
   </div>
   <div class="macro-item">
     <span class="macro-icon">⛏️</span>
     <div>
       <span class="macro-label">Mineral de Hierro</span>
-      <span class="macro-val">$102.50 / T</span>
+      <span class="macro-val code-font">$102.50 / T</span>
     </div>
   </div>
   <div class="macro-item">
     <span class="macro-icon">🌤️</span>
     <div>
       <span class="macro-label">Mina Los Colorados</span>
-      <span class="macro-val">Vallenar: 22°C</span>
+      <span class="macro-val code-font">Vallenar: 22°C</span>
     </div>
   </div>
 </div>
 
 <div class="header-controls">
   <div class="header-controls-left">
-    <input type="text" id="buscador" class="search-input" placeholder="🔍 Buscar por Tag o Área..." onkeyup="ejecutarBusqueda()">
+    <input type="text" id="buscador" class="search-input code-font" placeholder="🔍 Filtrar por Tag o Área..." onkeyup="ejecutarBusqueda()">
   </div>
   <div class="header-controls-right">
     <button class="filter-chip active" onclick="filtrarDias(0, this)">Todos</button>
@@ -264,27 +287,27 @@
 <div class="kpi-container" id="kpiContainer">
   <div class="kpi-card kpi-total">
     <span class="kpi-label">Total Activos</span>
-    <div class="kpi-value" id="kpiTotal">0</div>
+    <div class="kpi-value code-font" id="kpiTotal">0</div>
   </div>
   <div class="kpi-card kpi-rojo">
     <span class="kpi-label">🔴 Críticos (Alto)</span>
-    <div class="kpi-value" id="kpiRojo">0</div>
+    <div class="kpi-value code-font" id="kpiRojo">0</div>
   </div>
   <div class="kpi-card kpi-naranja">
     <span class="kpi-label">🟠 Alertas (Medio)</span>
-    <div class="kpi-value" id="kpiNaranja">0</div>
+    <div class="kpi-value code-font" id="kpiNaranja">0</div>
   </div>
   <div class="kpi-card kpi-amarillo">
     <span class="kpi-label">🟡 Monitoreo (Bajo)</span>
-    <div class="kpi-value" id="kpiAmarillo">0</div>
+    <div class="kpi-value code-font" id="kpiAmarillo">0</div>
   </div>
   <div class="kpi-card kpi-verde">
     <span class="kpi-label">🟢 Operativos (Normal)</span>
-    <div class="kpi-value" id="kpiVerde">0</div>
+    <div class="kpi-value code-font" id="kpiVerde">0</div>
   </div>
 </div>
 
-<!-- PANEL ADMIN -->
+<!-- PANEL ADMIN 4.0 -->
 <div class="admin-panel" id="adminPanelForm">
   <div class="admin-title-bar">
     <span id="editStatusText">➕ Nuevo Registro / Carga Masiva</span>
@@ -296,7 +319,7 @@
   </div>
   <div class="input-group">
     <label>N° Tag / Equipo</label>
-    <input type="text" id="inNombre" placeholder="ej. MH27152" required>
+    <input type="text" id="inNombre" class="code-font" placeholder="ej. MH27152" required>
   </div>
   <div class="input-group">
     <label>Tipo Equipo</label>
@@ -340,7 +363,7 @@
   <div class="input-group" style="flex-basis: 48%;">
     <label>
       Análisis Técnico 
-      <button type="button" class="btn-ai" onclick="generarAnalisisIA()" style="padding: 2px 8px; font-size: 0.65rem;">✨ Redactar con IA</button>
+      <button type="button" class="btn-ai" onclick="generarAnalisisIA()" style="padding: 2px 8px; font-size: 0.62rem;">✨ Redactar con IA</button>
     </label>
     <textarea id="inAnalisis" placeholder="Escribe notas breves y haz clic en Redactar con IA..."></textarea>
   </div>
@@ -357,7 +380,7 @@
   <div class="full-width">
     <div class="upload-box" id="uploadBoxCont">
       <div style="flex-grow: 1;">
-        <label style="color:#10b981;">CARGA MASIVA EXCEL (Flexible Total)</label>
+        <label style="color:#10b981;">CARGA MASIVA EXCEL</label>
         <input type="file" id="inExcelFile" accept=".xlsx, .xls, .csv" style="background:transparent; border:none; padding:0; margin-top:3px;">
       </div>
       <button class="btn-upload" onclick="procesarExcel()">📥 Actualizar desde Excel</button>
@@ -378,19 +401,19 @@
   <div id="map-container"></div>
 </div>
 
-<!-- MODAL V2.5 -->
+<!-- MODAL 4.0 -->
 <div id="evidenciaModal" class="modal-overlay" onclick="cerrarModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="cerrarModal()">&times;</button>
     <div class="modal-header-flex">
-      <h2 id="modalTitle" class="modal-title">Tag</h2>
+      <h2 id="modalTitle" class="modal-title code-font">Tag</h2>
       <span id="modalSevBadge" class="modal-sev-badge">Color</span>
     </div>
     <div class="modal-grid">
       <div><span class="modal-label">Tipo Equipo</span><span id="modalTipo" class="modal-value accent-text"></span></div>
       <div><span class="modal-label">Componente</span><span id="modalComponente" class="modal-value"></span></div>
-      <div><span class="modal-label">Aviso SAP</span><span id="modalAviso" class="modal-value"></span></div>
-      <div><span class="modal-label">OM SAP</span><span id="modalOm" class="modal-value"></span></div>
+      <div><span class="modal-label">Aviso SAP</span><span id="modalAviso" class="modal-value code-font"></span></div>
+      <div><span class="modal-label">OM SAP</span><span id="modalOm" class="modal-value code-font"></span></div>
       <div><span class="modal-label">Fecha Hallazgo</span><span id="modalFecha" class="modal-value"></span></div>
       <div><span class="modal-label">Última Medición</span><span id="modalUltimaMedicion" class="modal-value"></span></div>
       <div><span class="modal-label">Estado Medición</span><span id="modalDias" class="modal-value accent-text"></span></div>
@@ -473,7 +496,7 @@
     }, 800);
   }
 
-  // --- MOTOR DE SELECCIÓN DE TARJETAS BLINDADO ---
+  // --- MOTOR DE SELECCIÓN V4.0 ---
   document.getElementById('app-root').addEventListener('click', function(e) {
     const delBtn = e.target.closest('.delete-btn');
     const card = e.target.closest('.card');
@@ -502,7 +525,7 @@
             guardarEquipoYEditarNuevo(eqTarget);
           }
         } else {
-          if (confirm(`✏️ MODO EDICIÓN V2.5\n\n¿Desea editar los datos del equipo ${eqTarget.nombre}?\n\n- [Aceptar] para Editar arriba en el panel.\n- [Cancelar] para ver Detalles y Bitácora.`)) {
+          if (confirm(`✏️ MODO EDICIÓN V4.0\n\n¿Desea editar los datos del equipo ${eqTarget.nombre}?\n\n- [Aceptar] para Editar arriba en el panel.\n- [Cancelar] para ver Detalles y Bitácora.`)) {
             cargarDatosAlFormulario(eqTarget);
           } else {
             abrirModal(eqTarget.id);
@@ -539,7 +562,7 @@
 
   function generarReporteTurno() {
     const criticos = equipos.filter(e => e.severidad === 'Rojo' || e.severidad === 'Naranja');
-    let textoReporte = `=== REPORTE EJECUTIVO DE TURNO V2.5 - PLANTA MLC ===\nFecha: ${new Date().toLocaleDateString()}\nTotal Activos Críticos/Alertas: ${criticos.length}\n\n`;
+    let textoReporte = `=== REPORTE EJECUTIVO DE TURNO V4.0 - PLANTA MLC ===\nFecha: ${new Date().toLocaleDateString()}\nTotal Activos Críticos/Alertas: ${criticos.length}\n\n`;
     criticos.forEach(e => {
       textoReporte += `[${e.severidad.toUpperCase()}] Área: ${e.area} | Tag: ${e.nombre} | Tipo: ${e.tipo_equipo || 'N/D'}\n`;
       textoReporte += ` - Análisis: ${e.analisis || 'Sin análisis'}\n`;
@@ -560,7 +583,6 @@
     }
   }
 
-  // --- LECTOR EXCEL ULTRA-ROBUSTO Y FLEXIBLE (LEE TODAS LAS FILAS) ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -579,18 +601,15 @@
           const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false, defval: ""});
           if (jsonRows.length === 0) return;
 
-          // Detectar columnas automáticamente o usar índices por defecto (0: Área, 1: Tag, 2: Tipo, 3: Fecha)
           for (let i = 0; i < jsonRows.length; i++) {
             let row = jsonRows[i];
             if (!row || row.length < 2) continue;
 
-            // Buscar celdas que contengan texto válido y no sean cabeceras de título
             let areaVal = String(row[0] || '').trim();
             let eqVal = String(row[1] || '').trim();
             let tipoVal = String(row[2] || '').trim();
             let fechaVal = String(row[3] || '').trim();
 
-            // Si la segunda columna está vacía o dice "EQUIPO", saltar
             if (!eqVal || eqVal.toLowerCase() === 'tag' || eqVal.toLowerCase() === 'equipo' || eqVal.toLowerCase() === 'undefined') continue;
             if (!areaVal || areaVal.toLowerCase() === 'area' || areaVal.toLowerCase() === 'área') {
               areaVal = "Área General";
@@ -625,7 +644,7 @@
           }
         });
 
-        alert(`✅ Sincronización masiva exitosa:\n- Se procesaron ${agregados} registros correctamente.`);
+        alert(`✅ Sincronización masiva exitosa:\n- Se procesaron ${agregados} registros.`);
         fileInput.value = '';
       } catch (err) { alert("❌ Error procesando Excel: " + err.message); }
     };
@@ -658,7 +677,7 @@
     if (!map) return;
     markersLayer.clearLayers();
     mapMarkersObj = {}; 
-    const cMap = { 'Rojo':'#ef4444', 'Naranja':'#f97316', 'Amarillo':'#eab308', 'Verde':'#22c55e', 'Plomo':'#64748b' };
+    const cMap = { 'Rojo':'#f43f5e', 'Naranja':'#f97316', 'Amarillo':'#eab308', 'Verde':'#10b981', 'Plomo':'#64748b' };
     const aMap = { 'Rojo':'sirena-roja 1.2s infinite alternate', 'Naranja':'sirena-naranja 2s infinite alternate', 'Amarillo':'respiracion-amarilla 3s infinite alternate' };
 
     eqList.forEach(eq => {
@@ -709,14 +728,15 @@
     renderizarMarcadoresMapa(equipos);
   });
 
+  // --- MOTOR DE GUARDADO V4.0 ---
   function procesarGuardado() {
     if (!isAdmin) return; 
     const area = document.getElementById('inArea').value.trim();
     const nombre = document.getElementById('inNombre').value.trim().toUpperCase();
     if(!area || !nombre) { alert("⚠️ Área y Tag requeridos."); return; }
 
-    let eqId = editId || nombre.replace(/[.#$\[\]\s\/]/g, "_");
-    const eqOrig = equipos.find(e => String(e.id) === String(eqId));
+    let eqId = editId ? editId : nombre.replace(/[.#$\[\]\s\/]/g, "_");
+    const eqOrig = equipos.find(e => String(e.id).trim() === String(eqId).trim());
 
     let nuevaBitacora = eqOrig && eqOrig.bitacora ? eqOrig.bitacora : [];
     const nuevoAnalisis = document.getElementById('inAnalisis').value.trim();
@@ -730,12 +750,14 @@
     }
 
     const eqData = { 
-      id: eqId, area, nombre, 
+      id: eqId, 
+      area: area, 
+      nombre: nombre, 
       tipo_equipo: document.getElementById('inTipo').value.trim(),
       componente: document.getElementById('inComponente').value.trim(), 
       aviso: document.getElementById('inAviso').value.trim(), 
       om: document.getElementById('inOm').value.trim(), 
-      fecha: document.getElementById('inFecha').value || '', 
+      fecha: document.getElementById('inFecha').value || (eqOrig ? eqOrig.fecha : ''), 
       ultima_medicion: document.getElementById('inUltimaMedicion').value || '', 
       severidad: nuevaSev,
       estatus: document.getElementById('inEstatus').value.trim(),
@@ -761,7 +783,7 @@
     if(!area || !nombre) { alert("⚠️ Faltan datos en el equipo actual."); return; }
 
     let eqId = editId;
-    const eqOrig = equipos.find(e => String(e.id) === String(eqId));
+    const eqOrig = equipos.find(e => String(e.id).trim() === String(eqId).trim());
     let nuevaBitacora = eqOrig && eqOrig.bitacora ? eqOrig.bitacora : [];
     const nuevoAnalisis = document.getElementById('inAnalisis').value.trim();
     const nuevaSev = document.getElementById('inSeveridad').value;
@@ -779,7 +801,7 @@
       componente: document.getElementById('inComponente').value.trim(), 
       aviso: document.getElementById('inAviso').value.trim(), 
       om: document.getElementById('inOm').value.trim(), 
-      fecha: document.getElementById('inFecha').value || '', 
+      fecha: document.getElementById('inFecha').value || (eqOrig ? eqOrig.fecha : ''), 
       ultima_medicion: document.getElementById('inUltimaMedicion').value || '', 
       severidad: nuevaSev,
       estatus: document.getElementById('inEstatus').value.trim(),
@@ -870,13 +892,13 @@
   }
 
   function abrirModal(id) {
-    const eq = equipos.find(i => String(i.id) === String(id));
+    const eq = equipos.find(i => String(i.id).trim() === String(id).trim());
     if (!eq) return;
 
     document.getElementById('modalTitle').innerText = `${eq.nombre} - ${eq.area}`;
     const badge = document.getElementById('modalSevBadge');
     badge.innerText = `Estado: ${eq.severidad || 'Plomo'}`;
-    const cMap = { 'Rojo':'#ef4444', 'Naranja':'#f97316', 'Amarillo':'#eab308', 'Verde':'#22c55e', 'Plomo':'#64748b' };
+    const cMap = { 'Rojo':'#f43f5e', 'Naranja':'#f97316', 'Amarillo':'#eab308', 'Verde':'#10b981', 'Plomo':'#64748b' };
     badge.style.backgroundColor = cMap[eq.severidad] || cMap['Plomo'];
 
     document.getElementById('modalTipo').innerText = eq.tipo_equipo || '-';
@@ -961,8 +983,8 @@
           <div class="pulse-indicator"></div>
           <button class="delete-btn" data-id="${eq.id}" title="Eliminar">✖</button>
           <span class="asset-type-badge" title="${eq.tipo_equipo || 'Equipo'}">${eq.tipo_equipo || 'Equipo'}</span>
-          <h3 class="asset-tag">${eq.nombre}</h3>
-          <span class="asset-days">⏱️ ${eq.textDias}</span>
+          <h3 class="asset-tag code-font">${eq.nombre}</h3>
+          <span class="asset-days code-font">⏱️ ${eq.textDias}</span>
         </div>
       `).join('');
       
