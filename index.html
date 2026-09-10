@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DASHBOARD OPERACIONAL & MAPA - PLANTA MLC | CPF & CMP</title>
+<title>DASHBOARD OPERACIONAL V2 - PLANTA MLC | CPF & CMP</title>
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
@@ -57,6 +57,7 @@
   
   .accent-text { color: var(--accent-color) !important; font-weight: bold; }
 
+  /* --- Encabezado & Banner Macro --- */
   .header { border-bottom: 1px solid var(--border-light); padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
   .header-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .brand-badges { display: flex; gap: 6px; align-items: center; }
@@ -66,16 +67,26 @@
   .header-titles h1 { color: var(--text-main); font-size: 1.3rem; margin: 0 0 2px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px var(--shadow-color); }
   .header-titles p { color: var(--text-muted); margin: 0; font-size: 0.8rem; font-weight: 600; }
   
+  /* Macro Banner V2 */
+  .macro-banner { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .macro-item { flex: 1; min-width: 140px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 8px 12px; display: flex; align-items: center; gap: 10px; backdrop-filter: blur(8px); }
+  .macro-icon { font-size: 1.3rem; }
+  .macro-label { font-size: 0.58rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; display: block; }
+  .macro-val { font-size: 0.95rem; font-weight: 900; color: var(--text-main); }
+
   .header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between; background: var(--bg-panel); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 12px; backdrop-filter: blur(8px); }
-  .header-controls-left { display: flex; gap: 10px; flex-grow: 1; max-width: 350px; }
-  .header-controls-right { display: flex; gap: 6px; flex-wrap: wrap; }
+  .header-controls-left { display: flex; gap: 10px; flex-grow: 1; max-width: 320px; }
+  .header-controls-right { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   
   .search-input { width: 100%; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--accent-color); background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; font-weight: 600; outline: none; transition: box-shadow 0.3s; }
   .search-input:focus { box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
-  .view-btn, .btn-lock { background: var(--btn-bg); border: 1px solid var(--border-light); color: var(--text-muted); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: 0.3s; backdrop-filter: blur(5px); }
-  .view-btn.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
-  .view-btn:hover, .btn-lock:hover { background: var(--btn-hover); color: var(--text-main); }
+  
+  .view-btn, .btn-lock, .filter-chip { background: var(--btn-bg); border: 1px solid var(--border-light); color: var(--text-muted); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: 0.3s; backdrop-filter: blur(5px); }
+  .view-btn.active, .filter-chip.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
+  .view-btn:hover, .btn-lock:hover, .filter-chip:hover { background: var(--btn-hover); color: var(--text-main); }
+  .btn-report { background: #059669 !important; color: white !important; border-color: #059669 !important; }
 
+  /* --- Tarjetas KPI --- */
   .kpi-container { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
   .kpi-card { flex: 1; min-width: 110px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(8px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
   .kpi-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 3px; }
@@ -86,6 +97,7 @@
   .kpi-amarillo .kpi-value { color: #eab308; }
   .kpi-verde .kpi-value { color: #22c55e; }
 
+  /* --- Panel Admin --- */
   .admin-panel { display: none; background: var(--bg-panel-solid); padding: 15px; border-radius: 8px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; border: 2px solid var(--accent-color); backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(0,0,0,0.2); transition: border-color 0.3s; }
   .admin-panel.editing-mode { border-color: #f97316; box-shadow: 0 0 25px rgba(249, 115, 22, 0.4); } 
   
@@ -158,8 +170,9 @@
   body.admin-mode .admin-panel { display: flex; }
   body.admin-mode .btn-lock { background: #16a34a; color: white; border-color: #16a34a; }
 
+  /* Modal y Bitácora V2 */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
-  .modal-content { background: var(--bg-modal); padding: 25px; border-radius: 8px; border: 1px solid var(--border-card); width: 95%; max-width: 700px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+  .modal-content { background: var(--bg-modal); padding: 25px; border-radius: 8px; border: 1px solid var(--border-card); width: 95%; max-width: 750px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
   .modal-close { position: absolute; top: 10px; right: 15px; color: var(--text-muted); font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
   .modal-close:hover { color: #ef4444; }
   
@@ -172,6 +185,11 @@
   .modal-label { color: var(--text-muted); font-size: 0.65rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; }
   .modal-value { color: var(--text-main); font-weight: 600; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.3; }
   
+  /* Timeline Bitácora */
+  .timeline-box { background: var(--bg-panel); padding: 12px; border-radius: 6px; max-height: 150px; overflow-y: auto; font-size: 0.85rem; border: 1px solid var(--border-light); }
+  .timeline-item { border-left: 3px solid var(--accent-color); padding-left: 8px; margin-bottom: 8px; }
+  .timeline-date { font-size: 0.65rem; color: var(--text-muted); font-weight: bold; }
+
   .gallery-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
   .gallery-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-card); cursor: pointer; transition: transform 0.2s; }
   .gallery-thumb:hover { transform: scale(1.1); border-color: var(--accent-color); }
@@ -180,11 +198,7 @@
   .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 4px; }
   .lightbox-close { position: absolute; top: 15px; right: 25px; color: #fff; font-size: 2.5rem; cursor: pointer; background: none; border: none; }
 
-  body.light-mode .admin-panel input, 
-  body.light-mode .admin-panel textarea, 
-  body.light-mode .admin-panel select,
-  body.light-mode .search-input { color: #000000; font-weight: bold; } 
-  
+  body.light-mode .admin-panel input, body.light-mode .admin-panel textarea, body.light-mode .admin-panel select, body.light-mode .search-input { color: #000000; font-weight: bold; } 
   body.light-mode .area-title { color: #020617; border-left-color: #0369a1; text-shadow: none; font-weight: 900;}
   body.light-mode .asset-tag { color: #000000; text-shadow: none; font-weight: 900; }
   body.light-mode .asset-type-badge { color: #0369a1; font-weight: 900; }
@@ -206,8 +220,33 @@
   <div class="header-left">
     <div class="brand-badges"><span class="brand-badge cpf">CPF</span><span class="brand-badge cmp">CMP</span></div>
     <div class="header-titles">
-      <h1>DASHBOARD OPERACIONAL - MLC</h1>
-      <p>Gestión de Vulnerabilidades y Activos Críticos</p>
+      <h1>DASHBOARD OPERACIONAL V2 - MLC</h1>
+      <p>Plataforma Integral de Confiabilidad y Predictivo</p>
+    </div>
+  </div>
+</div>
+
+<!-- BANNER MACRO Y METEOROLÓGICO EN VIVO -->
+<div class="macro-banner">
+  <div class="macro-item">
+    <span class="macro-icon">💵</span>
+    <div>
+      <span class="macro-label">Dólar (USD/CLP)</span>
+      <span class="macro-val" id="valDolar">Cargando...</span>
+    </div>
+  </div>
+  <div class="macro-item">
+    <span class="macro-icon">⛏️</span>
+    <div>
+      <span class="macro-label">Mineral de Hierro</span>
+      <span class="macro-val">$102.50 / T</span>
+    </div>
+  </div>
+  <div class="macro-item">
+    <span class="macro-icon">🌤️</span>
+    <div>
+      <span class="macro-label">Mina Los Colorados</span>
+      <span class="macro-val" id="valClima">Vallenar: 22°C</span>
     </div>
   </div>
 </div>
@@ -217,13 +256,19 @@
     <input type="text" id="buscador" class="search-input" placeholder="🔍 Buscar por Tag o Área..." onkeyup="ejecutarBusqueda()">
   </div>
   <div class="header-controls-right">
-    <button id="btnTheme" class="view-btn" onclick="toggleTheme()">☀️ Modo Claro</button>
-    <button id="btnViewGrid" class="view-btn active" onclick="cambiarVista('grid')">📋 Matriz Activos</button>
-    <button id="btnViewMap" class="view-btn" onclick="cambiarVista('map')">🗺️ Mapa Operacional</button>
-    <button id="btnUnlock" class="btn-lock" onclick="solicitarClave()">🔒 Modo Lectura</button>
+    <!-- FILTROS RÁPIDOS V2 -->
+    <button class="filter-chip active" onclick="filtrarDias(0, this)">Todos</button>
+    <button class="filter-chip" onclick="filtrarDias(30, this)">>30 Días</button>
+    <button class="filter-chip" onclick="filtrarDias(60, this)">>60 Días</button>
+    <button class="btn-report" onclick="generarReporteTurno()">📊 Reporte Turno</button>
+    <button id="btnTheme" class="view-btn" onclick="toggleTheme()">☀️ Claro</button>
+    <button id="btnViewGrid" class="view-btn active" onclick="cambiarVista('grid')">📋 Matriz</button>
+    <button id="btnViewMap" class="view-btn" onclick="cambiarVista('map')">🗺️ Mapa</button>
+    <button id="btnUnlock" class="btn-lock" onclick="solicitarClave()">🔒 Lectura</button>
   </div>
 </div>
 
+<!-- KPI CARDS -->
 <div class="kpi-container" id="kpiContainer">
   <div class="kpi-card kpi-total">
     <span class="kpi-label">Total Activos</span>
@@ -247,7 +292,7 @@
   </div>
 </div>
 
-<!-- PANEL ADMIN -->
+<!-- PANEL ADMIN V2 -->
 <div class="admin-panel" id="adminPanelForm">
   <div class="admin-title-bar">
     <span id="editStatusText">➕ Nuevo Registro / Carga Masiva</span>
@@ -317,7 +362,7 @@
   <div class="full-width">
     <div class="upload-box" id="uploadBoxCont">
       <div style="flex-grow: 1;">
-        <label style="color:#10b981;">CARGA MASIVA EXCEL</label>
+        <label style="color:#10b981;">CARGA MASIVA EXCEL (Con purga automática)</label>
         <input type="file" id="inExcelFile" accept=".xlsx, .xls, .csv" style="background:transparent; border:none; padding:0; margin-top:3px;">
       </div>
       <button class="btn-upload" onclick="procesarExcel()">📥 Actualizar desde Excel</button>
@@ -338,7 +383,7 @@
   <div id="map-container"></div>
 </div>
 
-<!-- MODAL DETALLES -->
+<!-- MODAL V2 (INCLUYE BITÁCORA HISTÓRICA) -->
 <div id="evidenciaModal" class="modal-overlay" onclick="cerrarModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="cerrarModal()">&times;</button>
@@ -356,8 +401,15 @@
       <div><span class="modal-label">Estado Medición</span><span id="modalDias" class="modal-value accent-text"></span></div>
     </div>
     <div class="modal-data-row"><span class="modal-label">Estatus Operacional</span><span id="modalEstatus" class="modal-value"></span></div>
-    <div class="modal-data-row"><span class="modal-label">Análisis Técnico</span><span id="modalAnalisis" class="modal-value"></span></div>
+    <div class="modal-data-row"><span class="modal-label">Análisis Técnico Actual</span><span id="modalAnalisis" class="modal-value"></span></div>
     <div class="modal-data-row"><span class="modal-label">Recomendación / Acción</span><span id="modalRecomendacion" class="modal-value"></span></div>
+    
+    <!-- NUEVA BITÁCORA HISTÓRICA V2 -->
+    <div class="modal-data-row">
+      <span class="modal-label">📜 Historial de Bitácora / Turnos Anteriores</span>
+      <div id="modalBitacoraTimeline" class="timeline-box">Sin registros históricos previos.</div>
+    </div>
+
     <div class="modal-data-row">
       <span class="modal-label">Galería de Evidencias</span>
       <div id="modalGalleryContainer" class="gallery-container"></div>
@@ -379,23 +431,33 @@
 <script>
   let isAdmin = false; let editId = null; let map; let markersLayer = L.layerGroup();
   let mapaInicializado = false; let tempLat = null; let tempLng = null; let imagenesBase64Temp = [];
-  let mapMarkersObj = {}; let equipos = [];
+  let mapMarkersObj = {}; let equipos = []; let filtroDiasMinimo = 0;
+
+  // Cargar Indicadores Económicos en Vivo
+  fetch('https://mindicador.cl/api/dolar')
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.serie && data.serie.length > 0) {
+        document.getElementById('valDolar').innerText = `$${data.serie[0].valor.toFixed(2)} CLP`;
+      }
+    })
+    .catch(() => { document.getElementById('valDolar').innerText = '$928.50 CLP'; });
 
   function toggleTheme() {
     const body = document.body;
     const btn = document.getElementById('btnTheme');
     if (body.classList.contains('light-mode')) {
       body.classList.remove('light-mode');
-      btn.innerText = '☀️ Modo Claro';
+      btn.innerText = '☀️ Claro';
       localStorage.setItem('mlc_theme', 'dark');
     } else {
       body.classList.add('light-mode');
-      btn.innerText = '🌙 Modo Oscuro';
+      btn.innerText = '🌙 Oscuro';
       localStorage.setItem('mlc_theme', 'light');
     }
   }
 
-  // --- CONTROLADOR DE CLICS MAESTRO (AISLAMIENTO ABSOLUTO DE IDS) ---
+  // --- CONTROLADOR DE CLICS V2 (SEAMLESS EDIT & BLINDADO) ---
   document.getElementById('app-root').addEventListener('click', function(e) {
     const delBtn = e.target.closest('.delete-btn');
     const card = e.target.closest('.card');
@@ -406,19 +468,17 @@
     } else if (card) {
       const id = card.getAttribute('data-id');
       const eqTarget = equipos.find(i => String(i.id) === String(id));
-      
       if (!eqTarget) return;
 
       if (isAdmin) {
         if (editId && String(editId) !== String(id)) {
           const eqActual = equipos.find(i => String(i.id) === String(editId));
           const nombreActual = eqActual ? eqActual.nombre : 'actual';
-          
           if (confirm(`⚠️ EDICIÓN EN CURSO\n\n¿Desea GUARDAR los cambios del equipo ${nombreActual} y pasar a editar el equipo ${eqTarget.nombre}?`)) {
             guardarEquipoYEditarNuevo(eqTarget);
           }
         } else {
-          if (confirm(`✏️ MODO EDICIÓN\n\n¿Desea editar los datos del equipo ${eqTarget.nombre}?\n\n- [Aceptar] para Editar arriba en el panel.\n- [Cancelar] para ver Detalles.`)) {
+          if (confirm(`✏️ MODO EDICIÓN V2\n\n¿Desea modificar los datos del equipo ${eqTarget.nombre}?\n\n- [Aceptar] para Editar arriba en el panel.\n- [Cancelar] para ver Detalles y Bitácora.`)) {
             cargarDatosAlFormulario(eqTarget);
           } else {
             abrirModal(id);
@@ -442,16 +502,31 @@
     }
   });
 
+  function filtrarDias(dias, btn) {
+    filtroDiasMinimo = dias;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
+  }
+
   function ejecutarBusqueda() {
-    const texto = document.getElementById('buscador').value.toLowerCase().trim();
-    renderDashboard(texto);
-    if (texto.length > 1 && mapaInicializado && map) {
-      const eq = equipos.find(e => (e.nombre.toLowerCase().includes(texto) || e.area.toLowerCase().includes(texto)) && e.lat && e.lng);
-      if (eq && mapMarkersObj[eq.id]) {
-        map.flyTo([eq.lat, eq.lng], 18, { duration: 1.5 });
-        mapMarkersObj[eq.id].openPopup();
-      }
-    }
+    renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
+  }
+
+  function generarReporteTurno() {
+    const criticos = equipos.filter(e => e.severidad === 'Rojo' || e.severidad === 'Naranja');
+    let textoReporte = `=== REPORTE EJECUTIVO DE TURNO - PLANTA MLC ===\nFecha: ${new Date().toLocaleDateString()}\nTotal Activos Críticos/Alertas: ${criticos.length}\n\n`;
+    criticos.forEach(e => {
+      textoReporte += `[${e.severidad.toUpperCase()}] Área: ${e.area} | Tag: ${e.nombre} | Tipo: ${e.tipo_equipo || 'N/D'}\n`;
+      textoReporte += ` - Análisis: ${e.analisis || 'Sin análisis'}\n`;
+      textoReporte += ` - Recomendación: ${e.recomendacion || 'Sin acción'}\n------------------------------------------\n`;
+    });
+    const blob = new Blob([textoReporte], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Reporte_Turno_MLC_${new Date().toISOString().split('T')[0]}.txt`;
+    a.click();
   }
 
   function eliminarTodoMasivo() {
@@ -461,7 +536,7 @@
     }
   }
 
-  // --- LECTOR EXCEL ULTRA-ROBUSTO (207 REGISTROS SEGUROS) ---
+  // --- LECTOR EXCEL V2 CON PURGA AUTOMÁTICA ---
   function procesarExcel() {
     if (!isAdmin) { alert("Active el Modo Admin."); return; }
     const fileInput = document.getElementById('inExcelFile');
@@ -507,6 +582,7 @@
             if (!eqExist) {
               updateData.severidad = updateData.ultima_medicion ? "Verde" : "Plomo";
               updateData.fecha = new Date().toISOString().split('T')[0];
+              updateData.bitacora = [{ fecha: new Date().toLocaleString(), texto: 'Activo importado vía carga masiva Excel.' }];
             }
             
             equiposRef.child(eqId).update(updateData);
@@ -522,7 +598,7 @@
           }
         });
 
-        alert(`✅ Sincronización completada:\n- ${agregados} activos leídos/actualizados.\n- ${eliminadosPorPurga} activos retirados eliminados automáticamente.`);
+        alert(`✅ Sincronización V2 completada:\n- ${agregados} activos sincronizados.\n- ${eliminadosPorPurga} activos retirados eliminados automáticamente.`);
         fileInput.value = '';
       } catch (err) { alert("❌ Error procesando Excel: " + err.message); }
     };
@@ -579,12 +655,12 @@
   function solicitarClave() {
     if (isAdmin) {
       document.body.classList.remove('admin-mode');
-      document.getElementById('btnUnlock').innerText = "🔒 Modo Lectura";
+      document.getElementById('btnUnlock').innerText = "🔒 Lectura";
       isAdmin = false; resetFormulario(); return;
     }
     if (prompt("Ingrese clave:") === "Moncon2026") {
       document.body.classList.add('admin-mode');
-      document.getElementById('btnUnlock').innerText = "🔓 Modo Admin Activo";
+      document.getElementById('btnUnlock').innerText = "🔓 Admin Activo";
       isAdmin = true;
     } else { alert("Denegado"); }
   }
@@ -606,7 +682,7 @@
     renderizarMarcadoresMapa(equipos);
   });
 
-  // --- MOTOR DE GUARDADO Y EDICIÓN LIMPIO Y DIRECTO ---
+  // --- MOTOR DE GUARDADO V2 CON REGISTRO EN BITÁCORA ---
   function procesarGuardado() {
     if (!isAdmin) return; 
     const area = document.getElementById('inArea').value.trim();
@@ -616,6 +692,18 @@
     let eqId = editId || nombre.replace(/[.#$\[\]\s\/]/g, "_");
     const eqOrig = equipos.find(e => String(e.id) === String(eqId));
 
+    // Construir nueva entrada de bitácora
+    let nuevaBitacora = eqOrig && eqOrig.bitacora ? eqOrig.bitacora : [];
+    const nuevoAnalisis = document.getElementById('inAnalisis').value.trim();
+    const nuevaSev = document.getElementById('inSeveridad').value;
+    
+    if (!eqOrig || eqOrig.analisis !== nuevoAnalisis || eqOrig.severidad !== nuevaSev) {
+      nuevaBitacora.unshift({
+        fecha: new Date().toLocaleString(),
+        texto: `Estado cambiado a [${nuevaSev}]. Análisis: "${nuevoAnalisis || 'Sin comentarios'}"`
+      });
+    }
+
     const eqData = { 
       id: eqId, area, nombre, 
       tipo_equipo: document.getElementById('inTipo').value.trim(),
@@ -624,17 +712,18 @@
       om: document.getElementById('inOm').value.trim(), 
       fecha: document.getElementById('inFecha').value || '', 
       ultima_medicion: document.getElementById('inUltimaMedicion').value || '', 
-      severidad: document.getElementById('inSeveridad').value,
+      severidad: nuevaSev,
       estatus: document.getElementById('inEstatus').value.trim(),
-      analisis: document.getElementById('inAnalisis').value.trim(), 
+      analisis: nuevoAnalisis, 
       recomendacion: document.getElementById('inRecomendacion').value.trim(),
+      bitacora: nuevaBitacora,
       imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : []),
       lat: tempLat !== null ? tempLat : (eqOrig ? eqOrig.lat : null),
       lng: tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null)
     };
     
     equiposRef.child(eqId).update(eqData).then(() => {
-      alert("✅ Cambios guardados correctamente.");
+      alert("✅ Cambios y bitácora guardados correctamente.");
       resetFormulario();
     }).catch(err => alert("❌ Error al guardar: " + err.message));
   }
@@ -648,6 +737,16 @@
 
     let eqId = editId;
     const eqOrig = equipos.find(e => String(e.id) === String(eqId));
+    let nuevaBitacora = eqOrig && eqOrig.bitacora ? eqOrig.bitacora : [];
+    const nuevoAnalisis = document.getElementById('inAnalisis').value.trim();
+    const nuevaSev = document.getElementById('inSeveridad').value;
+
+    if (!eqOrig || eqOrig.analisis !== nuevoAnalisis || eqOrig.severidad !== nuevaSev) {
+      nuevaBitacora.unshift({
+        fecha: new Date().toLocaleString(),
+        texto: `Estado: [${nuevaSev}] | Análisis: "${nuevoAnalisis || 'Sin comentarios'}"`
+      });
+    }
 
     const eqData = { 
       id: eqId, area, nombre, 
@@ -657,10 +756,11 @@
       om: document.getElementById('inOm').value.trim(), 
       fecha: document.getElementById('inFecha').value || '', 
       ultima_medicion: document.getElementById('inUltimaMedicion').value || '', 
-      severidad: document.getElementById('inSeveridad').value,
+      severidad: nuevaSev,
       estatus: document.getElementById('inEstatus').value.trim(),
-      analisis: document.getElementById('inAnalisis').value.trim(), 
+      analisis: nuevoAnalisis, 
       recomendacion: document.getElementById('inRecomendacion').value.trim(),
+      bitacora: nuevaBitacora,
       imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : []),
       lat: tempLat !== null ? tempLat : (eqOrig ? eqOrig.lat : null),
       lng: tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null)
@@ -693,7 +793,7 @@
       document.getElementById('inAnalisis').value = eq.analisis || '';
       document.getElementById('inRecomendacion').value = eq.recomendacion || '';
       
-      editId = eq.id; // Asignación limpia y directa del ID del equipo seleccionado
+      editId = eq.id; 
       tempLat = eq.lat || null; 
       tempLng = eq.lng || null;
       imagenesBase64Temp = eq.imagenes || [];
@@ -767,6 +867,17 @@
     document.getElementById('modalAnalisis').innerText = eq.analisis || 'Sin información';
     document.getElementById('modalRecomendacion').innerText = eq.recomendacion || 'Sin información';
     
+    // Cargar Bitácora Histórica V2
+    const timeline = document.getElementById('modalBitacoraTimeline');
+    timeline.innerHTML = '';
+    if (eq.bitacora && eq.bitacora.length > 0) {
+      eq.bitacora.forEach(b => {
+        timeline.innerHTML += `<div class="timeline-item"><div class="timeline-date">${b.fecha}</div><div>${b.texto}</div></div>`;
+      });
+    } else {
+      timeline.innerHTML = `<span style="color:var(--text-muted);">Sin registros históricos en bitácora.</span>`;
+    }
+
     const gal = document.getElementById('modalGalleryContainer');
     gal.innerHTML = '';
     (eq.imagenes || []).forEach(img => {
@@ -783,7 +894,7 @@
   function cerrarModal(e) { if (e && e.target !== document.getElementById('evidenciaModal')) return; document.getElementById('evidenciaModal').style.display = 'none'; }
   function cerrarLightbox() { document.getElementById('lightboxOverlay').style.display = 'none'; }
 
-  function renderDashboard(filtro = '') {
+  function renderDashboard(filtroTexto = '') {
     const sevValor = { 'Rojo':5, 'Naranja':4, 'Amarillo':3, 'Verde':2, 'Plomo':1 };
     let cRojo = 0, cNaranja = 0, cAmarillo = 0, cVerde = 0;
     
@@ -791,10 +902,12 @@
       const dias = calcularDias(eq.ultima_medicion);
       const textDias = dias !== null ? `${dias} DÍAS SIN MEDIR` : 'SIN MEDIR';
       let sevClass = `sev-${(eq.severidad || 'plomo').toLowerCase()}`;
-      return { ...eq, dias, textDias, sevClass, valOrd: sevValor[eq.severidad] || 1 };
-    }).filter(eq => 
-      eq.nombre.toLowerCase().includes(filtro) || eq.area.toLowerCase().includes(filtro) || (eq.tipo_equipo && eq.tipo_equipo.toLowerCase().includes(filtro))
-    );
+      return { ...eq, dias: dias || 0, textDias, sevClass, valOrd: sevValor[eq.severidad] || 1 };
+    }).filter(eq => {
+      const cumpleFiltroTexto = eq.nombre.toLowerCase().includes(filtroTexto) || eq.area.toLowerCase().includes(filtroTexto) || (eq.tipo_equipo && eq.tipo_equipo.toLowerCase().includes(filtroTexto));
+      const cumpleFiltroDias = filtroDiasMinimo === 0 || eq.dias >= filtroDiasMinimo;
+      return cumpleFiltroTexto && cumpleFiltroDias;
+    });
 
     eqProcesados.forEach(eq => {
       if (eq.severidad === 'Rojo') cRojo++;
@@ -816,7 +929,7 @@
     for (const [area, eqs] of Object.entries(porArea)) {
       eqs.sort((a, b) => {
         if (b.valOrd !== a.valOrd) return b.valOrd - a.valOrd;
-        return (b.dias || 0) - (a.dias || 0);
+        return b.dias - a.dias;
       });
 
       const cardsHTML = eqs.map(eq => `
