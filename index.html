@@ -12,7 +12,7 @@
     --bg-main: #020617;
     --text-main: #f1f5f9;
     --text-muted: #64748b;
-    --accent-color: #06b6d4; /* Cian industrial 4.0 */
+    --accent-color: #06b6d4; 
     --accent-glow: rgba(6, 182, 212, 0.25);
     --bg-panel: rgba(15, 23, 42, 0.75);
     --bg-panel-solid: rgba(11, 19, 38, 0.96);
@@ -53,7 +53,6 @@
   body { 
     background-color: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; 
     padding: 16px; margin: 0; transition: background-color 0.3s, color 0.3s;
-    /* Retícula geométrica SCADA tipo Industria 4.0 */
     background-image: 
       linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
@@ -65,7 +64,6 @@
   .code-font { font-family: 'Share Tech Mono', monospace; letter-spacing: 0.5px; }
   .accent-text { color: var(--accent-color) !important; font-weight: 700; }
 
-  /* Encabezado Industrial 4.0 */
   .header { border-bottom: 2px solid var(--border-light); padding-bottom: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
   .header-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   .brand-badges { display: flex; gap: 6px; align-items: center; }
@@ -75,12 +73,12 @@
   .header-titles h1 { color: var(--text-main); font-size: 1.35rem; margin: 0 0 2px 0; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 900; text-shadow: 0 2px 8px var(--shadow-color); }
   .header-titles p { color: var(--text-muted); margin: 0; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
   
-  /* Macro Banner 4.0 */
+  /* Macro Banner 4.0 Expandido */
   .macro-banner { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
-  .macro-item { flex: 1; min-width: 150px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-  .macro-icon { font-size: 1.3rem; }
-  .macro-label { font-size: 0.55rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; display: block; letter-spacing: 0.8px; }
-  .macro-val { font-size: 0.95rem; font-weight: 900; color: var(--text-main); }
+  .macro-item { flex: 1; min-width: 140px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+  .macro-icon { font-size: 1.2rem; }
+  .macro-label { font-size: 0.52rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; display: block; letter-spacing: 0.8px; }
+  .macro-val { font-size: 0.9rem; font-weight: 900; color: var(--text-main); }
 
   .header-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between; background: var(--bg-panel); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 15px; backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
   .header-controls-left { display: flex; gap: 10px; flex-grow: 1; max-width: 320px; }
@@ -244,12 +242,20 @@
   </div>
 </div>
 
+<!-- MACRO BANNER 4.0 (INCLUYE ACCIÓN DE CAP) -->
 <div class="macro-banner">
   <div class="macro-item">
     <span class="macro-icon">💵</span>
     <div>
       <span class="macro-label">Dólar (USD/CLP)</span>
       <span class="macro-val code-font" id="valDolar">Cargando...</span>
+    </div>
+  </div>
+  <div class="macro-item">
+    <span class="macro-icon">📈</span>
+    <div>
+      <span class="macro-label">Acción CAP (Bolsa SGO)</span>
+      <span class="macro-val code-font" id="valCap">$5,680 CLP</span>
     </div>
   </div>
   <div class="macro-item">
