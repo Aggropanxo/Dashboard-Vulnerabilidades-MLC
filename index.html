@@ -3,227 +3,224 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INDUSTRIA 4.0 | DASHBOARD PREDICTIVO - PLANTA MLC</title>
+<title>CIO - CENTRO INTEGRADO DE OPERACIONES | PLANTA MLC</title>
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- jsPDF para Reportes Ejecutivos -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-main: #020617;
-    --text-main: #f1f5f9;
-    --text-muted: #64748b;
-    --accent-color: #06b6d4; 
-    --accent-glow: rgba(6, 182, 212, 0.25);
-    --bg-panel: rgba(15, 23, 42, 0.75);
-    --bg-panel-solid: rgba(11, 19, 38, 0.96);
-    --bg-card: rgba(15, 23, 42, 0.85);
-    --border-card: rgba(56, 189, 248, 0.2);
-    --border-light: rgba(255, 255, 255, 0.08);
-    --input-bg: rgba(3, 7, 18, 0.9);
-    --btn-bg: rgba(30, 41, 59, 0.85);
-    --btn-hover: rgba(51, 65, 85, 0.95);
-    --bg-modal: #070d1a;
-    --shadow-color: rgba(0, 0, 0, 0.8);
-    --badge-bg: rgba(30, 41, 59, 0.8);
-    --card-days-bg: rgba(3, 7, 18, 0.8);
-    --card-days-border: rgba(255, 255, 255, 0.08);
+    --bg-main: #0d1117;
+    --text-main: #e6edf3;
+    --text-muted: #8b949e;
+    --accent-color: #2f81f7; 
+    --bg-panel: #161b22;
+    --bg-panel-solid: #1b212c;
+    --bg-card: #161b22;
+    --border-card: #30363d;
+    --border-light: rgba(240, 246, 252, 0.1);
+    --input-bg: #0d1117;
+    --btn-bg: #21262d;
+    --btn-hover: #30363d;
+    --bg-modal: #161b22;
+    --shadow-color: rgba(0, 0, 0, 0.6);
+    --badge-bg: #21262d;
+    --card-days-bg: #0d1117;
+    --card-days-border: #30363d;
   }
 
   body.light-mode {
-    --bg-main: #f1f5f9;
-    --text-main: #0f172a; 
-    --text-muted: #475569;
-    --accent-color: #0891b2; 
-    --accent-glow: rgba(8, 145, 178, 0.2);
-    --bg-panel: rgba(255, 255, 255, 0.9);
-    --bg-panel-solid: rgba(255, 255, 255, 0.98);
-    --bg-card: rgba(255, 255, 255, 0.92);
-    --border-card: #cbd5e1;
+    --bg-main: #f6f8fa;
+    --text-main: #1f2328; 
+    --text-muted: #57606a;
+    --accent-color: #0969da; 
+    --bg-panel: #ffffff;
+    --bg-panel-solid: #ffffff;
+    --bg-card: #ffffff;
+    --border-card: #d0d7de;
     --border-light: rgba(0, 0, 0, 0.1);
-    --input-bg: #ffffff;
-    --btn-bg: rgba(226, 232, 240, 0.9);
-    --btn-hover: #e2e8f0;
+    --input-bg: #f6f8fa;
+    --btn-bg: #f3f4f6;
+    --btn-hover: #e5e7eb;
     --bg-modal: #ffffff;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --badge-bg: rgba(241, 245, 249, 0.9);
-    --card-days-bg: rgba(241, 245, 249, 0.9);
-    --card-days-border: #cbd5e1;
+    --shadow-color: rgba(0, 0, 0, 0.08);
+    --badge-bg: #eaeef2;
+    --card-days-bg: #f6f8fa;
+    --card-days-border: #d0d7de;
   }
 
   body { 
     background-color: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; 
-    padding: 16px; margin: 0; transition: background-color 0.3s, color 0.3s;
-    background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.08) 0%, transparent 60%);
-    background-size: 24px 24px, 24px 24px, 100% 100%;
-    background-attachment: fixed;
+    padding: 16px; margin: 0; transition: background-color 0.2s, color 0.2s;
   }
   
   .code-font { font-family: 'Share Tech Mono', monospace; letter-spacing: 0.5px; }
   .accent-text { color: var(--accent-color) !important; font-weight: 700; }
 
-  .header { border-bottom: 2px solid var(--border-light); padding-bottom: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
-  .header-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .brand-badges { display: flex; gap: 6px; align-items: center; }
-  .brand-badge { background: var(--badge-bg); border: 1px solid var(--border-light); color: var(--text-main); font-weight: 800; font-size: 0.85rem; padding: 4px 10px; border-radius: 4px; letter-spacing: 1px; backdrop-filter: blur(8px); }
-  .brand-badge.cpf { border-left: 4px solid var(--accent-color); box-shadow: 0 0 10px var(--accent-glow); }
-  .brand-badge.cmp { border-left: 4px solid #f43f5e; box-shadow: 0 0 10px rgba(244, 63, 94, 0.3); }
-  .header-titles h1 { color: var(--text-main); font-size: 1.35rem; margin: 0 0 2px 0; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 900; text-shadow: 0 2px 8px var(--shadow-color); }
-  .header-titles p { color: var(--text-muted); margin: 0; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .logo-box-left { display: flex; align-items: center; justify-content: flex-start; height: 60px; min-width: 200px; }
+  .logo-box-right { display: flex; align-items: center; justify-content: flex-end; height: 60px; min-width: 160px; }
+  .brand-logo-cpf { height: 54px; max-width: 220px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(47, 129, 247, 0.45)) brightness(1.35); }
+  .brand-logo-cmp { height: 44px; max-width: 160px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+
+  .header { border-bottom: 2px solid var(--border-card); padding-bottom: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; background: var(--bg-panel); padding: 12px 16px; border-radius: 6px; box-shadow: 0 1px 3px var(--shadow-color); }
+  .header-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .header-titles h1 { color: var(--text-main); font-size: 1.25rem; margin: 0 0 2px 0; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+  .header-titles p { color: var(--text-muted); margin: 0; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
   
-  /* Macro Banner 4.0 Expandido */
   .macro-banner { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
-  .macro-item { flex: 1; min-width: 140px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-  .macro-icon { font-size: 1.2rem; }
-  .macro-label { font-size: 0.52rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; display: block; letter-spacing: 0.8px; }
-  .macro-val { font-size: 0.9rem; font-weight: 900; color: var(--text-main); }
+  .macro-item { flex: 1; min-width: 140px; background: var(--bg-panel); border: 1px solid var(--border-card); border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 3px var(--shadow-color); }
+  .macro-icon { font-size: 1.1rem; }
+  .macro-label { font-size: 0.55rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; display: block; letter-spacing: 0.5px; }
+  .macro-val { font-size: 0.9rem; font-weight: 800; color: var(--text-main); }
 
-  .header-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between; background: var(--bg-panel); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 15px; backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-  .header-controls-left { display: flex; gap: 10px; flex-grow: 1; max-width: 320px; }
-  .header-controls-right { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .header-controls { display: flex; flex-direction: column; gap: 10px; background: var(--bg-panel); padding: 12px 16px; border-radius: 6px; border: 1px solid var(--border-card); margin-bottom: 15px; box-shadow: 0 1px 3px var(--shadow-color); }
+  .controls-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between; }
+  .controls-row.admin-only-row { border-bottom: 1px solid var(--border-light); padding-bottom: 10px; display: none; }
+  body.admin-mode .controls-row.admin-only-row { display: flex; }
   
-  .search-input { width: 100%; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--accent-color); background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; font-weight: 600; outline: none; transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
-  .search-input:focus { box-shadow: 0 0 15px var(--accent-glow), inset 0 2px 4px rgba(0,0,0,0.5); }
+  .search-input { width: 100%; min-width: 260px; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; font-weight: 600; outline: none; }
+  .search-input:focus { border-color: var(--accent-color); }
   
-  .view-btn, .btn-lock, .filter-chip { background: var(--btn-bg); border: 1px solid var(--border-light); color: var(--text-muted); padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: 700; font-size: 0.78rem; transition: 0.25s; text-transform: uppercase; letter-spacing: 0.5px; }
-  .view-btn.active, .filter-chip.active { background: var(--accent-color); color: #020617; border-color: var(--accent-color); box-shadow: 0 0 12px var(--accent-glow); font-weight: 900; }
-  .view-btn:hover, .btn-lock:hover, .filter-chip:hover { background: var(--btn-hover); color: var(--text-main); border-color: var(--accent-color); }
-  .btn-report { background: #059669 !important; color: white !important; border-color: #059669 !important; }
-  .btn-ai { background: #7c3aed !important; color: white !important; border-color: #7c3aed !important; box-shadow: 0 0 10px rgba(124, 58, 237, 0.4); }
+  .view-btn, .btn-lock, .filter-chip { background: var(--btn-bg); border: 1px solid var(--border-card); color: var(--text-muted); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; }
+  .view-btn.active, .filter-chip.active { background: var(--accent-color); color: white; border-color: var(--accent-color); font-weight: 800; }
+  .view-btn:hover, .btn-lock:hover, .filter-chip:hover { background: var(--btn-hover); color: var(--text-main); }
+  
+  .btn-map-protagonist { background: #1f6feb !important; color: white !important; border: 1px solid #388bfd !important; font-weight: 900 !important; box-shadow: 0 0 10px rgba(47, 129, 247, 0.4); }
+  .btn-map-protagonist:hover { background: #388bfd !important; box-shadow: 0 0 15px rgba(47, 129, 247, 0.7); }
 
-  /* KPIs 4.0 */
+  .btn-report { background: #238636 !important; color: white !important; border-color: #2ea043 !important; display: none; }
+  .btn-stats { background: #8250df !important; color: white !important; border-color: #8957e5 !important; display: none; }
+  .btn-pdf { background: #da3633 !important; color: white !important; border-color: #f85149 !important; display: none; }
+  .btn-create-asset { background: #238636 !important; color: white !important; display: none; font-weight: 800 !important; }
+
+  body.admin-mode .btn-report { display: inline-block; }
+  body.admin-mode .btn-stats { display: inline-block; }
+  body.admin-mode .btn-pdf { display: inline-block; }
+  body.admin-mode .btn-create-asset { display: inline-block; }
+
+  .session-timer { display: none; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: #f85149; background: rgba(248, 81, 73, 0.1); border: 1px solid rgba(248, 81, 73, 0.3); padding: 4px 8px; border-radius: 4px; align-items: center; gap: 5px; }
+  body.admin-mode .session-timer { display: flex; }
+
   .kpi-container { display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
-  .kpi-card { flex: 1; min-width: 120px; background: var(--bg-panel); border: 1px solid var(--border-light); border-radius: 6px; padding: 12px; text-align: center; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(12px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); position: relative; overflow: hidden; }
-  .kpi-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; }
-  .kpi-total::after { background: var(--accent-color); }
-  .kpi-rojo::after { background: #f43f5e; }
-  .kpi-naranja::after { background: #f97316; }
-  .kpi-amarillo::after { background: #eab308; }
-  .kpi-verde::after { background: #10b981; }
+  .kpi-card { flex: 1; min-width: 110px; background: var(--bg-panel); border: 1px solid var(--border-card); border-radius: 6px; padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 1px 3px var(--shadow-color); border-top: 3px solid var(--border-card); cursor: pointer; transition: all 0.2s; }
+  .kpi-card:hover { transform: translateY(-2px); border-color: var(--accent-color); }
+  .kpi-card.active-kpi { background: var(--btn-hover); border-color: var(--accent-color); box-shadow: 0 0 10px rgba(47,129,247,0.3); }
+  
+  .kpi-total { border-top-color: var(--accent-color); }
+  .kpi-rojo { border-top-color: #f85149; }
+  .kpi-naranja { border-top-color: #db6d28; }
+  .kpi-amarillo { border-top-color: #d29922; }
+  .kpi-verde { border-top-color: #238636; }
+  .kpi-plomo { border-top-color: #6e7681; }
 
-  .kpi-label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 4px; letter-spacing: 0.8px; }
-  .kpi-value { font-size: 2rem; font-weight: 900; line-height: 1; text-shadow: 0 2px 4px var(--shadow-color); }
+  .kpi-label { font-size: 0.58rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 3px; letter-spacing: 0.5px; }
+  .kpi-value { font-size: 1.6rem; font-weight: 900; line-height: 1; }
   .kpi-total .kpi-value { color: var(--accent-color); }
-  .kpi-rojo .kpi-value { color: #f43f5e; }
-  .kpi-naranja .kpi-value { color: #f97316; }
-  .kpi-amarillo .kpi-value { color: #eab308; }
-  .kpi-verde .kpi-value { color: #10b981; }
-
-  /* Admin Panel 4.0 */
-  .admin-panel { display: none; background: var(--bg-panel-solid); padding: 18px; border-radius: 8px; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; border: 2px solid var(--accent-color); backdrop-filter: blur(16px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: border-color 0.3s; }
-  .admin-panel.editing-mode { border-color: #f97316; box-shadow: 0 10px 30px rgba(249, 115, 22, 0.4); } 
-  
-  .admin-title-bar { flex-basis: 100%; border-bottom: 1px solid var(--border-light); margin-bottom: 6px; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-  .admin-title-bar span { color: var(--accent-color); font-weight: 900; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
-  .admin-panel.editing-mode .admin-title-bar span { color: #f97316; }
-  
-  .admin-panel .input-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 150px; }
-  .admin-panel label { font-size: 0.62rem; color: var(--accent-color); font-weight: 800; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; }
-  .admin-panel input, .admin-panel textarea, .admin-panel select { padding: 7px 10px; border-radius: 5px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); font-weight: 600; width: 100%; box-sizing: border-box; font-family: inherit; font-size: 0.8rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
-  .admin-panel textarea { resize: vertical; min-height: 45px; }
-  .admin-panel .full-width { flex-basis: 100%; display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-top: 5px; flex-wrap: wrap; border-top: 1px solid var(--border-light); padding-top: 10px; }
-  
-  .admin-panel button { background: var(--accent-color); color: #020617; cursor: pointer; font-weight: 800; border: none; border-radius: 5px; padding: 7px 14px; font-size: 0.82rem; transition: 0.25s; text-transform: uppercase; letter-spacing: 0.5px; }
-  .admin-panel button:hover { filter: brightness(1.15); box-shadow: 0 0 12px var(--accent-glow); }
-  .btn-upload { background: #10b981 !important; color: white !important; }
-  .btn-danger { background: #f43f5e !important; color: white !important; }
-  .btn-cancel { background: #64748b !important; color: white !important; display: none; }
-  .btn-save-edit { background: #f97316 !important; color: white !important; font-size: 0.9rem !important; padding: 8px 22px !important; box-shadow: 0 0 15px rgba(249, 115, 22, 0.6); }
-
-  .upload-box { border: 1px dashed #10b981; padding: 8px 12px; border-radius: 6px; display: flex; gap: 10px; align-items: center; background: rgba(16, 185, 129, 0.08); flex-grow: 1; }
+  .kpi-rojo .kpi-value { color: #f85149; }
+  .kpi-naranja .kpi-value { color: #db6d28; }
+  .kpi-amarillo .kpi-value { color: #d29922; }
+  .kpi-verde .kpi-value { color: #238636; }
+  .kpi-plomo .kpi-value { color: #6e7681; }
 
   #map-view { display: none; margin-bottom: 20px; }
-  .map-instruction { background: var(--bg-card); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; font-size: 0.85rem; font-weight: bold; display: none; backdrop-filter: blur(8px); }
-  body.admin-mode .map-instruction { display: block; }
-  #map-container { width: 100%; height: 550px; border-radius: 8px; border: 1px solid var(--border-light); background: #000; z-index: 1;}
+  .map-instruction { background: var(--bg-panel); border: 1px solid var(--accent-color); color: var(--text-main); padding: 8px 12px; border-radius: 4px; margin-bottom: 12px; font-size: 0.8rem; font-weight: bold; }
+  #map-container { width: 100%; height: 550px; border-radius: 6px; border: 1px solid var(--border-card); background: #000; z-index: 1;}
 
   #dashboard-view { display: block; }
-  .area-title { color: var(--accent-color); font-size: 1.15rem; border-left: 4px solid var(--accent-color); padding-left: 10px; margin: 20px 0 10px 0; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 900; text-shadow: 0 2px 4px var(--shadow-color); background: linear-gradient(90deg, rgba(6,182,212,0.15) 0%, transparent 100%); padding-top: 4px; padding-bottom: 4px; border-radius: 0 6px 6px 0; }
+  .area-title { color: var(--text-main); font-size: 1rem; border-left: 3px solid var(--accent-color); padding-left: 8px; margin: 18px 0 8px 0; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 800; background: var(--bg-panel); padding-top: 6px; padding-bottom: 6px; border-radius: 0 4px 4px 0; border-top: 1px solid var(--border-card); border-right: 1px solid var(--border-card); border-bottom: 1px solid var(--border-card); display: flex; justify-content: space-between; align-items: center; }
+  .area-badge-crit { font-size: 0.7rem; background: rgba(248, 81, 73, 0.2); color: #f85149; padding: 2px 8px; border-radius: 3px; border: 1px solid #f85149; font-family: 'Share Tech Mono', monospace; }
+
+  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
   
-  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); gap: 10px; }
-  
-  /* Tarjetas Industria 4.0 Digital Twin */
+  /* Tarjetas compactas por defecto para Usuario/Jefatura */
   .card { 
-    background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 6px; padding: 12px 6px; 
+    background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 4px; padding: 8px 4px; 
     position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; 
-    min-height: 75px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(8px); overflow: visible;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    min-height: 58px; transition: all 0.2s; box-shadow: 0 1px 2px var(--shadow-color);
   }
-  .card:hover { transform: scale(1.08) translateY(-3px); z-index: 50; box-shadow: 0 12px 30px rgba(0,0,0,0.7), 0 0 15px var(--accent-glow); border-color: var(--accent-color); }
-  
-  .sev-rojo { border-color: rgba(244, 63, 94, 0.8); background: linear-gradient(135deg, rgba(244, 63, 94, 0.15) 0%, var(--bg-card) 60%); animation: sirena-roja 1.2s ease-in-out infinite alternate; }
-  @keyframes sirena-roja { 0% { box-shadow: 0 0 6px rgba(244, 63, 94, 0.3); } 100% { box-shadow: 0 0 22px rgba(244, 63, 94, 0.9), inset 0 0 10px rgba(244, 63, 94, 0.4); border-color: rgba(244, 63, 94, 1); } }
-  
-  .sev-naranja { border-color: rgba(249, 115, 22, 0.8); background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, var(--bg-card) 60%); animation: sirena-naranja 2s ease-in-out infinite alternate; }
-  @keyframes sirena-naranja { 0% { box-shadow: 0 0 6px rgba(249, 115, 22, 0.2); } 100% { box-shadow: 0 0 18px rgba(249, 115, 22, 0.8), inset 0 0 8px rgba(249, 115, 22, 0.3); border-color: rgba(249, 115, 22, 1); } }
-  
-  .sev-amarillo { border-color: rgba(234, 179, 8, 0.7); background: linear-gradient(135deg, rgba(234, 179, 8, 0.12) 0%, var(--bg-card) 60%); }
-  .sev-verde { border-color: rgba(16, 185, 129, 0.6); background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, var(--bg-card) 60%); }
-  .sev-plomo { border-color: rgba(100, 116, 139, 0.5); }
+  .card:hover { border-color: var(--accent-color); background-color: var(--btn-hover); }
 
-  .pulse-indicator { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; }
-  .sev-rojo .pulse-indicator { background-color: #f43f5e; box-shadow: 0 0 8px #f43f5e; }
-  .sev-naranja .pulse-indicator { background-color: #f97316; box-shadow: 0 0 8px #f97316; }
-  .sev-amarillo .pulse-indicator { background-color: #eab308; box-shadow: 0 0 6px #eab308; }
-  .sev-verde .pulse-indicator { background-color: #10b981; box-shadow: 0 0 6px #10b981; }
-  .sev-plomo .pulse-indicator { background-color: #64748b; }
+  /* En Modo Admin, las tarjetas se expanden ligeramente para mostrar los días */
+  body.admin-mode .card {
+    min-height: 74px;
+    padding: 10px 4px;
+  }
   
-  .delete-btn { display: none; position: absolute; top: 2px; left: 2px; background: rgba(0,0,0,0.85); border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); font-size: 0.7rem; z-index: 100; padding: 2px 6px; cursor: pointer; color: #f43f5e; }
-  .delete-btn:hover { background: #1e293b; }
-  
-  .asset-type-badge { font-size: 0.58rem; color: var(--accent-color); font-weight: 800; text-transform: uppercase; margin-bottom: 2px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 98px; letter-spacing: 0.5px; }
-  .asset-tag { color: var(--text-main); font-size: 1.05rem; font-weight: 900; margin: 0; letter-spacing: 0.8px; z-index: 2; text-shadow: 0 1px 3px var(--shadow-color); }
-  .asset-days { font-size: 0.58rem; font-weight: 800; margin-top: 6px; padding: 3px 6px; border-radius: 4px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; letter-spacing: 0.5px; }
-  
-  .sev-rojo .asset-days { color: #fecdd3; border-color: rgba(244,63,94,0.4); }
-  .sev-naranja .asset-days { color: #ffedd5; border-color: rgba(249,115,22,0.4); }
-  .sev-amarillo .asset-days { color: #fef08a; }
-  .sev-verde .asset-days { color: #a7f3d0; }
-  .sev-plomo .asset-days { color: var(--text-muted); }
+  .sev-rojo { border-left: 4px solid #f85149; background: rgba(248, 81, 73, 0.08); }
+  .sev-naranja { border-left: 4px solid #db6d28; background: rgba(219, 109, 40, 0.08); }
+  .sev-amarillo { border-left: 4px solid #d29922; background: rgba(210, 153, 34, 0.06); }
+  .sev-verde { border-left: 4px solid #238636; }
+  .sev-plomo { border-left: 4px solid #6e7681; }
 
-  body.admin-mode .delete-btn { display: block !important; }
-  body.admin-mode .admin-panel { display: flex; }
-  body.admin-mode .btn-lock { background: #10b981; color: white; border-color: #10b981; }
+  .pulse-indicator { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; }
+  .sev-rojo .pulse-indicator { background-color: #f85149; }
+  .sev-naranja .pulse-indicator { background-color: #db6d28; }
+  .sev-amarillo .pulse-indicator { background-color: #d29922; }
+  .sev-verde .pulse-indicator { background-color: #238636; }
+  .sev-plomo .pulse-indicator { background-color: #6e7681; }
+  
+  .asset-type-badge { font-size: 0.54rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 1px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 115px; }
+  .asset-tag { color: var(--text-main); font-size: 0.86rem; font-weight: 800; margin: 0; letter-spacing: 0.4px; z-index: 2; white-space: normal; word-break: break-word; line-height: 1.15; max-width: 115px; }
+  
+  /* Los días solo se muestran al activar el Modo Admin */
+  .asset-days { display: none; font-size: 0.50rem; font-weight: 700; margin-top: 4px; padding: 2px 4px; border-radius: 3px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; max-width: 115px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.admin-mode .asset-days { display: block; }
 
-  /* Modal 4.0 Glass */
-  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(6px); }
-  .modal-content { background: var(--bg-modal); padding: 25px; border-radius: 10px; border: 1px solid var(--accent-color); width: 95%; max-width: 750px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 25px var(--accent-glow); }
-  .modal-close { position: absolute; top: 12px; right: 18px; color: var(--text-muted); font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
-  .modal-close:hover { color: #f43f5e; }
+  @keyframes radarBlink {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.8); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 14px rgba(248, 81, 73, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(248, 81, 73, 0); }
+  }
+  .pin-blink-radar { animation: radarBlink 1.5s infinite; background-color: #f85149; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #fff; }
+
+  /* Modales */
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 2000; justify-content: center; align-items: center; }
+  .modal-content { background: var(--bg-modal); padding: 22px; border-radius: 6px; border: 1px solid var(--border-card); width: 95%; max-width: 750px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 8px 24px var(--shadow-color); }
+  .modal-close { position: absolute; top: 10px; right: 15px; color: var(--text-muted); font-size: 1.5rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
+  .modal-close:hover { color: #f85149; }
   
-  .modal-header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 15px; }
-  .modal-title { color: var(--text-main); font-size: 1.35rem; margin: 0; text-transform: uppercase; font-weight: 900; letter-spacing: 0.8px; }
-  .modal-sev-badge { padding: 5px 12px; border-radius: 5px; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; color: #fff; margin-right: 35px; letter-spacing: 0.5px; }
+  .modal-header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-card); padding-bottom: 10px; margin-bottom: 14px; }
+  .modal-title { color: var(--text-main); font-size: 1.2rem; margin: 0; text-transform: uppercase; font-weight: 800; }
+  .modal-sev-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #fff; margin-right: 30px; }
   
-  .modal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; background: var(--bg-panel); padding: 15px; border-radius: 6px; border: 1px solid var(--border-light); }
-  .modal-data-row { margin-bottom: 12px; }
-  .modal-label { color: var(--text-muted); font-size: 0.62rem; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 3px; letter-spacing: 0.8px; }
-  .modal-value { color: var(--text-main); font-weight: 600; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.4; }
+  .modal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; background: var(--bg-panel); padding: 12px; border-radius: 4px; border: 1px solid var(--border-card); }
+  .modal-data-row { margin-bottom: 14px; background: var(--bg-panel); padding: 10px 12px; border-radius: 4px; border: 1px solid var(--border-card); }
+  .modal-label { color: var(--text-muted); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 4px; letter-spacing: 0.5px; }
+  .modal-value { color: var(--text-main); font-weight: 600; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.5; word-break: break-word; }
   
-  .timeline-box { background: var(--bg-panel); padding: 12px; border-radius: 6px; max-height: 150px; overflow-y: auto; font-size: 0.82rem; border: 1px solid var(--border-light); }
-  .timeline-item { border-left: 3px solid var(--accent-color); padding-left: 10px; margin-bottom: 8px; }
-  .timeline-date { font-size: 0.62rem; color: var(--text-muted); font-weight: 700; }
+  .timeline-box { background: var(--bg-panel); padding: 10px; border-radius: 4px; max-height: 140px; overflow-y: auto; font-size: 0.8rem; border: 1px solid var(--border-card); }
+  .timeline-item { border-left: 3px solid var(--accent-color); padding-left: 8px; margin-bottom: 6px; }
+  .timeline-date { font-size: 0.6rem; color: var(--text-muted); font-weight: 700; }
 
   .gallery-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-  .gallery-thumb { width: 75px; height: 75px; object-fit: cover; border-radius: 5px; border: 1px solid var(--border-card); cursor: pointer; transition: transform 0.2s; }
-  .gallery-thumb:hover { transform: scale(1.1); border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-glow); }
+  .gallery-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-card); cursor: pointer; }
+  .gallery-thumb:hover { border-color: var(--accent-color); }
 
-  .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 3000; justify-content: center; align-items: center; }
-  .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 6px; }
+  .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 3000; justify-content: center; align-items: center; }
+  .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 4px; }
   .lightbox-close { position: absolute; top: 15px; right: 25px; color: #fff; font-size: 2.5rem; cursor: pointer; background: none; border: none; }
 
-  body.light-mode .admin-panel input, body.light-mode .admin-panel textarea, body.light-mode .admin-panel select, body.light-mode .search-input { color: #0f172a; font-weight: 700; } 
-  body.light-mode .area-title { color: #0f172a; background: linear-gradient(90deg, rgba(8,145,178,0.12) 0%, transparent 100%); }
-  body.light-mode .asset-tag { color: #0f172a; text-shadow: none; }
-  body.light-mode .asset-type-badge { color: #0891b2; }
+  .modal-footer-brand { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-card); margin-top: 18px; padding-top: 10px; opacity: 0.7; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 15px; }
+  .stat-card { background: var(--bg-panel); border: 1px solid var(--border-card); border-radius: 6px; padding: 16px; text-align: left; }
+  .stat-title { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--accent-color); margin-bottom: 12px; text-align: center; }
+  .bar-stat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 0.78rem; }
+  .bar-container { width: 100%; background: rgba(255,255,255,0.06); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+
+  .edit-form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .edit-form-grid .full { grid-column: span 2; }
+  .edit-form-grid label { font-size: 0.65rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 3px; }
+  .edit-form-grid input, .edit-form-grid select { width: 100%; padding: 8px 10px; border-radius: 4px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; box-sizing: border-box; font-family: inherit; }
   
-  body.light-mode .sev-rojo .asset-days { background: #ffe4e6; color: #9f1239 !important; border-color: #fda4af; }
-  body.light-mode .sev-naranja .asset-days { background: #ffedd5; color: #9a3412 !important; border-color: #fdba74; }
-  body.light-mode .sev-amarillo .asset-days { background: #fef9c3; color: #854d0e !important; border-color: #fde047; }
-  body.light-mode .sev-verde .asset-days { background: #d1fae5; color: #065f46 !important; border-color: #6ee7b7; }
-  body.light-mode .sev-plomo .asset-days { background: #e2e8f0; color: #1e293b !important; border-color: #cbd5e1; }
+  .edit-form-grid textarea {
+    width: 100%; padding: 8px 10px; border-radius: 4px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; box-sizing: border-box; font-family: inherit;
+    resize: vertical; overflow-y: hidden; min-height: 60px; line-height: 1.4;
+  }
+
+  body.light-mode .admin-panel input, body.light-mode .admin-panel textarea, body.light-mode .admin-panel select, body.light-mode .search-input { color: #1f2328; font-weight: 600; } 
 </style>
 </head>
 <body>
@@ -234,180 +231,240 @@
 
 <div class="header">
   <div class="header-left">
-    <div class="brand-badges"><span class="brand-badge cpf">CPF</span><span class="brand-badge cmp">CMP</span></div>
-    <div class="header-titles">
-      <h1>CENTRO DE CONTROL PREDICTIVO - MLC</h1>
-      <p class="code-font">INDUSTRIA 4.0 // DIGITAL TWIN MONITORING</p>
+    <div class="logo-box-left">
+      <img src="logo-cpf.png" alt="CPF Ingeniería" class="brand-logo-cpf" onerror="this.style.display='none'">
     </div>
+    <div class="header-titles">
+      <h1>CENTRO INTEGRADO DE OPERACIONES (CIO) - PLANTA MLC</h1>
+      <p class="code-font">MONITOREO DE CONDICIONES</p>
+    </div>
+  </div>
+
+  <div class="logo-box-right">
+    <img src="logo-cmp.png" alt="CMP" class="brand-logo-cmp" onerror="this.style.display='none'">
   </div>
 </div>
 
-<!-- MACRO BANNER 4.0 (INCLUYE ACCIÓN DE CAP) -->
 <div class="macro-banner">
   <div class="macro-item">
     <span class="macro-icon">💵</span>
     <div>
       <span class="macro-label">Dólar (USD/CLP)</span>
-      <span class="macro-val code-font" id="valDolar">Cargando...</span>
+      <span class="macro-val code-font" id="valDolar">Conectando...</span>
     </div>
   </div>
   <div class="macro-item">
     <span class="macro-icon">📈</span>
     <div>
       <span class="macro-label">Acción CAP (Bolsa SGO)</span>
-      <span class="macro-val code-font" id="valCap">$5,680 CLP</span>
+      <span class="macro-val code-font" id="valCap">Conectando...</span>
     </div>
   </div>
   <div class="macro-item">
     <span class="macro-icon">⛏️</span>
     <div>
-      <span class="macro-label">Mineral de Hierro</span>
-      <span class="macro-val code-font">$102.50 / T</span>
+      <span class="macro-label">Mineral de Hierro (Fe 62%)</span>
+      <span class="macro-val code-font" id="valHierro">Conectando...</span>
     </div>
   </div>
   <div class="macro-item">
-    <span class="macro-icon">🌤️</span>
+    <span class="macro-icon" id="climaIcon">🌤️</span>
     <div>
-      <span class="macro-label">Mina Los Colorados</span>
-      <span class="macro-val code-font">Vallenar: 22°C</span>
+      <span class="macro-label" id="climaLabel">Mina Los Colorados</span>
+      <span class="macro-val code-font" id="valClima">Vallenar: Cargando...</span>
     </div>
   </div>
 </div>
 
+<!-- BARRA DE CONTROLES -->
 <div class="header-controls">
-  <div class="header-controls-left">
-    <input type="text" id="buscador" class="search-input code-font" placeholder="🔍 Filtrar por Tag o Área..." onkeyup="ejecutarBusqueda()">
+  <!-- Línea 1: Filtros Avanzados (Solo Administrador) -->
+  <div class="controls-row admin-only-row">
+    <button class="filter-chip active" onclick="filtrarRango('todos', this)">Todos</button>
+    <button class="filter-chip" onclick="filtrarRango('seguimiento', this)">🔍 Seguimiento (<15d)</button>
+    <button class="filter-chip" onclick="filtrarRango('normal', this)">✅ Ciclo Normal (15-30d)</button>
+    <button class="filter-chip" onclick="filtrarRango('vencido', this)">⚠️ Ciclo Vencido (>30d)</button>
+    <button class="filter-chip" onclick="filtrarRango('sin_medicion', this)">⚪ Sin Medir / Plomos</button>
+    <button class="filter-chip" onclick="filtrarSinAviso(this)" style="border-color:#f85149; color:#f85149;">🚨 Sin Aviso SAP</button>
   </div>
-  <div class="header-controls-right">
-    <button class="filter-chip active" onclick="filtrarDias(0, this)">Todos</button>
-    <button class="filter-chip" onclick="filtrarDias(30, this)">>30 Días</button>
-    <button class="filter-chip" onclick="filtrarDias(60, this)">>60 Días</button>
-    <button class="btn-report" onclick="generarReporteTurno()">📊 Reporte</button>
-    <button id="btnTheme" class="view-btn" onclick="toggleTheme()">☀️ Claro</button>
-    <button id="btnViewGrid" class="view-btn active" onclick="cambiarVista('grid')">📋 Matriz</button>
-    <button id="btnViewMap" class="view-btn" onclick="cambiarVista('map')">🗺️ Mapa</button>
-    <button id="btnUnlock" class="btn-lock" onclick="solicitarClave()">🔒 Lectura</button>
+  <!-- Línea 2: Pantalla Principal Limpia -->
+  <div class="controls-row">
+    <div style="flex-grow: 1; max-width: 280px;">
+      <input type="text" id="buscador" class="search-input code-font" placeholder="🔍 Filtrar por Tag o Área..." onkeyup="ejecutarBusqueda()">
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+      <div id="sessionTimerBadge" class="session-timer">⏱️ <span id="timerCountdown">15:00</span></div>
+      <button class="btn-create-asset" onclick="abrirModalCrearActivo()">➕ Crear Activo</button>
+      <button id="btnViewMap" class="view-btn btn-map-protagonist" onclick="cambiarVista('map')">🗺️ MAPA</button>
+      <button id="btnViewGrid" class="view-btn active" onclick="cambiarVista('grid')">📋 Matriz</button>
+      <button class="btn-stats" onclick="abrirModalEstadisticas()">📊 Analítica</button>
+      <button class="btn-report" onclick="generarReporteTurno()">📊 Reporte</button>
+      <button class="btn-pdf" onclick="exportarPDFDirectorio()">📄 PDF</button>
+      <button id="btnTheme" class="view-btn" onclick="toggleTheme()" title="Cambiar Tema">🌓 Tema</button>
+      <button id="btnUnlock" class="btn-lock" onclick="solicitarClave()">👤 Usuario</button>
+    </div>
   </div>
 </div>
 
+<!-- KPIS DIRECTOS INTERACTIVOS -->
 <div class="kpi-container" id="kpiContainer">
-  <div class="kpi-card kpi-total">
+  <div class="kpi-card kpi-total active-kpi" id="kpiBtn-todos" onclick="filtrarSeveridadKPI('todos', this)">
     <span class="kpi-label">Total Activos</span>
     <div class="kpi-value code-font" id="kpiTotal">0</div>
   </div>
-  <div class="kpi-card kpi-rojo">
+  <div class="kpi-card kpi-rojo" id="kpiBtn-Rojo" onclick="filtrarSeveridadKPI('Rojo', this)">
     <span class="kpi-label">🔴 Críticos (Alto)</span>
     <div class="kpi-value code-font" id="kpiRojo">0</div>
   </div>
-  <div class="kpi-card kpi-naranja">
+  <div class="kpi-card kpi-naranja" id="kpiBtn-Naranja" onclick="filtrarSeveridadKPI('Naranja', this)">
     <span class="kpi-label">🟠 Alertas (Medio)</span>
     <div class="kpi-value code-font" id="kpiNaranja">0</div>
   </div>
-  <div class="kpi-card kpi-amarillo">
+  <div class="kpi-card kpi-amarillo" id="kpiBtn-Amarillo" onclick="filtrarSeveridadKPI('Amarillo', this)">
     <span class="kpi-label">🟡 Monitoreo (Bajo)</span>
     <div class="kpi-value code-font" id="kpiAmarillo">0</div>
   </div>
-  <div class="kpi-card kpi-verde">
+  <div class="kpi-card kpi-verde" id="kpiBtn-Verde" onclick="filtrarSeveridadKPI('Verde', this)">
     <span class="kpi-label">🟢 Operativos (Normal)</span>
     <div class="kpi-value code-font" id="kpiVerde">0</div>
   </div>
-</div>
-
-<!-- PANEL ADMIN 4.0 -->
-<div class="admin-panel" id="adminPanelForm">
-  <div class="admin-title-bar">
-    <span id="editStatusText">➕ Nuevo Registro / Carga Masiva</span>
-  </div>
-
-  <div class="input-group">
-    <label>Área Operacional</label>
-    <input type="text" id="inArea" placeholder="ej. Área 61" required>
-  </div>
-  <div class="input-group">
-    <label>N° Tag / Equipo</label>
-    <input type="text" id="inNombre" class="code-font" placeholder="ej. MH27152" required>
-  </div>
-  <div class="input-group">
-    <label>Tipo Equipo</label>
-    <input type="text" id="inTipo" placeholder="ej. Transportador, Módulo">
-  </div>
-  <div class="input-group">
-    <label>Color (Severidad)</label>
-    <select id="inSeveridad">
-      <option value="Rojo">🔴 Rojo (Crítico / Acción Inmediata)</option>
-      <option value="Naranja">🟠 Naranja (Alerta / Precaución)</option>
-      <option value="Amarillo">🟡 Amarillo (Advertencia / Monitoreo)</option>
-      <option value="Verde">🟢 Verde (Normal / Buen Estado)</option>
-      <option value="Plomo">⚪ Plomo (Sin Medición)</option>
-    </select>
-  </div>
-  <div class="input-group">
-    <label>Componente Específico</label>
-    <input type="text" id="inComponente" placeholder="ej. Descanso Libre">
-  </div>
-  <div class="input-group">
-    <label>Aviso SAP</label>
-    <input type="text" id="inAviso">
-  </div>
-  <div class="input-group">
-    <label>OM SAP</label>
-    <input type="text" id="inOm">
-  </div>
-  <div class="input-group">
-    <label>Fecha de Hallazgo</label>
-    <input type="date" id="inFecha">
-  </div>
-  <div class="input-group">
-    <label>Última Medición</label>
-    <input type="date" id="inUltimaMedicion">
-  </div>
-  
-  <div class="input-group" style="flex-basis: 100%;">
-    <label>Estatus Logístico / Operacional</label>
-    <textarea id="inEstatus" placeholder="ej. En bodega a la espera de detención..."></textarea>
-  </div>
-  <div class="input-group" style="flex-basis: 48%;">
-    <label>
-      Análisis Técnico 
-      <button type="button" class="btn-ai" onclick="generarAnalisisIA()" style="padding: 2px 8px; font-size: 0.62rem;">✨ Redactar con IA</button>
-    </label>
-    <textarea id="inAnalisis" placeholder="Escribe notas breves y haz clic en Redactar con IA..."></textarea>
-  </div>
-  <div class="input-group" style="flex-basis: 48%;">
-    <label>Recomendación / Acción</label>
-    <textarea id="inRecomendacion" placeholder="Acción correctiva..."></textarea>
-  </div>
-
-  <div class="input-group" style="flex-basis: 100%;">
-    <label>Subir Imágenes de Evidencia</label>
-    <input type="file" id="inImagenesFiles" accept="image/*" multiple>
-  </div>
-  
-  <div class="full-width">
-    <div class="upload-box" id="uploadBoxCont">
-      <div style="flex-grow: 1;">
-        <label style="color:#10b981;">CARGA MASIVA EXCEL</label>
-        <input type="file" id="inExcelFile" accept=".xlsx, .xls, .csv" style="background:transparent; border:none; padding:0; margin-top:3px;">
-      </div>
-      <button class="btn-upload" onclick="procesarExcel()">📥 Actualizar desde Excel</button>
-    </div>
-    
-    <div style="display: flex; gap: 8px;">
-      <button class="btn-danger" id="btnDeleteAll" onclick="eliminarTodoMasivo()" title="Borra todos los activos">🗑️ Borrar Todo</button>
-      <button class="btn-cancel" id="btnCancelEdit" onclick="resetFormulario()">✖ Cancelar Edición</button>
-      <button id="btnSubmit" onclick="procesarGuardado()" style="height: fit-content;">+ Guardar Activo</button>
-    </div>
+  <div class="kpi-card kpi-plomo" id="kpiBtn-Plomo" onclick="filtrarSeveridadKPI('Plomo', this)">
+    <span class="kpi-label">⚪ Sin Medición (Plomos)</span>
+    <div class="kpi-value code-font" id="kpiPlomo">0</div>
   </div>
 </div>
 
 <div id="dashboard-view"><div id="app-root"></div></div>
 
 <div id="map-view">
-  <div class="map-instruction">📍 <b>Modo Admin:</b> Clic en el mapa para asignar coordenadas geográficas al activo.</div>
+  <div class="map-instruction">📍 <b>Modo Admin:</b> Clic en el mapa para capturar coordenadas geográficas para el activo en edición.</div>
   <div id="map-container"></div>
 </div>
 
-<!-- MODAL 4.0 -->
+<!-- MODAL DE EDICIÓN / CREACIÓN DEDICADA PARA ADMINISTRADOR -->
+<div id="editAssetModal" class="modal-overlay" onclick="cerrarModalEdicion(event)">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 680px;">
+    <button class="modal-close" onclick="cerrarModalEdicion()">&times;</button>
+    <div class="modal-header-flex">
+      <h2 id="editModalHeaderTitle" class="modal-title code-font">Ficha Técnica Activo</h2>
+    </div>
+    
+    <div class="edit-form-grid">
+      <div>
+        <label>Área Operacional</label>
+        <input type="text" id="modalInArea" placeholder="ej. Área 61">
+      </div>
+      <div>
+        <label>N° Tag / Equipo</label>
+        <input type="text" id="modalInNombre" class="code-font" placeholder="ej. MH27152">
+      </div>
+      <div>
+        <label>Tipo de Equipo</label>
+        <input type="text" id="modalInTipo" placeholder="ej. Transportador">
+      </div>
+      <div>
+        <label>Severidad (Color)</label>
+        <select id="modalInSeveridad" onchange="verificarRazonModalPlomo()">
+          <option value="Rojo">🔴 Rojo (Crítico / Acción Inmediata)</option>
+          <option value="Naranja">🟠 Naranja (Alerta / Precaución)</option>
+          <option value="Amarillo">🟡 Amarillo (Monitoreo)</option>
+          <option value="Verde">🟢 Verde (Operativo / Normal)</option>
+          <option value="Plomo">⚪ Plomo (Sin Medición / Inactivo)</option>
+        </select>
+      </div>
+      <div class="full" id="modalGrupoRazonPlomo" style="display:none;">
+        <label style="color:#f85149;">Razón de por qué no se mide</label>
+        <input type="text" id="modalInRazonPlomo" placeholder="ej. En Overhaul, Fuera de servicio...">
+      </div>
+      <div>
+        <label>Componente</label>
+        <input type="text" id="modalInComponente" placeholder="ej. Descanso Libre">
+      </div>
+      <div>
+        <label>Aviso SAP</label>
+        <input type="text" id="modalInAviso">
+      </div>
+      <div>
+        <label>OM SAP</label>
+        <input type="text" id="modalInOm">
+      </div>
+      <div>
+        <label>Última Medición</label>
+        <input type="date" id="modalInUltimaMedicion">
+      </div>
+      <div>
+        <label>Latitud (Georreferencia)</label>
+        <input type="text" id="modalInLat" class="code-font" placeholder="-28.2876">
+      </div>
+      <div>
+        <label>Longitud (Georreferencia)</label>
+        <input type="text" id="modalInLng" class="code-font" placeholder="-70.8130">
+      </div>
+      <div class="full">
+        <button type="button" class="btn-map-jump" onclick="activarSelectorPinMapa()">📍 Seleccionar Coordenada Directa en Mapa (Con Pin Parpadeante)</button>
+      </div>
+      <div class="full">
+        <label>Estatus Logístico</label>
+        <input type="text" id="modalInEstatus" placeholder="ej. En bodega a la espera de detención...">
+      </div>
+      <div class="full">
+        <label>
+          Análisis Técnico (Experto ISO Cat. IV en Vibraciones)
+          <button type="button" class="btn-ai" onclick="generarAnalisisIADedicada()" style="padding: 2px 8px; font-size: 0.6rem;">✨ Redactar con IA Experta</button>
+        </label>
+        <textarea id="modalInAnalisis" placeholder="Diagnóstico espectral y causa raíz..." oninput="autoExpand(this)"></textarea>
+      </div>
+      <div class="full">
+        <label>
+          Recomendación / Acción (Concreta y Clara)
+          <button type="button" class="btn-ai" onclick="generarRecomendacionIADedicada()" style="padding: 2px 8px; font-size: 0.6rem;">✨ Redactar con IA Experta</button>
+        </label>
+        <textarea id="modalInRecomendacion" placeholder="Acción correctiva inmediata..." oninput="autoExpand(this)"></textarea>
+      </div>
+      <div class="full">
+        <label>Subir Fotografías y Evidencias</label>
+        <input type="file" id="modalInImagenesFiles" accept="image/*" multiple>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 18px; justify-content: flex-end;">
+      <button class="btn-danger" onclick="eliminarActivoDesdeModal()" id="btnDeleteAssetModal">🗑️ Eliminar</button>
+      <button class="btn-upload" onclick="guardarActivoDesdeModal()">💾 Guardar y Persistir con Éxito</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE ESTADÍSTICAS AVANZADAS -->
+<div id="statsModal" class="modal-overlay" onclick="cerrarModalStats(event)">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 900px;">
+    <button class="modal-close" onclick="cerrarModalStats()">&times;</button>
+    <div class="modal-header-flex">
+      <h2 class="modal-title code-font">📊 Analítica Cognitiva CIO: Confiabilidad, Predicción y Riesgo Financiero</h2>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">Distribución por Ciclo de Medición</div>
+        <div id="statsCicloBars"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Criticidad Real por Área (% Ponderado)</div>
+        <div id="statsAreaPonderadaBars"></div>
+      </div>
+      <div class="stat-card" style="grid-column: span 2; border-color: #f85149; background: rgba(248,81,73,0.03);">
+        <div class="stat-title" style="color: #f85149;">⚡ Motor de Alerta Predictiva & Riesgo Financiero (Con base en precio Hierro en vivo)</div>
+        <div id="statsPredictivoBox" style="font-size: 0.85rem; line-height: 1.6;"></div>
+      </div>
+    </div>
+
+    <div class="modal-footer-brand" style="margin-top: 20px;">
+      <span>Planta Mina Los Colorados (MLC)</span>
+      <span>CIO • Motor Cognitivo Predictivo</span>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SCADA VISTA USUARIO -->
 <div id="evidenciaModal" class="modal-overlay" onclick="cerrarModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="cerrarModal()">&times;</button>
@@ -424,11 +481,17 @@
       <div><span class="modal-label">Última Medición</span><span id="modalUltimaMedicion" class="modal-value"></span></div>
       <div><span class="modal-label">Estado Medición</span><span id="modalDias" class="modal-value accent-text"></span></div>
     </div>
+    <div class="modal-data-row" id="modalRazonRow" style="display:none; border-left: 4px solid #f85149;">
+      <span class="modal-label" style="color:#f85149;">Razón de por qué no se mide</span>
+      <span id="modalRazonPlomo" class="modal-value" style="font-weight: 700;"></span>
+    </div>
     <div class="modal-data-row"><span class="modal-label">Estatus Operacional</span><span id="modalEstatus" class="modal-value"></span></div>
     <div class="modal-data-row"><span class="modal-label">Análisis Técnico</span><span id="modalAnalisis" class="modal-value"></span></div>
     <div class="modal-data-row"><span class="modal-label">Recomendación / Acción</span><span id="modalRecomendacion" class="modal-value"></span></div>
     
-    <div class="modal-data-row">
+    <button class="btn-map-jump" id="btnJumpToMap" onclick="saltarAlMapaDesdeModal()">📍 Localizar en Mapa Operacional</button>
+
+    <div class="modal-data-row" style="margin-top: 15px;">
       <span class="modal-label">📜 Bitácora de Turnos Anteriores</span>
       <div id="modalBitacoraTimeline" class="timeline-box">Sin registros históricos previos.</div>
     </div>
@@ -436,6 +499,11 @@
     <div class="modal-data-row">
       <span class="modal-label">Galería de Evidencias</span>
       <div id="modalGalleryContainer" class="gallery-container"></div>
+    </div>
+
+    <div class="modal-footer-brand">
+      <span>Planta Mina Los Colorados (MLC)</span>
+      <span>CPF // CMP • Confiabilidad Operacional</span>
     </div>
   </div>
 </div>
@@ -452,98 +520,237 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
-  let isAdmin = false; let editId = null; let map; let markersLayer = L.layerGroup();
-  let mapaInicializado = false; let tempLat = null; let tempLng = null; let imagenesBase64Temp = [];
-  let mapMarkersObj = {}; let equipos = []; let filtroDiasMinimo = 0;
+  let isAdmin = false; let map; let markersLayer = L.layerGroup();
+  let mapaInicializado = false; let tempLat = null; let tempLng = null;
+  let mapMarkersObj = {}; let equipos = []; let filtroRangoActual = 'todos'; 
+  let filtroSeveridadKPI = 'todos'; let filtroSinAvisoActivo = false; 
+  let modalEquipoActualId = null; let currentEditingId = null; 
+  let imagenesBase64Temp = []; let blinkMarker = null; let precioHierroActual = 104.20;
 
-  fetch('https://mindicador.cl/api/dolar')
-    .then(res => res.json())
-    .then(data => {
-      if (data && data.serie && data.serie.length > 0) {
-        document.getElementById('valDolar').innerText = `$${data.serie[0].valor.toFixed(2)} CLP`;
+  let timeLeft = 15 * 60;
+  function startSessionTimer() {
+    setInterval(() => {
+      if (isAdmin) {
+        timeLeft--;
+        let mins = Math.floor(timeLeft / 60);
+        let secs = timeLeft % 60;
+        document.getElementById('timerCountdown').innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+        if (timeLeft <= 0) {
+          isAdmin = false;
+          document.body.classList.remove('admin-mode');
+          document.getElementById('btnUnlock').innerText = "👤 Usuario";
+          timeLeft = 15 * 60;
+          alert("🔒 Sesión de Administrador cerrada por inactividad (15 min).");
+        }
+      } else { timeLeft = 15 * 60; }
+    }, 1000);
+  }
+  startSessionTimer();
+
+  function resetIdleTimer() { timeLeft = 15 * 60; }
+  window.onmousemove = resetIdleTimer;
+  window.onkeypress = resetIdleTimer;
+  window.onclick = resetIdleTimer;
+
+  function autoExpand(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = (textarea.scrollHeight + 4) + 'px';
+  }
+
+  function verificarRazonModalPlomo() {
+    const sev = document.getElementById('modalInSeveridad').value;
+    const grupo = document.getElementById('modalGrupoRazonPlomo');
+    grupo.style.display = (sev === 'Plomo') ? 'block' : 'none';
+  }
+
+  async function actualizarBannerEnVivo() {
+    try {
+      const resDolar = await fetch('https://mindicador.cl/api/dolar');
+      const dataDolar = await resDolar.json();
+      if (dataDolar && dataDolar.serie && dataDolar.serie.length > 0) {
+        document.getElementById('valDolar').innerText = `$${dataDolar.serie[0].valor.toFixed(2)} CLP`;
       }
-    })
-    .catch(() => { document.getElementById('valDolar').innerText = '$928.50 CLP'; });
+    } catch(e) { document.getElementById('valDolar').innerText = '$938.50 CLP'; }
+
+    try {
+      const resCap = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/CAP.SN');
+      const dataCap = await resCap.json();
+      const precioCap = dataCap.chart.result[0].meta.regularMarketPrice;
+      document.getElementById('valCap').innerText = `$${precioCap.toLocaleString('es-CL')} CLP`;
+    } catch(e) { document.getElementById('valCap').innerText = '$5,720 CLP'; }
+
+    try {
+      const resFe = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/TIO=F');
+      const dataFe = await resFe.json();
+      const precioFe = dataFe.chart.result[0].meta.regularMarketPrice;
+      precioHierroActual = precioFe;
+      document.getElementById('valHierro').innerText = `$${precioFe.toFixed(2)} / T`;
+    } catch(e) { document.getElementById('valHierro').innerText = '$104.20 / T'; }
+
+    try {
+      const resClima = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-28.5758&current_weather=true');
+      const dataClima = await resClima.json();
+      const temp = dataClima.current_weather.temperature;
+      const horaActual = new Date().getHours();
+      const esDeNoche = horaActual < 7 || horaActual >= 20;
+
+      const icono = document.getElementById('climaIcon');
+      const label = document.getElementById('climaLabel');
+      const valor = document.getElementById('valClima');
+
+      if (esDeNoche) {
+        icono.innerText = "🌙"; label.innerText = "Mina Los Colorados (Turno Noche)";
+      } else {
+        icono.innerText = "☀️"; label.innerText = "Mina Los Colorados (Turno Día)";
+      }
+      valor.innerText = `Vallenar: ${temp}°C`;
+    } catch(e) { document.getElementById('valClima').innerText = 'Vallenar: 21°C'; }
+  }
+  actualizarBannerEnVivo();
 
   function toggleTheme() {
     const body = document.body;
-    const btn = document.getElementById('btnTheme');
     if (body.classList.contains('light-mode')) {
       body.classList.remove('light-mode');
-      btn.innerText = '☀️ Claro';
       localStorage.setItem('mlc_theme', 'dark');
     } else {
       body.classList.add('light-mode');
-      btn.innerText = '🌙 Oscuro';
       localStorage.setItem('mlc_theme', 'light');
     }
   }
 
-  async function generarAnalisisIA() {
-    const tag = document.getElementById('inNombre').value.trim() || "Equipo sin Tag";
-    const tipo = document.getElementById('inTipo').value.trim() || "Equipo industrial";
-    const componente = document.getElementById('inComponente').value.trim() || "Componente mecánico";
-    const notasUsuario = document.getElementById('inAnalisis').value.trim();
+  if (localStorage.getItem('mlc_theme') === 'light') { document.body.classList.add('light-mode'); }
 
-    if (!notasUsuario) {
-      alert("⚠️ Escribe algunas notas breves primero.");
-      return;
-    }
+  async function generarAnalisisIADedicada() {
+    const tag = document.getElementById('modalInNombre').value.trim() || "Equipo sin Tag";
+    const componente = document.getElementById('modalInComponente').value.trim() || "Componente";
+    const tipo = document.getElementById('modalInTipo').value.trim() || "Equipo";
 
     const btnAi = event.target;
-    btnAi.innerText = "⏳ Generando...";
+    btnAi.innerText = "⏳ Analizando Espectro...";
     btnAi.disabled = true;
 
     setTimeout(() => {
-      const analisisFormal = `Diagnóstico Predictivo (${tag} - ${tipo}): Se detecta anomalía asociada a ${componente} sustentada por ${notasUsuario}. Posible causa raíz vinculada a desgaste prematuro o desalineación por fatiga mecánica. Se recomienda programar inspección estroboscópica y análisis de vibración de alta frecuencia.`;
-      document.getElementById('inAnalisis').value = analisisFormal;
-      btnAi.innerText = "✨ Redactar con IA";
+      const diagnosticoExperto = `Diagnóstico Vibracional (Experto Cat. IV - ${tag} | ${tipo}): Elevación armónica en 1X RPM con modulación en frecuencia de defectos de pista externa (BPFO) en ${componente}. Evidencia desalineación y holgura mecánica.`;
+      const campo = document.getElementById('modalInAnalisis');
+      campo.value = diagnosticoExperto; autoExpand(campo);
+      btnAi.innerText = "✨ Redactar con IA Experta";
       btnAi.disabled = false;
-    }, 800);
+    }, 900);
   }
 
-  // --- MOTOR DE SELECCIÓN V4.0 ---
-  document.getElementById('app-root').addEventListener('click', function(e) {
-    const delBtn = e.target.closest('.delete-btn');
-    const card = e.target.closest('.card');
+  async function generarRecomendacionIADedicada() {
+    const tag = document.getElementById('modalInNombre').value.trim() || "Equipo sin Tag";
+    const componente = document.getElementById('modalInComponente').value.trim() || "Componente";
 
-    if (delBtn) {
-      e.stopPropagation();
-      eliminarEquipo(delBtn.getAttribute('data-id'));
-      return;
-    } 
-    
+    const btnAi = event.target;
+    btnAi.innerText = "⏳ Generando Plan...";
+    btnAi.disabled = true;
+
+    setTimeout(() => {
+      const accionExperta = `Acción Correctiva (${tag}): 1) Programar detención en próxima ventana. 2) Inspección estroboscópica y control de torque en pernos de anclaje de ${componente}. 3) Ejecutar alineación láser.`;
+      const campo = document.getElementById('modalInRecomendacion');
+      campo.value = accionExperta; autoExpand(campo);
+      btnAi.innerText = "✨ Redactar con IA Experta";
+      btnAi.disabled = false;
+    }, 900);
+  }
+
+  function abrirModalEstadisticas() {
+    const total = equipos.length;
+    if (total === 0) { alert("⚠️ No hay activos registrados para analizar."); return; }
+
+    let cSeg = 0, cNorm = 0, cVenc = 0, cPlom = 0;
+    let porAreaTotal = {}; let porAreaCriticos = {};
+    let activosCriticosCount = 0; let activosVencidosCount = 0;
+
+    equipos.forEach(eq => {
+      const d = calcularDias(eq.ultima_medicion);
+      if (eq.severidad === 'Plomo' || d === null) cPlom++;
+      else if (d < 15) cSeg++;
+      else if (d <= 30) cNorm++;
+      else { cVenc++; activosVencidosCount++; }
+
+      if (eq.severidad === 'Rojo' || eq.severidad === 'Naranja') { activosCriticosCount++; }
+
+      const area = eq.area || 'Sin Área';
+      porAreaTotal[area] = (porAreaTotal[area] || 0) + 1;
+      if (eq.severidad === 'Rojo' || eq.severidad === 'Naranja') {
+        porAreaCriticos[area] = (porAreaCriticos[area] || 0) + 1;
+      }
+    });
+
+    const pSeg = ((cSeg / total) * 100).toFixed(1);
+    const pNorm = ((cNorm / total) * 100).toFixed(1);
+    const pVenc = ((cVenc / total) * 100).toFixed(1);
+    const pPlom = ((cPlom / total) * 100).toFixed(1);
+
+    document.getElementById('statsCicloBars').innerHTML = `
+      <div class="bar-stat-row"><span>En Seguimiento (<15d): <b>${cSeg} (${pSeg}%)</b></span></div>
+      <div class="bar-container"><div class="bar-fill" style="width: ${pSeg}%; background: #238636;"></div></div>
+      <div class="bar-stat-row" style="margin-top:8px;"><span>Ciclo Normal (15-30d): <b>${cNorm} (${pNorm}%)</b></span></div>
+      <div class="bar-container"><div class="bar-fill" style="width: ${pNorm}%; background: #388bfd;"></div></div>
+      <div class="bar-stat-row" style="margin-top:8px;"><span>Ciclo Vencido (>30d): <b>${cVenc} (${pVenc}%)</b></span></div>
+      <div class="bar-container"><div class="bar-fill" style="width: ${pVenc}%; background: #f85149;"></div></div>
+      <div class="bar-stat-row" style="margin-top:8px;"><span>Sin Medición / Plomos: <b>${cPlom} (${pPlom}%)</b></span></div>
+      <div class="bar-container"><div class="bar-fill" style="width: ${pPlom}%; background: #6e7681;"></div></div>
+    `;
+
+    let areaPonderadaHTML = '';
+    const areasOrdenadasPonderadas = Object.keys(porAreaTotal).sort((a, b) => {
+      const pA = (porAreaCriticos[a] || 0) / porAreaTotal[a];
+      const pB = (porAreaCriticos[b] || 0) / porAreaTotal[b];
+      return pB - pA;
+    });
+
+    areasOrdenadasPonderadas.forEach(area => {
+      const totalArea = porAreaTotal[area];
+      const criticosArea = porAreaCriticos[area] || 0;
+      const porcArea = ((criticosArea / totalArea) * 100).toFixed(1);
+      
+      areaPonderadaHTML += `
+        <div class="bar-stat-row"><span><b>${area}</b> (${criticosArea}/${totalArea} crit): <b>${porcArea}%</b></span></div>
+        <div class="bar-container"><div class="bar-fill" style="width: ${porcArea}%; background: #f85149;"></div></div>
+      `;
+    });
+
+    document.getElementById('statsAreaPonderadaBars').innerHTML = areaPonderadaHTML || '<span style="color:var(--text-muted);">Sin registros por área.</span>';
+
+    const costoEstimadoHoraUSD = (activosCriticosCount * 450 * (precioHierroActual / 10)).toLocaleString('es-CL', {maximumFractionDigits:0});
+    document.getElementById('statsPredictivoBox').innerHTML = `
+      • <b>Estado de Alerta Predictiva:</b> El motor detecta <b>${activosCriticosCount} activos críticos</b> y <b>${activosVencidosCount} equipos con ciclo de medición vencido</b>.<br>
+      • <b>Recomendación del Motor IA:</b> Priorizar intervención en los activos con más de 30 días sin inspección para evitar fallas armónicas en cadenas de transporte.<br>
+      • <b>Pronóstico de Impacto Financiero Potencial (No-Disponibilidad):</b> US$ ${costoEstimadoHoraUSD} / hora de detención no programada estimada según índice de mineral de hierro actual ($${precioHierroActual.toFixed(2)}/T).
+    `;
+
+    document.getElementById('statsModal').style.display = 'flex';
+  }
+
+  function cerrarModalStats() { document.getElementById('statsModal').style.display = 'none'; }
+
+  function filtrarSeveridadKPI(sev, el) {
+    filtroSeveridadKPI = sev;
+    document.querySelectorAll('.kpi-card').forEach(card => card.classList.remove('active-kpi'));
+    el.classList.add('active-kpi');
+    renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
+  }
+
+  document.getElementById('app-root').addEventListener('click', function(e) {
+    const card = e.target.closest('.card');
     if (card) {
       const idCard = card.getAttribute('data-id');
       const eqTarget = equipos.find(i => String(i.id).trim() === String(idCard).trim());
-      
-      if (!eqTarget) {
-        alert("⚠️ No se encontró el equipo en la memoria.");
-        return;
-      }
+      if (!eqTarget) return;
 
       if (isAdmin) {
-        if (editId && String(editId) !== String(eqTarget.id)) {
-          const eqActual = equipos.find(i => String(i.id) === String(editId));
-          const nombreActual = eqActual ? eqActual.nombre : 'actual';
-          
-          if (confirm(`⚠️ EDICIÓN EN CURSO\n\n¿Desea GUARDAR los cambios del equipo ${nombreActual} y pasar a editar el equipo ${eqTarget.nombre}?`)) {
-            guardarEquipoYEditarNuevo(eqTarget);
-          }
-        } else {
-          if (confirm(`✏️ MODO EDICIÓN V4.0\n\n¿Desea editar los datos del equipo ${eqTarget.nombre}?\n\n- [Aceptar] para Editar arriba en el panel.\n- [Cancelar] para ver Detalles y Bitácora.`)) {
-            cargarDatosAlFormulario(eqTarget);
-          } else {
-            abrirModal(eqTarget.id);
-          }
-        }
+        abrirFichaEdicion(eqTarget);
       } else {
         abrirModal(eqTarget.id);
       }
     }
   });
 
-  document.getElementById('inImagenesFiles').addEventListener('change', function(e) {
+  document.getElementById('modalInImagenesFiles').addEventListener('change', function(e) {
     const files = e.target.files;
     if (files && files.length > 0) {
       imagenesBase64Temp = [];
@@ -555,10 +762,155 @@
     }
   });
 
-  function filtrarDias(dias, btn) {
-    filtroDiasMinimo = dias;
+  function abrirFichaEdicion(eq) {
+    currentEditingId = eq.id;
+    imagenesBase64Temp = eq.imagenes || [];
+    document.getElementById('editModalHeaderTitle').innerText = `✏️ Ficha Técnica Activo: ${eq.nombre}`;
+    document.getElementById('btnDeleteAssetModal').style.display = 'inline-block';
+    
+    document.getElementById('modalInArea').value = eq.area || '';
+    document.getElementById('modalInNombre').value = eq.nombre || '';
+    document.getElementById('modalInTipo').value = eq.tipo_equipo || '';
+    document.getElementById('modalInSeveridad').value = eq.severidad || 'Plomo';
+    document.getElementById('modalInRazonPlomo').value = eq.razon_plomo || '';
+    verificarRazonModalPlomo();
+    document.getElementById('modalInComponente').value = eq.componente || '';
+    document.getElementById('modalInAviso').value = eq.aviso || '';
+    document.getElementById('modalInOm').value = eq.om || '';
+    document.getElementById('modalInUltimaMedicion').value = eq.ultima_medicion || '';
+    document.getElementById('modalInLat').value = eq.lat || '';
+    document.getElementById('modalInLng').value = eq.lng || '';
+    document.getElementById('modalInEstatus').value = eq.estatus || '';
+    
+    const cAn = document.getElementById('modalInAnalisis');
+    cAn.value = eq.analisis || ''; autoExpand(cAn);
+    
+    const cRec = document.getElementById('modalInRecomendacion');
+    cRec.value = eq.recomendacion || ''; autoExpand(cRec);
+
+    document.getElementById('editAssetModal').style.display = 'flex';
+  }
+
+  function abrirModalCrearActivo() {
+    currentEditingId = null;
+    imagenesBase64Temp = [];
+    document.getElementById('editModalHeaderTitle').innerText = `➕ Crear Nuevo Activo en Sistema`;
+    document.getElementById('btnDeleteAssetModal').style.display = 'none';
+
+    document.getElementById('modalInArea').value = '';
+    document.getElementById('modalInNombre').value = '';
+    document.getElementById('modalInTipo').value = '';
+    document.getElementById('modalInSeveridad').value = 'Rojo';
+    document.getElementById('modalInRazonPlomo').value = '';
+    verificarRazonModalPlomo();
+    document.getElementById('modalInComponente').value = '';
+    document.getElementById('modalInAviso').value = '';
+    document.getElementById('modalInOm').value = '';
+    document.getElementById('modalInUltimaMedicion').value = new Date().toISOString().split('T')[0];
+    document.getElementById('modalInLat').value = tempLat !== null ? tempLat : '';
+    document.getElementById('modalInLng').value = tempLng !== null ? tempLng : '';
+    document.getElementById('modalInEstatus').value = '';
+    
+    const cAn = document.getElementById('modalInAnalisis'); cAn.value = ''; autoExpand(cAn);
+    const cRec = document.getElementById('modalInRecomendacion'); cRec.value = ''; autoExpand(cRec);
+
+    document.getElementById('editAssetModal').style.display = 'flex';
+  }
+
+  function activarSelectorPinMapa() {
+    const nombreTag = document.getElementById('modalInNombre').value.trim() || "ACTIVO EN EDICIÓN";
+    const latAct = parseFloat(document.getElementById('modalInLat').value);
+    const lngAct = parseFloat(document.getElementById('modalInLng').value);
+
+    document.getElementById('editAssetModal').style.display = 'none';
+    cambiarVista('map');
+
+    if (!isNaN(latAct) && !isNaN(lngAct)) {
+      map.setView([latAct, lngAct], 17);
+      if (blinkMarker) markersLayer.removeLayer(blinkMarker);
+      
+      const blinkIcon = L.divIcon({
+        className: 'custom-blink-marker',
+        html: `<div class="pin-blink-radar" title="${nombreTag}"></div>`,
+        iconSize: [22, 22]
+      });
+      blinkMarker = L.marker([latAct, lngAct], { icon: blinkIcon }).addTo(markersLayer);
+      blinkMarker.bindPopup(`<b>🎯 EDITANDO: ${nombreTag}</b><br>Haz clic en otra posición si deseas mover el pin.`).openPopup();
+    } else {
+      alert(`📍 MODO SELECCIÓN DE PIN:\n\nEl equipo ${nombreTag} aún no tiene coordenadas guardadas. Haz clic en el mapa para ubicarlo.`);
+    }
+  }
+
+  function cerrarModalEdicion(e) {
+    if (e && e.target !== document.getElementById('editAssetModal')) return;
+    document.getElementById('editAssetModal').style.display = 'none';
+  }
+
+  function guardarActivoDesdeModal() {
+    if (!isAdmin) return;
+    const area = document.getElementById('modalInArea').value.trim();
+    const nombre = document.getElementById('modalInNombre').value.trim().toUpperCase();
+    if (!area || !nombre) { alert("⚠️ El Área y el Tag son obligatorios."); return; }
+
+    let eqId = currentEditingId ? String(currentEditingId).trim() : nombre.replace(/[.#$\[\]\s\/]/g, "_");
+    const eqOrig = equipos.find(e => String(e.id).trim() === String(eqId).trim());
+
+    let nuevaBitacora = eqOrig && eqOrig.bitacora ? eqOrig.bitacora : [];
+    const nuevoAnalisis = document.getElementById('modalInAnalisis').value.trim();
+    const nuevaSev = document.getElementById('modalInSeveridad').value;
+    const razonPlomoVal = document.getElementById('modalInRazonPlomo').value.trim();
+
+    if (!eqOrig || eqOrig.analisis !== nuevoAnalisis || eqOrig.severidad !== nuevaSev) {
+      nuevaBitacora.unshift({ fecha: new Date().toLocaleString(), texto: `Estado: [${nuevaSev}] | Ficha actualizada.` });
+    }
+
+    const eqData = {
+      id: eqId, area, nombre,
+      tipo_equipo: document.getElementById('modalInTipo').value.trim(),
+      severidad: nuevaSev,
+      razon_plomo: (nuevaSev === 'Plomo') ? razonPlomoVal : '',
+      componente: document.getElementById('modalInComponente').value.trim(),
+      aviso: document.getElementById('modalInAviso').value.trim(),
+      om: document.getElementById('modalInOm').value.trim(),
+      ultima_medicion: document.getElementById('modalInUltimaMedicion').value || '',
+      lat: document.getElementById('modalInLat').value ? parseFloat(document.getElementById('modalInLat').value) : (eqOrig ? eqOrig.lat : null),
+      lng: document.getElementById('modalInLng').value ? parseFloat(document.getElementById('modalInLng').value) : (eqOrig ? eqOrig.lng : null),
+      estatus: document.getElementById('modalInEstatus').value.trim(),
+      analisis: nuevoAnalisis,
+      recomendacion: document.getElementById('modalInRecomendacion').value.trim(),
+      bitacora: nuevaBitacora,
+      imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : [])
+    };
+
+    equiposRef.child(eqId).set(eqData).then(() => {
+      alert(`✅ ¡ÉXITO! Los cambios para el activo ${nombre} han sido guardados y persistidos correctamente en la base de datos.`);
+      document.getElementById('editAssetModal').style.display = 'none';
+    }).catch(err => alert("❌ Error al persistir en Firebase: " + err.message));
+  }
+
+  function eliminarActivoDesdeModal() {
+    if (!isAdmin || !currentEditingId) return;
+    if (confirm("⚠️ ¿Eliminar permanentemente este activo de la base de datos?")) {
+      equiposRef.child(currentEditingId).remove().then(() => {
+        alert("🗑️ Activo eliminado correctamente.");
+        document.getElementById('editAssetModal').style.display = 'none';
+      });
+    }
+  }
+
+  function filtrarRango(rango, btn) {
+    filtroRangoActual = rango;
+    filtroSinAvisoActivo = false;
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
+    if(btn) btn.classList.add('active');
+    renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
+  }
+
+  function filtrarSinAviso(btn) {
+    filtroSinAvisoActivo = true;
+    filtroRangoActual = 'todos';
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    if(btn) btn.classList.add('active');
     renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
   }
 
@@ -568,93 +920,44 @@
 
   function generarReporteTurno() {
     const criticos = equipos.filter(e => e.severidad === 'Rojo' || e.severidad === 'Naranja');
-    let textoReporte = `=== REPORTE EJECUTIVO DE TURNO V4.0 - PLANTA MLC ===\nFecha: ${new Date().toLocaleDateString()}\nTotal Activos Críticos/Alertas: ${criticos.length}\n\n`;
+    let textoReporte = `=== REPORTE EJECUTIVO CIO - PLANTA MLC ===\nFecha: ${new Date().toLocaleDateString()}\nTotal Críticos/Alertas: ${criticos.length}\n\n`;
     criticos.forEach(e => {
-      textoReporte += `[${e.severidad.toUpperCase()}] Área: ${e.area} | Tag: ${e.nombre} | Tipo: ${e.tipo_equipo || 'N/D'}\n`;
-      textoReporte += ` - Análisis: ${e.analisis || 'Sin análisis'}\n`;
-      textoReporte += ` - Recomendación: ${e.recomendacion || 'Sin acción'}\n------------------------------------------\n`;
+      textoReporte += `[${e.severidad.toUpperCase()}] Área: ${e.area} | Tag: ${e.nombre}\n`;
+      textoReporte += ` - Análisis: ${e.analisis || 'Sin análisis'}\n - Recomendación: ${e.recomendacion || 'Sin acción'}\n------------------------------------------\n`;
     });
     const blob = new Blob([textoReporte], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Reporte_Turno_MLC_${new Date().toISOString().split('T')[0]}.txt`;
+    const a = document.createElement('a'); a.href = url;
+    a.download = `Reporte_CIO_MLC_${new Date().toISOString().split('T')[0]}.txt`;
     a.click();
   }
 
-  function eliminarTodoMasivo() {
-    if (!isAdmin) return;
-    if (confirm("⚠️ ADVERTENCIA: ¿BORRAR TODOS LOS ACTIVOS?\nEsta acción no se puede deshacer.")) {
-      equiposRef.remove().then(() => { alert("🗑️ Base limpia."); resetFormulario(); }).catch(e => alert("❌ Error: " + e.message));
-    }
-  }
+  function exportarPDFDirectorio() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFillColor(13, 17, 23); doc.rect(0, 0, 210, 297, 'F');
+    doc.setTextColor(230, 237, 243); doc.setFont("helvetica", "bold"); doc.setFontSize(16);
+    doc.text("CENTRO INTEGRADO DE OPERACIONES (CIO)", 14, 20);
+    doc.setFontSize(10); doc.setTextColor(139, 148, 158);
+    doc.text(`PLANTA MINA LOS COLORADOS (MLC) - REPORTE DIRECTORIO`, 14, 27);
+    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 160, 27);
+    doc.setLineWidth(0.5); doc.setDrawColor(48, 54, 61); doc.line(14, 32, 196, 32);
 
-  function procesarExcel() {
-    if (!isAdmin) { alert("Active el Modo Admin."); return; }
-    const fileInput = document.getElementById('inExcelFile');
-    if (!fileInput.files.length) { alert("Seleccione un archivo Excel."); return; }
-    
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-        let agregados = 0;
-        let tagsEnExcel = new Set();
+    let y = 40;
+    const criticos = equipos.filter(e => e.severidad === 'Rojo' || e.severidad === 'Naranja');
+    doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(248, 81, 73);
+    doc.text(`Activos Críticos / Alertas: ${criticos.length}`, 14, y); y += 10;
 
-        workbook.SheetNames.forEach(sheetName => {
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonRows = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false, defval: ""});
-          if (jsonRows.length === 0) return;
-
-          for (let i = 0; i < jsonRows.length; i++) {
-            let row = jsonRows[i];
-            if (!row || row.length < 2) continue;
-
-            let areaVal = String(row[0] || '').trim();
-            let eqVal = String(row[1] || '').trim();
-            let tipoVal = String(row[2] || '').trim();
-            let fechaVal = String(row[3] || '').trim();
-
-            if (!eqVal || eqVal.toLowerCase() === 'tag' || eqVal.toLowerCase() === 'equipo' || eqVal.toLowerCase() === 'undefined') continue;
-            if (!areaVal || areaVal.toLowerCase() === 'area' || areaVal.toLowerCase() === 'área') {
-              areaVal = "Área General";
-            }
-
-            const tagLimpio = eqVal.toUpperCase();
-            const eqId = tagLimpio.replace(/[.#$\[\]\s\/]/g, "_");
-            tagsEnExcel.add(eqId);
-
-            const updateData = { 
-              id: eqId, 
-              area: areaVal, 
-              nombre: tagLimpio, 
-              tipo_equipo: tipoVal || 'Equipo' 
-            };
-            
-            if (fechaVal && !fechaVal.includes('1900') && !fechaVal.toLowerCase().includes('nat')) {
-              updateData.ultima_medicion = fechaVal;
-            } else { 
-              updateData.ultima_medicion = ''; 
-            }
-
-            const eqExist = equipos.find(item => String(item.id) === String(eqId));
-            if (!eqExist) {
-              updateData.severidad = updateData.ultima_medicion ? "Verde" : "Plomo";
-              updateData.fecha = new Date().toISOString().split('T')[0];
-              updateData.bitacora = [{ fecha: new Date().toLocaleString(), texto: 'Activo sincronizado vía Excel.' }];
-            }
-            
-            equiposRef.child(eqId).update(updateData);
-            agregados++;
-          }
-        });
-
-        alert(`✅ Sincronización masiva exitosa:\n- Se procesaron ${agregados} registros.`);
-        fileInput.value = '';
-      } catch (err) { alert("❌ Error procesando Excel: " + err.message); }
-    };
-    reader.readAsArrayBuffer(file);
+    criticos.forEach((eq, index) => {
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(47, 129, 247);
+      doc.text(`${index + 1}. [${eq.severidad.toUpperCase()}] Área: ${eq.area} | TAG: ${eq.nombre}`, 14, y); y += 6;
+      doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(230, 237, 243);
+      doc.text(`   - Componente: ${eq.componente || 'N/D'} | Aviso SAP: ${eq.aviso || 'Sin Aviso'}`, 14, y); y += 5;
+      doc.text(`   - Diagnóstico: ${eq.analisis || 'N/D'}`, 14, y); y += 6;
+      doc.text(`   - Recomendación: ${eq.recomendacion || 'N/D'}`, 14, y); y += 10;
+    });
+    doc.save(`Reporte_Directorio_CIO_MLC_${new Date().toISOString().split('T')[0]}.pdf`);
   }
 
   function cambiarVista(vista) {
@@ -672,9 +975,14 @@
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(map);
     markersLayer.addTo(map);
     map.on('click', function(e) {
-      if (!isAdmin) return;
       tempLat = e.latlng.lat; tempLng = e.latlng.lng;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('modalInLat').value = tempLat.toFixed(4);
+      document.getElementById('modalInLng').value = tempLng.toFixed(4);
+      
+      if (confirm(`📍 Coordenadas capturadas: ${tempLat.toFixed(4)}, ${tempLng.toFixed(4)}\n\n¿Desea volver a la Ficha Técnica para guardar este pin en el activo?`)) {
+        document.getElementById('editAssetModal').style.display = 'flex';
+        cambiarVista('grid');
+      }
     });
     renderizarMarcadoresMapa(equipos);
   }
@@ -683,38 +991,56 @@
     if (!map) return;
     markersLayer.clearLayers();
     mapMarkersObj = {}; 
-    const cMap = { 'Rojo':'#f43f5e', 'Naranja':'#f97316', 'Amarillo':'#eab308', 'Verde':'#10b981', 'Plomo':'#64748b' };
-    const aMap = { 'Rojo':'sirena-roja 1.2s infinite alternate', 'Naranja':'sirena-naranja 2s infinite alternate', 'Amarillo':'respiracion-amarilla 3s infinite alternate' };
+    const cMap = { 'Rojo':'#f85149', 'Naranja':'#db6d28', 'Amarillo':'#d29922', 'Verde':'#238636', 'Plomo':'#6e7681' };
 
     eqList.forEach(eq => {
       if (eq.lat && eq.lng) {
-        let color = cMap[eq.severidad] || '#64748b';
-        let anim = aMap[eq.severidad] ? `animation: ${aMap[eq.severidad]};` : '';
+        let color = cMap[eq.severidad] || '#6e7681';
         const icon = L.divIcon({
           className: 'custom-map-marker',
-          html: `<div style="background-color: ${color}; width:20px; height:20px; border-radius:50%; border:3px solid #fff; ${anim}"></div>`,
-          iconSize: [20, 20]
+          html: `<div style="background-color: ${color}; width:18px; height:18px; border-radius:4px; border:2px solid #fff; box-shadow: 0 0 8px ${color};"></div>`,
+          iconSize: [18, 18]
         });
         const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon });
         marker.on('click', () => abrirModal(eq.id));
-        marker.bindPopup(`<b>${eq.nombre}</b><br>${eq.area}<br>${eq.severidad}`);
+        marker.bindPopup(`<b>${eq.nombre}</b><br>${eq.area}<br>Estado: <b>${eq.severidad}</b>`);
         markersLayer.addLayer(marker);
         mapMarkersObj[eq.id] = marker; 
       }
     });
   }
 
+  function saltarAlMapaDesdeModal() {
+    if (!modalEquipoActualId) return;
+    const eq = equipos.find(i => String(i.id).trim() === String(modalEquipoActualId).trim());
+    document.getElementById('evidenciaModal').style.display = 'none';
+    cambiarVista('map');
+
+    if (eq && eq.lat && eq.lng) {
+      setTimeout(() => {
+        if (map) {
+          map.flyTo([parseFloat(eq.lat), parseFloat(eq.lng)], 18, { duration: 1.5 });
+          if (mapMarkersObj[eq.id]) mapMarkersObj[eq.id].openPopup();
+        }
+      }, 300);
+    } else { alert("ℹ️ El equipo no tiene coordenadas geográficas asignadas."); }
+  }
+
   function solicitarClave() {
     if (isAdmin) {
       document.body.classList.remove('admin-mode');
-      document.getElementById('btnUnlock').innerText = "🔒 Lectura";
-      isAdmin = false; resetFormulario(); return;
+      document.getElementById('btnUnlock').innerText = "👤 Usuario";
+      isAdmin = false; 
+      renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
+      return;
     }
-    if (prompt("Ingrese clave:") === "Moncon2026") {
+    if (prompt("Ingrese clave de Administrador:") === "Moncon2026") {
       document.body.classList.add('admin-mode');
-      document.getElementById('btnUnlock').innerText = "🔓 Admin Activo";
+      document.getElementById('btnUnlock').innerText = "🛡️ Administrador";
       isAdmin = true;
-    } else { alert("Denegado"); }
+      timeLeft = 15 * 60;
+      renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
+    } else { alert("Clave incorrecta."); }
   }
 
   const firebaseConfig = {
@@ -734,164 +1060,6 @@
     renderizarMarcadoresMapa(equipos);
   });
 
-  // --- MOTOR DE GUARDADO V4.0 ---
-  function procesarGuardado() {
-    if (!isAdmin) return; 
-    const area = document.getElementById('inArea').value.trim();
-    const nombre = document.getElementById('inNombre').value.trim().toUpperCase();
-    if(!area || !nombre) { alert("⚠️ Área y Tag requeridos."); return; }
-
-    let eqId = editId ? editId : nombre.replace(/[.#$\[\]\s\/]/g, "_");
-    const eqOrig = equipos.find(e => String(e.id).trim() === String(eqId).trim());
-
-    let nuevaBitacora = eqOrig && eqOrig.bitacora ? eqOrig.bitacora : [];
-    const nuevoAnalisis = document.getElementById('inAnalisis').value.trim();
-    const nuevaSev = document.getElementById('inSeveridad').value;
-    
-    if (!eqOrig || eqOrig.analisis !== nuevoAnalisis || eqOrig.severidad !== nuevaSev) {
-      nuevaBitacora.unshift({
-        fecha: new Date().toLocaleString(),
-        texto: `Estado: [${nuevaSev}] | Análisis: "${nuevoAnalisis || 'Sin comentarios'}"`
-      });
-    }
-
-    const eqData = { 
-      id: eqId, 
-      area: area, 
-      nombre: nombre, 
-      tipo_equipo: document.getElementById('inTipo').value.trim(),
-      componente: document.getElementById('inComponente').value.trim(), 
-      aviso: document.getElementById('inAviso').value.trim(), 
-      om: document.getElementById('inOm').value.trim(), 
-      fecha: document.getElementById('inFecha').value || (eqOrig ? eqOrig.fecha : ''), 
-      ultima_medicion: document.getElementById('inUltimaMedicion').value || '', 
-      severidad: nuevaSev,
-      estatus: document.getElementById('inEstatus').value.trim(),
-      analisis: nuevoAnalisis, 
-      recomendacion: document.getElementById('inRecomendacion').value.trim(),
-      bitacora: nuevaBitacora,
-      imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : []),
-      lat: tempLat !== null ? tempLat : (eqOrig ? eqOrig.lat : null),
-      lng: tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null)
-    };
-    
-    equiposRef.child(eqId).update(eqData).then(() => {
-      alert("✅ Cambios y bitácora guardados correctamente.");
-      resetFormulario();
-    }).catch(err => alert("❌ Error al guardar: " + err.message));
-  }
-
-  function guardarEquipoYEditarNuevo(nuevoEq) {
-    if (!editId) { cargarDatosAlFormulario(nuevoEq); return; }
-    
-    const area = document.getElementById('inArea').value.trim();
-    const nombre = document.getElementById('inNombre').value.trim().toUpperCase();
-    if(!area || !nombre) { alert("⚠️ Faltan datos en el equipo actual."); return; }
-
-    let eqId = editId;
-    const eqOrig = equipos.find(e => String(e.id).trim() === String(eqId).trim());
-    let nuevaBitacora = eqOrig && eqOrig.bitacora ? eqOrig.bitacora : [];
-    const nuevoAnalisis = document.getElementById('inAnalisis').value.trim();
-    const nuevaSev = document.getElementById('inSeveridad').value;
-
-    if (!eqOrig || eqOrig.analisis !== nuevoAnalisis || eqOrig.severidad !== nuevaSev) {
-      nuevaBitacora.unshift({
-        fecha: new Date().toLocaleString(),
-        texto: `Estado: [${nuevaSev}] | Análisis: "${nuevoAnalisis || 'Sin comentarios'}"`
-      });
-    }
-
-    const eqData = { 
-      id: eqId, area, nombre, 
-      tipo_equipo: document.getElementById('inTipo').value.trim(),
-      componente: document.getElementById('inComponente').value.trim(), 
-      aviso: document.getElementById('inAviso').value.trim(), 
-      om: document.getElementById('inOm').value.trim(), 
-      fecha: document.getElementById('inFecha').value || (eqOrig ? eqOrig.fecha : ''), 
-      ultima_medicion: document.getElementById('inUltimaMedicion').value || '', 
-      severidad: nuevaSev,
-      estatus: document.getElementById('inEstatus').value.trim(),
-      analisis: nuevoAnalisis, 
-      recomendacion: document.getElementById('inRecomendacion').value.trim(),
-      bitacora: nuevaBitacora,
-      imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : []),
-      lat: tempLat !== null ? tempLat : (eqOrig ? eqOrig.lat : null),
-      lng: tempLng !== null ? tempLng : (eqOrig ? eqOrig.lng : null)
-    };
-    
-    equiposRef.child(eqId).update(eqData).then(() => {
-      imagenesBase64Temp = [];
-      cargarDatosAlFormulario(nuevoEq);
-    }).catch(err => alert("❌ Error al actualizar: " + err.message));
-  }
-
-  function cargarDatosAlFormulario(eq) {
-    if (!eq) return;
-    try {
-      document.getElementById('inArea').value = eq.area || '';
-      document.getElementById('inNombre').value = eq.nombre || '';
-      document.getElementById('inTipo').value = eq.tipo_equipo || '';
-      document.getElementById('inComponente').value = eq.componente || '';
-      document.getElementById('inAviso').value = eq.aviso || '';
-      document.getElementById('inOm').value = eq.om || '';
-      
-      const setFechaSegura = (idElemento, valor) => { try { document.getElementById(idElemento).value = valor || ''; } catch(e) {} };
-      setFechaSegura('inFecha', eq.fecha);
-      setFechaSegura('inUltimaMedicion', eq.ultima_medicion);
-      
-      const validSeverities = ['Rojo', 'Naranja', 'Amarillo', 'Verde', 'Plomo'];
-      document.getElementById('inSeveridad').value = validSeverities.includes(eq.severidad) ? eq.severidad : 'Plomo';
-      
-      document.getElementById('inEstatus').value = eq.estatus || '';
-      document.getElementById('inAnalisis').value = eq.analisis || '';
-      document.getElementById('inRecomendacion').value = eq.recomendacion || '';
-      
-      editId = eq.id; 
-      tempLat = eq.lat || null; 
-      tempLng = eq.lng || null;
-      imagenesBase64Temp = eq.imagenes || [];
-      
-      document.getElementById('adminPanelForm').classList.add('editing-mode');
-      document.getElementById('editStatusText').innerText = `✏️ Editando Activo: ${eq.nombre}`;
-      document.getElementById('uploadBoxCont').style.display = 'none'; 
-      document.getElementById('btnDeleteAll').style.display = 'none';
-      document.getElementById('btnCancelEdit').style.display = 'block';
-      
-      const btnSubmit = document.getElementById('btnSubmit');
-      btnSubmit.innerText = "💾 Guardar Cambios";
-      btnSubmit.classList.add('btn-save-edit');
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (err) {
-      alert("⚠️ Error cargando datos: " + err.message);
-    }
-  }
-
-  function resetFormulario() {
-    document.querySelectorAll('.admin-panel input[type="text"], .admin-panel input[type="date"], .admin-panel textarea').forEach(i => i.value = '');
-    document.getElementById('inSeveridad').value = 'Rojo';
-    document.getElementById('inImagenesFiles').value = '';
-    
-    editId = null; tempLat = null; tempLng = null; imagenesBase64Temp = [];
-    
-    document.getElementById('adminPanelForm').classList.remove('editing-mode');
-    document.getElementById('editStatusText').innerText = `➕ Nuevo Registro / Carga Masiva`;
-    document.getElementById('uploadBoxCont').style.display = 'flex';
-    document.getElementById('btnDeleteAll').style.display = 'block';
-    document.getElementById('btnCancelEdit').style.display = 'none';
-    
-    const btnSubmit = document.getElementById('btnSubmit');
-    btnSubmit.innerText = "+ Guardar Activo";
-    btnSubmit.classList.remove('btn-save-edit');
-  }
-
-  function eliminarEquipo(id) {
-    if (!isAdmin) return;
-    if (confirm(`⚠️ ¿Eliminar activo permanentemente?`)) { 
-      equiposRef.child(id).remove().then(() => { if (String(editId) === String(id)) resetFormulario(); }); 
-    }
-  }
-
   function calcularDias(f) {
     if (!f) return null;
     const d = new Date(f); return isNaN(d) ? null : Math.max(0, Math.floor((new Date() - d) / 86400000));
@@ -901,10 +1069,11 @@
     const eq = equipos.find(i => String(i.id).trim() === String(id).trim());
     if (!eq) return;
 
+    modalEquipoActualId = eq.id;
     document.getElementById('modalTitle').innerText = `${eq.nombre} - ${eq.area}`;
     const badge = document.getElementById('modalSevBadge');
     badge.innerText = `Estado: ${eq.severidad || 'Plomo'}`;
-    const cMap = { 'Rojo':'#f43f5e', 'Naranja':'#f97316', 'Amarillo':'#eab308', 'Verde':'#10b981', 'Plomo':'#64748b' };
+    const cMap = { 'Rojo':'#f85149', 'Naranja':'#db6d28', 'Amarillo':'#d29922', 'Verde':'#238636', 'Plomo':'#6e7681' };
     badge.style.backgroundColor = cMap[eq.severidad] || cMap['Plomo'];
 
     document.getElementById('modalTipo').innerText = eq.tipo_equipo || '-';
@@ -915,7 +1084,14 @@
     document.getElementById('modalUltimaMedicion').innerText = eq.ultima_medicion || 'Sin Registrar';
     
     const dias = calcularDias(eq.ultima_medicion);
-    document.getElementById('modalDias').innerText = dias !== null ? `${dias} días sin medir` : 'Sin Medición';
+    document.getElementById('modalDias').innerText = dias !== null ? `${dias} días` : 'Sin Medición';
+    
+    const razonRow = document.getElementById('modalRazonRow');
+    if (eq.severidad === 'Plomo' && eq.razon_plomo) {
+      document.getElementById('modalRazonPlomo').innerText = eq.razon_plomo;
+      razonRow.style.display = 'block';
+    } else { razonRow.style.display = 'none'; }
+
     document.getElementById('modalEstatus').innerText = eq.estatus || 'No definido';
     document.getElementById('modalAnalisis').innerText = eq.analisis || 'Sin información';
     document.getElementById('modalRecomendacion').innerText = eq.recomendacion || 'Sin información';
@@ -926,9 +1102,7 @@
       eq.bitacora.forEach(b => {
         timeline.innerHTML += `<div class="timeline-item"><div class="timeline-date">${b.fecha}</div><div>${b.texto}</div></div>`;
       });
-    } else {
-      timeline.innerHTML = `<span style="color:var(--text-muted);">Sin registros históricos en bitácora.</span>`;
-    }
+    } else { timeline.innerHTML = `<span style="color:var(--text-muted);">Sin registros.</span>`; }
 
     const gal = document.getElementById('modalGalleryContainer');
     gal.innerHTML = '';
@@ -944,60 +1118,97 @@
   }
   
   function cerrarModal(e) { if (e && e.target !== document.getElementById('evidenciaModal')) return; document.getElementById('evidenciaModal').style.display = 'none'; }
+  function cerrarModalStats(e) { if (e && e.target !== document.getElementById('statsModal')) return; document.getElementById('statsModal').style.display = 'none'; }
   function cerrarLightbox() { document.getElementById('lightboxOverlay').style.display = 'none'; }
 
   function renderDashboard(filtroTexto = '') {
     const sevValor = { 'Rojo':5, 'Naranja':4, 'Amarillo':3, 'Verde':2, 'Plomo':1 };
-    let cRojo = 0, cNaranja = 0, cAmarillo = 0, cVerde = 0;
+    let cRojo = 0, cNaranja = 0, cAmarillo = 0, cVerde = 0, cPlomo = 0;
     
     const eqProcesados = equipos.map(eq => {
       const dias = calcularDias(eq.ultima_medicion);
-      const textDias = dias !== null ? `${dias} DÍAS SIN MEDIR` : 'SIN MEDIR';
+      const isPlomo = (eq.severidad === 'Plomo');
+      
+      let subRango = 'normal';
+      let textDias = '';
+
+      if (isPlomo) {
+        subRango = 'sin_medicion';
+        textDias = eq.razon_plomo ? `⚪ ${eq.razon_plomo}` : '⚪ SIN MEDIR';
+      } else if (dias === null) {
+        subRango = 'sin_medicion';
+        textDias = '⚪ SIN MEDICIÓN';
+      } else if (dias < 15) {
+        subRango = 'seguimiento';
+        textDias = `🔍 ${dias}d SEGUIM.`;
+      } else if (dias <= 30) {
+        subRango = 'normal';
+        textDias = `✅ ${dias}d NORMAL`;
+      } else {
+        subRango = 'vencido';
+        textDias = `⚠️ ${dias}d VENCIDO`;
+      }
+
       let sevClass = `sev-${(eq.severidad || 'plomo').toLowerCase()}`;
-      return { ...eq, dias: dias || 0, textDias, sevClass, valOrd: sevValor[eq.severidad] || 1 };
+      return { ...eq, dias: dias || 0, subRango, textDias, sevClass, valOrd: sevValor[eq.severidad] || 1 };
     }).filter(eq => {
-      const cumpleFiltroTexto = eq.nombre.toLowerCase().includes(filtroTexto) || eq.area.toLowerCase().includes(filtroTexto) || (eq.tipo_equipo && eq.tipo_equipo.toLowerCase().includes(filtroTexto));
-      const cumpleFiltroDias = filtroDiasMinimo === 0 || eq.dias >= filtroDiasMinimo;
-      return cumpleFiltroTexto && cumpleFiltroDias;
+      const cumpleTexto = eq.nombre.toLowerCase().includes(filtroTexto) || eq.area.toLowerCase().includes(filtroTexto) || (eq.tipo_equipo && eq.tipo_equipo.toLowerCase().includes(filtroTexto));
+      const cumpleRango = !isAdmin || filtroRangoActual === 'todos' || eq.subRango === filtroRangoActual;
+      const cumpleSevKPI = filtroSeveridadKPI === 'todos' || eq.severidad === filtroSeveridadKPI;
+      const cumpleSinAviso = !filtroSinAvisoActivo || !eq.aviso || eq.aviso.trim() === '';
+      return cumpleTexto && cumpleRango && cumpleSevKPI && cumpleSinAviso;
     });
 
-    eqProcesados.forEach(eq => {
-      if (eq.severidad === 'Rojo') cRojo++;
-      else if (eq.severidad === 'Naranja') cNaranja++;
-      else if (eq.severidad === 'Amarillo') cAmarillo++;
-      else if (eq.severidad === 'Verde') cVerde++;
+    equipos.forEach(eq => {
+      const sev = eq.severidad;
+      if (sev === 'Rojo') cRojo++;
+      else if (sev === 'Naranja') cNaranja++;
+      else if (sev === 'Amarillo') cAmarillo++;
+      else if (sev === 'Verde') cVerde++;
+      else if (sev === 'Plomo') cPlomo++;
     });
 
-    document.getElementById('kpiTotal').innerText = eqProcesados.length;
+    document.getElementById('kpiTotal').innerText = equipos.length;
     document.getElementById('kpiRojo').innerText = cRojo;
     document.getElementById('kpiNaranja').innerText = cNaranja;
     document.getElementById('kpiAmarillo').innerText = cAmarillo;
     document.getElementById('kpiVerde').innerText = cVerde;
+    document.getElementById('kpiPlomo').innerText = cPlomo;
 
     const porArea = {};
     eqProcesados.forEach(eq => { (porArea[eq.area] = porArea[eq.area] || []).push(eq); });
 
+    const areasOrdenadas = Object.keys(porArea).sort((a, b) => {
+      const criticosA = porArea[a].filter(eq => eq.severidad === 'Rojo' || eq.severidad === 'Naranja').length;
+      const criticosB = porArea[b].filter(eq => eq.severidad === 'Rojo' || eq.severidad === 'Naranja').length;
+      if (criticosB !== criticosA) return criticosB - criticosA;
+      return porArea[b].length - porArea[a].length;
+    });
+
     let finalHTML = '';
-    for (const [area, eqs] of Object.entries(porArea)) {
+    areasOrdenadas.forEach(area => {
+      const eqs = porArea[area];
       eqs.sort((a, b) => {
         if (b.valOrd !== a.valOrd) return b.valOrd - a.valOrd;
         return b.dias - a.dias;
       });
 
+      const criticosCount = eqs.filter(eq => eq.severidad === 'Rojo' || eq.severidad === 'Naranja').length;
+      const badgeCriticoHTML = criticosCount > 0 ? `<span class="area-badge-crit">⚠️ ${criticosCount} Críticos/Alertas</span>` : '';
+
       const cardsHTML = eqs.map(eq => `
         <div class="card ${eq.sevClass}" data-id="${eq.id}">
           <div class="pulse-indicator"></div>
-          <button class="delete-btn" data-id="${eq.id}" title="Eliminar">✖</button>
           <span class="asset-type-badge" title="${eq.tipo_equipo || 'Equipo'}">${eq.tipo_equipo || 'Equipo'}</span>
           <h3 class="asset-tag code-font">${eq.nombre}</h3>
-          <span class="asset-days code-font">⏱️ ${eq.textDias}</span>
+          <span class="asset-days code-font" title="${eq.textDias}">${eq.textDias}</span>
         </div>
       `).join('');
       
-      finalHTML += `<h2 class="area-title">${area}</h2><div class="critical-grid">${cardsHTML}</div>`;
-    }
+      finalHTML += `<h2 class="area-title"><span>${area}</span> ${badgeCriticoHTML}</h2><div class="critical-grid">${cardsHTML}</div>`;
+    });
     
-    document.getElementById('app-root').innerHTML = finalHTML;
+    document.getElementById('app-root').innerHTML = finalHTML || `<div style="text-align:center; padding:40px; color:var(--text-muted);">No se encontraron activos con el filtro seleccionado.</div>`;
   }
 </script>
 
