@@ -133,7 +133,6 @@
   .area-title { color: var(--text-main); font-size: 1rem; border-left: 3px solid var(--accent-color); padding-left: 8px; margin: 18px 0 8px 0; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 800; background: var(--bg-panel); padding-top: 6px; padding-bottom: 6px; border-radius: 0 4px 4px 0; border-top: 1px solid var(--border-card); border-right: 1px solid var(--border-card); border-bottom: 1px solid var(--border-card); display: flex; justify-content: space-between; align-items: center; }
   .area-badge-crit { font-size: 0.7rem; background: rgba(248, 81, 73, 0.2); color: #f85149; padding: 2px 8px; border-radius: 3px; border: 1px solid #f85149; font-family: 'Share Tech Mono', monospace; }
 
-  /* Rediseño de Tarjetas en Matriz: Círculos / Mini-píldoras industriales de alta densidad */
   .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 6px; }
   
   @keyframes pulseRojo {
@@ -178,7 +177,9 @@
   .asset-days { display: none; font-size: 0.45rem; font-weight: 700; margin-top: 2px; padding: 1px 3px; border-radius: 3px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; max-width: 85px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   body.admin-mode .asset-days { display: block; }
 
-  /* Animación de pulso para pines en el mapa */
+  /* Indicador Visual de Presencia / Edición Simultánea */
+  .edit-lock-badge { position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); font-size: 0.42rem; background: #f85149; color: white; padding: 1px 4px; border-radius: 3px; font-weight: 800; z-index: 3; white-space: nowrap; box-shadow: 0 0 5px rgba(248,81,73,0.8); animation: pulseRojo 1.5s infinite; }
+
   .map-pin-rojo { background-color: #f85149; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; animation: pulseRojo 2s infinite; box-shadow: 0 0 10px #f85149; }
   .map-pin-naranja { background-color: #db6d28; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; animation: pulseNaranja 3s infinite; box-shadow: 0 0 10px #db6d28; }
   .map-pin-amarillo { background-color: #d29922; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 8px #d29922; }
@@ -192,7 +193,7 @@
   }
   .pin-blink-radar { animation: radarBlink 1.5s infinite; background-color: #f85149; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #fff; }
 
-  /* Modales a Pantalla Completa (Full-Screen Immersive UI) */
+  /* Modales a Pantalla Completa */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
   .modal-content { background: var(--bg-modal); padding: 30px; border-radius: 8px; border: 1px solid var(--accent-color); width: 100%; max-width: 1100px; height: 92vh; overflow-y: auto; position: relative; box-shadow: 0 12px 40px var(--shadow-color); display: flex; flex-direction: column; gap: 16px; }
   .modal-close { position: absolute; top: 15px; right: 25px; color: var(--text-muted); font-size: 2rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
@@ -228,7 +229,6 @@
   .bar-container { width: 100%; background: rgba(255,255,255,0.06); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
   .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
 
-  /* Estilos para Múltiples Avisos en Ficha */
   .aviso-item-box { background: var(--bg-panel); border: 1px solid var(--border-card); padding: 12px; border-radius: 6px; margin-bottom: 10px; position: relative; }
   .aviso-item-box h4 { margin: 0 0 8px 0; font-size: 0.75rem; color: var(--accent-color); text-transform: uppercase; font-weight: 800; }
   .btn-remove-aviso { position: absolute; top: 8px; right: 10px; background: #f85149; color: white; border: none; border-radius: 3px; padding: 2px 6px; font-size: 0.65rem; cursor: pointer; font-weight: bold; }
@@ -242,8 +242,6 @@
     width: 100%; padding: 8px 10px; border-radius: 4px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; box-sizing: border-box; font-family: inherit;
     resize: vertical; overflow-y: hidden; min-height: 50px; line-height: 1.4;
   }
-
-  body.light-mode .admin-panel input, body.light-mode .admin-panel textarea, body.light-mode .admin-panel select, body.light-mode .search-input { color: #1f2328; font-weight: 600; } 
 </style>
 </head>
 <body>
@@ -301,7 +299,6 @@
 
 <!-- BARRA DE CONTROLES -->
 <div class="header-controls">
-  <!-- Línea 1: Filtros Avanzados (Solo Administrador) -->
   <div class="controls-row admin-only-row">
     <button class="filter-chip active" onclick="filtrarRango('todos', this)">Todos</button>
     <button class="filter-chip" onclick="filtrarRango('seguimiento', this)">🔍 Seguimiento (<15d)</button>
@@ -310,7 +307,6 @@
     <button class="filter-chip" onclick="filtrarRango('sin_medicion', this)">⚪ Sin Medir / Plomos</button>
     <button class="filter-chip" onclick="filtrarSinAviso(this)" style="border-color:#f85149; color:#f85149;">🚨 Sin Aviso SAP</button>
   </div>
-  <!-- Línea 2: Pantalla Principal Limpia para Operadores -->
   <div class="controls-row">
     <div style="flex-grow: 1; max-width: 280px;">
       <input type="text" id="buscador" class="search-input code-font" placeholder="🔍 Filtrar por Tag o Área..." onkeyup="ejecutarBusqueda()">
@@ -361,7 +357,7 @@
 <div id="dashboard-view"><div id="app-root"></div></div>
 
 <div id="map-view">
-  <div class="map-instruction">📍 <b>Modo Admin:</b> Clic en el mapa para capturar coordenadas geográficas para el activo en edición (Zoom satelital estable optimizado).</div>
+  <div class="map-instruction">📍 <b>Modo Admin:</b> Clic en el mapa para capturar coordenadas geográficas para el activo en edición (Sincronización multiusuario activa).</div>
   <div id="map-container"></div>
 </div>
 
@@ -539,6 +535,7 @@
         document.getElementById('timerCountdown').innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
         if (timeLeft <= 0) {
           isAdmin = false;
+          liberarBloqueoActual();
           document.body.classList.remove('admin-mode');
           document.getElementById('btnUnlock').innerText = "👤 Usuario";
           timeLeft = 15 * 60;
@@ -813,6 +810,11 @@
       if (!eqTarget) return;
 
       if (isAdmin) {
+        if (eqTarget.en_edicion) {
+          if (!confirm(`⚠️ Este activo (${eqTarget.nombre}) ya está siendo editado por otro operador. ¿Desea abrirlo de todos modos?`)) {
+            return;
+          }
+        }
         abrirFichaEdicion(eqTarget);
       } else {
         abrirModal(eqTarget.id);
@@ -832,8 +834,19 @@
     }
   });
 
+  function liberarBloqueoActual() {
+    if (currentEditingId) {
+      equiposRef.child(currentEditingId).update({ en_edicion: false });
+    }
+  }
+
   function abrirFichaEdicion(eq) {
+    liberarBloqueoActual(); // Liberar activo anterior si existía
     currentEditingId = eq.id;
+    
+    // Marcar en tiempo real en Firebase que este activo está siendo editado
+    equiposRef.child(eq.id).update({ en_edicion: true });
+
     imagenesBase64Temp = eq.imagenes || [];
     document.getElementById('editModalHeaderTitle').innerText = `✏️ Ficha Técnica Activo: ${eq.nombre}`;
     document.getElementById('btnDeleteAssetModal').style.display = 'inline-block';
@@ -864,6 +877,7 @@
   }
 
   function abrirModalCrearActivo() {
+    liberarBloqueoActual();
     currentEditingId = null;
     imagenesBase64Temp = [];
     localStorage.removeItem('cio_draft_activo');
@@ -912,6 +926,8 @@
 
   function cerrarModalEdicion(e) {
     if (e && e.target !== document.getElementById('editAssetModal')) return;
+    liberarBloqueoActual();
+    currentEditingId = null;
     document.getElementById('editAssetModal').style.display = 'none';
   }
 
@@ -966,12 +982,14 @@
       analisis: avisosList.length > 0 ? avisosList[0].analisis : '',
       recomendacion: avisosList.length > 0 ? avisosList[0].recomendacion : '',
       bitacora: nuevaBitacora,
-      imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : [])
+      imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : []),
+      en_edicion: false // Liberar flag al guardar
     };
 
     equiposRef.child(eqId).set(eqData).then(() => {
       localStorage.removeItem('cio_draft_activo');
-      alert(`✅ ¡ÉXITO! Los cambios para ${nombre} con ${avisosList.length} aviso(s) asociado(s) han sido guardados.`);
+      currentEditingId = null;
+      alert(`✅ ¡ÉXITO! Los cambios para ${nombre} han sido guardados.`);
       document.getElementById('editAssetModal').style.display = 'none';
     }).catch(err => alert("❌ Error al persistir en Firebase: " + err.message));
   }
@@ -981,6 +999,7 @@
     if (confirm("⚠️ ¿Eliminar permanentemente este activo de la base de datos?")) {
       equiposRef.child(currentEditingId).remove().then(() => {
         localStorage.removeItem('cio_draft_activo');
+        currentEditingId = null;
         alert("🗑️ Activo eliminado correctamente.");
         document.getElementById('editAssetModal').style.display = 'none';
       });
@@ -1069,7 +1088,6 @@
   }
 
   function initMap() {
-    // Mapa satelital optimizado y estable con zoom máximo de 19 para evitar pantallas blancas en desierto
     map = L.map('map-container', { maxZoom: 19 }).setView([-28.2876, -70.8130], 15);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19,
@@ -1095,15 +1113,7 @@
     if (!map) return;
     markersLayer.clearLayers();
     mapMarkersObj = {}; 
-    
-    // Mapeo de clases con animación idéntica a las tarjetas de la matriz
-    const classMap = {
-      'Rojo': 'map-pin-rojo',
-      'Naranja': 'map-pin-naranja',
-      'Amarillo': 'map-pin-amarillo',
-      'Verde': 'map-pin-verde',
-      'Plomo': 'map-pin-plomo'
-    };
+    const classMap = { 'Rojo': 'map-pin-rojo', 'Naranja': 'map-pin-naranja', 'Amarillo': 'map-pin-amarillo', 'Verde': 'map-pin-verde', 'Plomo': 'map-pin-plomo' };
 
     eqList.forEach(eq => {
       if (eq.lat && eq.lng) {
@@ -1115,7 +1125,7 @@
         });
         const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon });
         marker.on('click', () => abrirModal(eq.id));
-        marker.bindPopup(`<b>${eq.nombre}</b><br>${eq.area}<br>Estado: <b>${eq.severidad}</b>`);
+        marker.bindPopup(`<b>${eq.nombre}</b><br>${eq.area}<br>Estado: <b>${eq.severidad}</b>${eq.en_edicion ? '<br><span style="color:#f85149; font-weight:bold;">🔒 En Edición</span>' : ''}`);
         markersLayer.addLayer(marker);
         mapMarkersObj[eq.id] = marker; 
       }
@@ -1140,6 +1150,7 @@
 
   function solicitarClave() {
     if (isAdmin) {
+      liberarBloqueoActual();
       document.body.classList.remove('admin-mode');
       document.getElementById('btnUnlock').innerText = "👤 Usuario";
       isAdmin = false; 
@@ -1327,14 +1338,18 @@
       const criticosCount = eqs.filter(eq => eq.severidad === 'Rojo' || eq.severidad === 'Naranja').length;
       const badgeCriticoHTML = criticosCount > 0 ? `<span class="area-badge-crit">⚠️ ${criticosCount} Críticos/Alertas</span>` : '';
 
-      const cardsHTML = eqs.map(eq => `
-        <div class="card ${eq.sevClass}" data-id="${eq.id}">
-          <div class="pulse-indicator"></div>
-          <span class="asset-type-badge" title="${eq.tipo_equipo || 'Equipo'}">${eq.tipo_equipo || 'Equipo'}</span>
-          <h3 class="asset-tag code-font" title="${eq.nombre}">${eq.nombre}</h3>
-          <span class="asset-days code-font" title="${eq.textDias}">${eq.textDias}</span>
-        </div>
-      `).join('');
+      const cardsHTML = eqs.map(eq => {
+        const editBadge = eq.en_edicion ? `<div class="edit-lock-badge">🔒 En Edición</div>` : '';
+        return `
+          <div class="card ${eq.sevClass}" data-id="${eq.id}">
+            <div class="pulse-indicator"></div>
+            <span class="asset-type-badge" title="${eq.tipo_equipo || 'Equipo'}">${eq.tipo_equipo || 'Equipo'}</span>
+            <h3 class="asset-tag code-font" title="${eq.nombre}">${eq.nombre}</h3>
+            <span class="asset-days code-font" title="${eq.textDias}">${eq.textDias}</span>
+            ${editBadge}
+          </div>
+        `;
+      }).join('');
       
       finalHTML += `<h2 class="area-title"><span>${area}</span> ${badgeCriticoHTML}</h2><div class="critical-grid">${cardsHTML}</div>`;
     });
