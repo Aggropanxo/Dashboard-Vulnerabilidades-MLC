@@ -133,7 +133,8 @@
   .area-title { color: var(--text-main); font-size: 1rem; border-left: 3px solid var(--accent-color); padding-left: 8px; margin: 18px 0 8px 0; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 800; background: var(--bg-panel); padding-top: 6px; padding-bottom: 6px; border-radius: 0 4px 4px 0; border-top: 1px solid var(--border-card); border-right: 1px solid var(--border-card); border-bottom: 1px solid var(--border-card); display: flex; justify-content: space-between; align-items: center; }
   .area-badge-crit { font-size: 0.7rem; background: rgba(248, 81, 73, 0.2); color: #f85149; padding: 2px 8px; border-radius: 3px; border: 1px solid #f85149; font-family: 'Share Tech Mono', monospace; }
 
-  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+  /* Rediseño de Tarjetas en Matriz: Círculos / Mini-píldoras industriales de alta densidad */
+  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 6px; }
   
   @keyframes pulseRojo {
     0% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.6); }
@@ -148,13 +149,13 @@
   }
 
   .card { 
-    background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 4px; padding: 8px 4px; 
+    background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 50px; padding: 6px 4px; 
     position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; 
-    min-height: 58px; transition: all 0.2s; box-shadow: 0 1px 2px var(--shadow-color);
+    min-height: 48px; transition: all 0.2s; box-shadow: 0 1px 2px var(--shadow-color);
   }
   .card:hover { border-color: var(--accent-color); background-color: var(--btn-hover); transform: translateY(-2px); }
 
-  body.admin-mode .card { min-height: 74px; padding: 10px 4px; }
+  body.admin-mode .card { min-height: 62px; padding: 8px 4px; border-radius: 12px; }
   
   .sev-rojo { border-left: 4px solid #f85149; background: rgba(248, 81, 73, 0.12); animation: pulseRojo 2s infinite; }
   .sev-naranja { border-left: 4px solid #db6d28; background: rgba(219, 109, 40, 0.1); animation: pulseNaranja 3s infinite; }
@@ -162,17 +163,19 @@
   .sev-verde { border-left: 4px solid #238636; }
   .sev-plomo { border-left: 4px solid #6e7681; }
 
-  .pulse-indicator { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; }
+  .pulse-indicator { position: absolute; top: 3px; right: 6px; width: 5px; height: 5px; border-radius: 50%; }
   .sev-rojo .pulse-indicator { background-color: #f85149; box-shadow: 0 0 6px #f85149; }
   .sev-naranja .pulse-indicator { background-color: #db6d28; }
   .sev-amarillo .pulse-indicator { background-color: #d29922; }
   .sev-verde .pulse-indicator { background-color: #238636; }
   .sev-plomo .pulse-indicator { background-color: #6e7681; }
   
-  .asset-type-badge { font-size: 0.54rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 1px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 115px; }
-  .asset-tag { color: var(--text-main); font-size: 0.86rem; font-weight: 800; margin: 0; letter-spacing: 0.4px; z-index: 2; white-space: normal; word-break: break-word; line-height: 1.15; max-width: 115px; }
+  .asset-type-badge { font-size: 0.48rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 0px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 85px; display: none; }
+  body.admin-mode .asset-type-badge { display: block; }
+
+  .asset-tag { color: var(--text-main); font-size: 0.78rem; font-weight: 800; margin: 0; letter-spacing: 0.3px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1; max-width: 85px; }
   
-  .asset-days { display: none; font-size: 0.50rem; font-weight: 700; margin-top: 4px; padding: 2px 4px; border-radius: 3px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; max-width: 115px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .asset-days { display: none; font-size: 0.45rem; font-weight: 700; margin-top: 2px; padding: 1px 3px; border-radius: 3px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; max-width: 85px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   body.admin-mode .asset-days { display: block; }
 
   @keyframes radarBlink {
@@ -351,7 +354,7 @@
 <div id="dashboard-view"><div id="app-root"></div></div>
 
 <div id="map-view">
-  <div class="map-instruction">📍 <b>Modo Admin:</b> Clic en el mapa para capturar coordenadas geográficas para el activo en edición.</div>
+  <div class="map-instruction">📍 <b>Modo Admin:</b> Clic en el mapa para capturar coordenadas geográficas para el activo en edición (Zoom profesional habilitado con alta resolución satelital ESRI).</div>
   <div id="map-container"></div>
 </div>
 
@@ -698,7 +701,6 @@
     } catch(e) { document.getElementById('valClima').innerText = 'Vallenar: 21°C'; }
   }
   
-  // Ejecutar actualización inicial del banner y programar refresco automático cada 10 minutos
   actualizarBannerEnVivo();
   setInterval(() => {
     actualizarBannerEnVivo();
@@ -886,7 +888,7 @@
     cambiarVista('map');
 
     if (!isNaN(latAct) && !isNaN(lngAct)) {
-      map.setView([latAct, lngAct], 17);
+      map.setView([latAct, lngAct], 18);
       if (blinkMarker) markersLayer.removeLayer(blinkMarker);
       
       const blinkIcon = L.divIcon({
@@ -1060,8 +1062,14 @@
   }
 
   function initMap() {
-    map = L.map('map-container').setView([-28.2876, -70.8130], 14);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(map);
+    // Mapa mejorado con Esri World Imagery (Permite un zoom ultra profundo y nítido para minería)
+    map = L.map('map-container', { maxZoom: 22 }).setView([-28.2876, -70.8130], 15);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 22,
+      maxNativeZoom: 19,
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    }).addTo(map);
+
     markersLayer.addTo(map);
     map.on('click', function(e) {
       tempLat = e.latlng.lat; tempLng = e.latlng.lng;
@@ -1088,8 +1096,8 @@
         let color = cMap[eq.severidad] || '#6e7681';
         const icon = L.divIcon({
           className: 'custom-map-marker',
-          html: `<div style="background-color: ${color}; width:18px; height:18px; border-radius:4px; border:2px solid #fff; box-shadow: 0 0 8px ${color};"></div>`,
-          iconSize: [18, 18]
+          html: `<div style="background-color: ${color}; width:16px; height:16px; border-radius:50%; border:2px solid #fff; box-shadow: 0 0 10px ${color};"></div>`,
+          iconSize: [16, 16]
         });
         const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon });
         marker.on('click', () => abrirModal(eq.id));
@@ -1109,7 +1117,7 @@
     if (eq && eq.lat && eq.lng) {
       setTimeout(() => {
         if (map) {
-          map.flyTo([parseFloat(eq.lat), parseFloat(eq.lng)], 18, { duration: 1.5 });
+          map.flyTo([parseFloat(eq.lat), parseFloat(eq.lng)], 19, { duration: 1.5 });
           if (mapMarkersObj[eq.id]) mapMarkersObj[eq.id].openPopup();
         }
       }, 300);
@@ -1249,13 +1257,13 @@
         textDias = '⚪ SIN MEDICIÓN';
       } else if (dias < 15) {
         subRango = 'seguimiento';
-        textDias = `🔍 ${dias}d SEGUIM.`;
+        textDias = `🔍 ${dias}d`;
       } else if (dias <= 30) {
         subRango = 'normal';
-        textDias = `✅ ${dias}d NORMAL`;
+        textDias = `✅ ${dias}d`;
       } else {
         subRango = 'vencido';
-        textDias = `⚠️ ${dias}d VENCIDO`;
+        textDias = `⚠️ ${dias}d`;
       }
 
       let sevClass = `sev-${(eq.severidad || 'plomo').toLowerCase()}`;
@@ -1309,7 +1317,7 @@
         <div class="card ${eq.sevClass}" data-id="${eq.id}">
           <div class="pulse-indicator"></div>
           <span class="asset-type-badge" title="${eq.tipo_equipo || 'Equipo'}">${eq.tipo_equipo || 'Equipo'}</span>
-          <h3 class="asset-tag code-font">${eq.nombre}</h3>
+          <h3 class="asset-tag code-font" title="${eq.nombre}">${eq.nombre}</h3>
           <span class="asset-days code-font" title="${eq.textDias}">${eq.textDias}</span>
         </div>
       `).join('');
@@ -1317,7 +1325,7 @@
       finalHTML += `<h2 class="area-title"><span>${area}</span> ${badgeCriticoHTML}</h2><div class="critical-grid">${cardsHTML}</div>`;
     });
     
-    document.getElementById('app-root').innerHTML = finalHTML || `<div style="text-align:center; padding:40px; color:var(--text-muted);">No se encontraron activos con el filtro seleccionado.</div>`;
+    document.getElementById('app-root').innerHTML = finalHTML || `<div style="text-align:center; padding:40px; color:var(--text-muted);">No se encontraron activos con el filtro seleccionado.`.replace();
   }
 </script>
 
