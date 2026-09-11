@@ -697,7 +697,12 @@
       valor.innerText = `Vallenar: ${temp}°C`;
     } catch(e) { document.getElementById('valClima').innerText = 'Vallenar: 21°C'; }
   }
+  
+  // Ejecutar actualización inicial del banner y programar refresco automático cada 10 minutos
   actualizarBannerEnVivo();
+  setInterval(() => {
+    actualizarBannerEnVivo();
+  }, 10 * 60 * 1000);
 
   function toggleTheme() {
     const body = document.body;
@@ -1174,7 +1179,6 @@
       razonRow.style.display = 'block';
     } else { razonRow.style.display = 'none'; }
 
-    // Renderizar múltiples avisos en el modal de pantalla completa
     const avisosContainer = document.getElementById('modalAvisosContainer');
     avisosContainer.innerHTML = '';
     let listaAvisos = eq.avisos || [];
