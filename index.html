@@ -92,11 +92,13 @@
   .btn-report { background: #238636 !important; color: white !important; border-color: #2ea043 !important; display: none; }
   .btn-stats { background: #8250df !important; color: white !important; border-color: #8957e5 !important; display: none; }
   .btn-pdf { background: #da3633 !important; color: white !important; border-color: #f85149 !important; display: none; }
+  .btn-excel { background: #1f6feb !important; color: white !important; display: none; font-weight: 800 !important; }
   .btn-create-asset { background: #238636 !important; color: white !important; display: none; font-weight: 800 !important; }
 
   body.admin-mode .btn-report { display: inline-block; }
   body.admin-mode .btn-stats { display: inline-block; }
   body.admin-mode .btn-pdf { display: inline-block; }
+  body.admin-mode .btn-excel { display: inline-block; }
   body.admin-mode .btn-create-asset { display: inline-block; }
 
   .session-timer { display: none; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: #f85149; background: rgba(248, 81, 73, 0.1); border: 1px solid rgba(248, 81, 73, 0.3); padding: 4px 8px; border-radius: 4px; align-items: center; gap: 5px; }
@@ -133,28 +135,35 @@
 
   .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
   
-  /* Tarjetas compactas por defecto para Usuario/Jefatura */
+  @keyframes pulseRojo {
+    0% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.6); }
+    70% { box-shadow: 0 0 0 8px rgba(248, 81, 73, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0); }
+  }
+
+  @keyframes pulseNaranja {
+    0% { box-shadow: 0 0 0 0 rgba(219, 109, 40, 0.6); }
+    70% { box-shadow: 0 0 0 8px rgba(219, 109, 40, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(219, 109, 40, 0); }
+  }
+
   .card { 
     background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 4px; padding: 8px 4px; 
     position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; 
     min-height: 58px; transition: all 0.2s; box-shadow: 0 1px 2px var(--shadow-color);
   }
-  .card:hover { border-color: var(--accent-color); background-color: var(--btn-hover); }
+  .card:hover { border-color: var(--accent-color); background-color: var(--btn-hover); transform: translateY(-2px); }
 
-  /* En Modo Admin, las tarjetas se expanden ligeramente para mostrar los días */
-  body.admin-mode .card {
-    min-height: 74px;
-    padding: 10px 4px;
-  }
+  body.admin-mode .card { min-height: 74px; padding: 10px 4px; }
   
-  .sev-rojo { border-left: 4px solid #f85149; background: rgba(248, 81, 73, 0.08); }
-  .sev-naranja { border-left: 4px solid #db6d28; background: rgba(219, 109, 40, 0.08); }
+  .sev-rojo { border-left: 4px solid #f85149; background: rgba(248, 81, 73, 0.12); animation: pulseRojo 2s infinite; }
+  .sev-naranja { border-left: 4px solid #db6d28; background: rgba(219, 109, 40, 0.1); animation: pulseNaranja 3s infinite; }
   .sev-amarillo { border-left: 4px solid #d29922; background: rgba(210, 153, 34, 0.06); }
   .sev-verde { border-left: 4px solid #238636; }
   .sev-plomo { border-left: 4px solid #6e7681; }
 
   .pulse-indicator { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; }
-  .sev-rojo .pulse-indicator { background-color: #f85149; }
+  .sev-rojo .pulse-indicator { background-color: #f85149; box-shadow: 0 0 6px #f85149; }
   .sev-naranja .pulse-indicator { background-color: #db6d28; }
   .sev-amarillo .pulse-indicator { background-color: #d29922; }
   .sev-verde .pulse-indicator { background-color: #238636; }
@@ -163,7 +172,6 @@
   .asset-type-badge { font-size: 0.54rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 1px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 115px; }
   .asset-tag { color: var(--text-main); font-size: 0.86rem; font-weight: 800; margin: 0; letter-spacing: 0.4px; z-index: 2; white-space: normal; word-break: break-word; line-height: 1.15; max-width: 115px; }
   
-  /* Los días solo se muestran al activar el Modo Admin */
   .asset-days { display: none; font-size: 0.50rem; font-weight: 700; margin-top: 4px; padding: 2px 4px; border-radius: 3px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; max-width: 115px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   body.admin-mode .asset-days { display: block; }
 
@@ -176,7 +184,7 @@
 
   /* Modales */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 2000; justify-content: center; align-items: center; }
-  .modal-content { background: var(--bg-modal); padding: 22px; border-radius: 6px; border: 1px solid var(--border-card); width: 95%; max-width: 750px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 8px 24px var(--shadow-color); }
+  .modal-content { background: var(--bg-modal); padding: 22px; border-radius: 6px; border: 1px solid var(--border-card); width: 95%; max-width: 800px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 8px 24px var(--shadow-color); }
   .modal-close { position: absolute; top: 10px; right: 15px; color: var(--text-muted); font-size: 1.5rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
   .modal-close:hover { color: #f85149; }
   
@@ -210,6 +218,11 @@
   .bar-container { width: 100%; background: rgba(255,255,255,0.06); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
   .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
 
+  /* Estilos para Múltiples Avisos en Ficha */
+  .aviso-item-box { background: var(--bg-panel); border: 1px solid var(--border-card); padding: 12px; border-radius: 6px; margin-bottom: 10px; position: relative; }
+  .aviso-item-box h4 { margin: 0 0 8px 0; font-size: 0.75rem; color: var(--accent-color); text-transform: uppercase; font-weight: 800; }
+  .btn-remove-aviso { position: absolute; top: 8px; right: 10px; background: #f85149; color: white; border: none; border-radius: 3px; padding: 2px 6px; font-size: 0.65rem; cursor: pointer; font-weight: bold; }
+
   .edit-form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .edit-form-grid .full { grid-column: span 2; }
   .edit-form-grid label { font-size: 0.65rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 3px; }
@@ -217,7 +230,7 @@
   
   .edit-form-grid textarea {
     width: 100%; padding: 8px 10px; border-radius: 4px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); font-size: 0.85rem; box-sizing: border-box; font-family: inherit;
-    resize: vertical; overflow-y: hidden; min-height: 60px; line-height: 1.4;
+    resize: vertical; overflow-y: hidden; min-height: 50px; line-height: 1.4;
   }
 
   body.light-mode .admin-panel input, body.light-mode .admin-panel textarea, body.light-mode .admin-panel select, body.light-mode .search-input { color: #1f2328; font-weight: 600; } 
@@ -287,7 +300,7 @@
     <button class="filter-chip" onclick="filtrarRango('sin_medicion', this)">⚪ Sin Medir / Plomos</button>
     <button class="filter-chip" onclick="filtrarSinAviso(this)" style="border-color:#f85149; color:#f85149;">🚨 Sin Aviso SAP</button>
   </div>
-  <!-- Línea 2: Pantalla Principal Limpia -->
+  <!-- Línea 2: Pantalla Principal Limpia para Operadores -->
   <div class="controls-row">
     <div style="flex-grow: 1; max-width: 280px;">
       <input type="text" id="buscador" class="search-input code-font" placeholder="🔍 Filtrar por Tag o Área..." onkeyup="ejecutarBusqueda()">
@@ -295,6 +308,7 @@
     <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
       <div id="sessionTimerBadge" class="session-timer">⏱️ <span id="timerCountdown">15:00</span></div>
       <button class="btn-create-asset" onclick="abrirModalCrearActivo()">➕ Crear Activo</button>
+      <button class="btn-excel" onclick="exportarHistorialExcel()">📥 Excel Historial</button>
       <button id="btnViewMap" class="view-btn btn-map-protagonist" onclick="cambiarVista('map')">🗺️ MAPA</button>
       <button id="btnViewGrid" class="view-btn active" onclick="cambiarVista('grid')">📋 Matriz</button>
       <button class="btn-stats" onclick="abrirModalEstadisticas()">📊 Analítica</button>
@@ -343,7 +357,7 @@
 
 <!-- MODAL DE EDICIÓN / CREACIÓN DEDICADA PARA ADMINISTRADOR -->
 <div id="editAssetModal" class="modal-overlay" onclick="cerrarModalEdicion(event)">
-  <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 680px;">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 750px;">
     <button class="modal-close" onclick="cerrarModalEdicion()">&times;</button>
     <div class="modal-header-flex">
       <h2 id="editModalHeaderTitle" class="modal-title code-font">Ficha Técnica Activo</h2>
@@ -352,19 +366,19 @@
     <div class="edit-form-grid">
       <div>
         <label>Área Operacional</label>
-        <input type="text" id="modalInArea" placeholder="ej. Área 61">
+        <input type="text" id="modalInArea" placeholder="ej. Área 61" oninput="guardarBorradorAutomatico()">
       </div>
       <div>
         <label>N° Tag / Equipo</label>
-        <input type="text" id="modalInNombre" class="code-font" placeholder="ej. MH27152">
+        <input type="text" id="modalInNombre" class="code-font" placeholder="ej. MH27152" oninput="guardarBorradorAutomatico()">
       </div>
       <div>
         <label>Tipo de Equipo</label>
-        <input type="text" id="modalInTipo" placeholder="ej. Transportador">
+        <input type="text" id="modalInTipo" placeholder="ej. Transportador" oninput="guardarBorradorAutomatico()">
       </div>
       <div>
         <label>Severidad (Color)</label>
-        <select id="modalInSeveridad" onchange="verificarRazonModalPlomo()">
+        <select id="modalInSeveridad" onchange="verificarRazonModalPlomo(); guardarBorradorAutomatico();">
           <option value="Rojo">🔴 Rojo (Crítico / Acción Inmediata)</option>
           <option value="Naranja">🟠 Naranja (Alerta / Precaución)</option>
           <option value="Amarillo">🟡 Amarillo (Monitoreo)</option>
@@ -374,53 +388,32 @@
       </div>
       <div class="full" id="modalGrupoRazonPlomo" style="display:none;">
         <label style="color:#f85149;">Razón de por qué no se mide</label>
-        <input type="text" id="modalInRazonPlomo" placeholder="ej. En Overhaul, Fuera de servicio...">
-      </div>
-      <div>
-        <label>Componente</label>
-        <input type="text" id="modalInComponente" placeholder="ej. Descanso Libre">
-      </div>
-      <div>
-        <label>Aviso SAP</label>
-        <input type="text" id="modalInAviso">
-      </div>
-      <div>
-        <label>OM SAP</label>
-        <input type="text" id="modalInOm">
+        <input type="text" id="modalInRazonPlomo" placeholder="ej. En Overhaul, Fuera de servicio..." oninput="guardarBorradorAutomatico()">
       </div>
       <div>
         <label>Última Medición</label>
-        <input type="date" id="modalInUltimaMedicion">
+        <input type="date" id="modalInUltimaMedicion" oninput="guardarBorradorAutomatico()">
       </div>
       <div>
-        <label>Latitud (Georreferencia)</label>
-        <input type="text" id="modalInLat" class="code-font" placeholder="-28.2876">
-      </div>
-      <div>
-        <label>Longitud (Georreferencia)</label>
-        <input type="text" id="modalInLng" class="code-font" placeholder="-70.8130">
+        <label>Lat / Lng (Georreferencia)</label>
+        <div style="display: flex; gap: 4px;">
+          <input type="text" id="modalInLat" class="code-font" placeholder="Lat" oninput="guardarBorradorAutomatico()">
+          <input type="text" id="modalInLng" class="code-font" placeholder="Lng" oninput="guardarBorradorAutomatico()">
+        </div>
       </div>
       <div class="full">
         <button type="button" class="btn-map-jump" onclick="activarSelectorPinMapa()">📍 Seleccionar Coordenada Directa en Mapa (Con Pin Parpadeante)</button>
       </div>
-      <div class="full">
-        <label>Estatus Logístico</label>
-        <input type="text" id="modalInEstatus" placeholder="ej. En bodega a la espera de detención...">
+
+      <!-- SECCIÓN DE MÚLTIPLES AVISOS Y COMPONENTES -->
+      <div class="full" style="border-top: 1px solid var(--border-card); padding-top: 12px; margin-top: 5px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label style="color: var(--accent-color); font-size: 0.75rem; font-weight: 800;">⚡ Gestión de Múltiples Avisos (Motor, Reductor, Poleas, etc.)</label>
+          <button type="button" class="btn-upload" onclick="agregarNuevoAvisoForm()" style="padding: 3px 8px; font-size: 0.65rem;">+ Agregar Aviso / Componente</button>
+        </div>
+        <div id="containerAvisosDinamicos"></div>
       </div>
-      <div class="full">
-        <label>
-          Análisis Técnico (Experto ISO Cat. IV en Vibraciones)
-          <button type="button" class="btn-ai" onclick="generarAnalisisIADedicada()" style="padding: 2px 8px; font-size: 0.6rem;">✨ Redactar con IA Experta</button>
-        </label>
-        <textarea id="modalInAnalisis" placeholder="Diagnóstico espectral y causa raíz..." oninput="autoExpand(this)"></textarea>
-      </div>
-      <div class="full">
-        <label>
-          Recomendación / Acción (Concreta y Clara)
-          <button type="button" class="btn-ai" onclick="generarRecomendacionIADedicada()" style="padding: 2px 8px; font-size: 0.6rem;">✨ Redactar con IA Experta</button>
-        </label>
-        <textarea id="modalInRecomendacion" placeholder="Acción correctiva inmediata..." oninput="autoExpand(this)"></textarea>
-      </div>
+
       <div class="full">
         <label>Subir Fotografías y Evidencias</label>
         <input type="file" id="modalInImagenesFiles" accept="image/*" multiple>
@@ -474,25 +467,24 @@
     </div>
     <div class="modal-grid">
       <div><span class="modal-label">Tipo Equipo</span><span id="modalTipo" class="modal-value accent-text"></span></div>
-      <div><span class="modal-label">Componente</span><span id="modalComponente" class="modal-value"></span></div>
-      <div><span class="modal-label">Aviso SAP</span><span id="modalAviso" class="modal-value code-font"></span></div>
-      <div><span class="modal-label">OM SAP</span><span id="modalOm" class="modal-value code-font"></span></div>
-      <div><span class="modal-label">Fecha Hallazgo</span><span id="modalFecha" class="modal-value"></span></div>
       <div><span class="modal-label">Última Medición</span><span id="modalUltimaMedicion" class="modal-value"></span></div>
       <div><span class="modal-label">Estado Medición</span><span id="modalDias" class="modal-value accent-text"></span></div>
     </div>
+    
     <div class="modal-data-row" id="modalRazonRow" style="display:none; border-left: 4px solid #f85149;">
       <span class="modal-label" style="color:#f85149;">Razón de por qué no se mide</span>
       <span id="modalRazonPlomo" class="modal-value" style="font-weight: 700;"></span>
     </div>
-    <div class="modal-data-row"><span class="modal-label">Estatus Operacional</span><span id="modalEstatus" class="modal-value"></span></div>
-    <div class="modal-data-row"><span class="modal-label">Análisis Técnico</span><span id="modalAnalisis" class="modal-value"></span></div>
-    <div class="modal-data-row"><span class="modal-label">Recomendación / Acción</span><span id="modalRecomendacion" class="modal-value"></span></div>
+
+    <div class="modal-data-row">
+      <span class="modal-label">⚡ Detalle de Avisos y Componentes Asociados</span>
+      <div id="modalAvisosContainer" style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;"></div>
+    </div>
     
     <button class="btn-map-jump" id="btnJumpToMap" onclick="saltarAlMapaDesdeModal()">📍 Localizar en Mapa Operacional</button>
 
     <div class="modal-data-row" style="margin-top: 15px;">
-      <span class="modal-label">📜 Bitácora de Turnos Anteriores</span>
+      <span class="modal-label">📜 Historial de Evolución de Condición</span>
       <div id="modalBitacoraTimeline" class="timeline-box">Sin registros históricos previos.</div>
     </div>
 
@@ -563,6 +555,106 @@
     grupo.style.display = (sev === 'Plomo') ? 'block' : 'none';
   }
 
+  // --- GESTIÓN DE MÚLTIPLES AVISOS DINÁMICOS EN FICHA ---
+  function agregarNuevoAvisoForm(datos = {}) {
+    const container = document.getElementById('containerAvisosDinamicos');
+    const idx = container.children.length + 1;
+    const box = document.createElement('div');
+    box.className = 'aviso-item-box';
+    box.innerHTML = `
+      <button type="button" class="btn-remove-aviso" onclick="this.parentElement.remove()">X Quitar</button>
+      <h4>Aviso / Componente N° <span class="num-aviso">${idx}</span></h4>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 6px;">
+        <div><label>Componente</label><input type="text" class="aviso-comp" placeholder="ej. Motor, Reductor" value="${datos.componente || ''}"></div>
+        <div><label>Aviso SAP</label><input type="text" class="aviso-sap" placeholder="N° Aviso" value="${datos.aviso || ''}"></div>
+        <div><label>OM SAP</label><input type="text" class="aviso-om" placeholder="N° OM" value="${datos.om || ''}"></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 6px;">
+        <div><label>Estatus Logístico</label><input type="text" class="aviso-estatus" placeholder="ej. En bodega a la espera de detención..." value="${datos.estatus || ''}"></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div>
+          <label>Análisis Técnico <button type="button" class="btn-ai" onclick="generarAnalisisIAItem(this)" style="padding:1px 4px; font-size:0.55rem;">✨ IA</button></label>
+          <textarea class="aviso-analisis" placeholder="Diagnóstico..." oninput="autoExpand(this)">${datos.analisis || ''}</textarea>
+        </div>
+        <div>
+          <label>Recomendación <button type="button" class="btn-ai" onclick="generarRecomendacionIAItem(this)" style="padding:1px 4px; font-size:0.55rem;">✨ IA</button></label>
+          <textarea class="aviso-recomendacion" placeholder="Acción..." oninput="autoExpand(this)">${datos.recomendacion || ''}</textarea>
+        </div>
+      </div>
+    `;
+    container.appendChild(box);
+  }
+
+  function generarAnalisisIAItem(btn) {
+    const box = btn.closest('.aviso-item-box');
+    const txtArea = box.querySelector('.aviso-analisis');
+    const comp = box.querySelector('.aviso-comp').value || 'Componente';
+    txtArea.value = `Diagnóstico Vibracional (Cat. IV): Anomalía detectada en ${comp}. Elevación armónica y modulación espectral.`;
+    autoExpand(txtArea);
+  }
+
+  function generarRecomendacionIAItem(btn) {
+    const box = btn.closest('.aviso-item-box');
+    const txtArea = box.querySelector('.aviso-recomendacion');
+    const comp = box.querySelector('.aviso-comp').value || 'Componente';
+    txtArea.value = `Acción Correctiva: Programar intervención y revisión metrológica de ${comp} en próxima ventana.`;
+    autoExpand(txtArea);
+  }
+
+  function guardarBorradorAutomatico() {
+    if (!isAdmin) return;
+    const avisosList = [];
+    document.querySelectorAll('.aviso-item-box').forEach(box => {
+      avisosList.push({
+        componente: box.querySelector('.aviso-comp').value,
+        aviso: box.querySelector('.aviso-sap').value,
+        om: box.querySelector('.aviso-om').value,
+        estatus: box.querySelector('.aviso-estatus').value,
+        analisis: box.querySelector('.aviso-analisis').value,
+        recomendacion: box.querySelector('.aviso-recomendacion').value
+      });
+    });
+
+    const borrador = {
+      area: document.getElementById('modalInArea').value,
+      nombre: document.getElementById('modalInNombre').value,
+      tipo: document.getElementById('modalInTipo').value,
+      severidad: document.getElementById('modalInSeveridad').value,
+      razonPlomo: document.getElementById('modalInRazonPlomo').value,
+      ultimaMedicion: document.getElementById('modalInUltimaMedicion').value,
+      lat: document.getElementById('modalInLat').value,
+      lng: document.getElementById('modalInLng').value,
+      avisos: avisosList
+    };
+    localStorage.setItem('cio_draft_activo', JSON.stringify(borrador));
+  }
+
+  function cargarBorradorAutomatico() {
+    const guardado = localStorage.getItem('cio_draft_activo');
+    if (guardado) {
+      try {
+        const b = JSON.parse(guardado);
+        document.getElementById('modalInArea').value = b.area || '';
+        document.getElementById('modalInNombre').value = b.nombre || '';
+        document.getElementById('modalInTipo').value = b.tipo || '';
+        document.getElementById('modalInSeveridad').value = b.severidad || 'Rojo';
+        document.getElementById('modalInRazonPlomo').value = b.razonPlomo || '';
+        verificarRazonModalPlomo();
+        document.getElementById('modalInUltimaMedicion').value = b.ultimaMedicion || '';
+        document.getElementById('modalInLat').value = b.lat || '';
+        document.getElementById('modalInLng').value = b.lng || '';
+        
+        document.getElementById('containerAvisosDinamicos').innerHTML = '';
+        if (b.avisos && b.avisos.length > 0) {
+          b.avisos.forEach(av => agregarNuevoAvisoForm(av));
+        } else {
+          agregarNuevoAvisoForm();
+        }
+      } catch(e) {}
+    }
+  }
+
   async function actualizarBannerEnVivo() {
     try {
       const resDolar = await fetch('https://mindicador.cl/api/dolar');
@@ -620,41 +712,6 @@
   }
 
   if (localStorage.getItem('mlc_theme') === 'light') { document.body.classList.add('light-mode'); }
-
-  async function generarAnalisisIADedicada() {
-    const tag = document.getElementById('modalInNombre').value.trim() || "Equipo sin Tag";
-    const componente = document.getElementById('modalInComponente').value.trim() || "Componente";
-    const tipo = document.getElementById('modalInTipo').value.trim() || "Equipo";
-
-    const btnAi = event.target;
-    btnAi.innerText = "⏳ Analizando Espectro...";
-    btnAi.disabled = true;
-
-    setTimeout(() => {
-      const diagnosticoExperto = `Diagnóstico Vibracional (Experto Cat. IV - ${tag} | ${tipo}): Elevación armónica en 1X RPM con modulación en frecuencia de defectos de pista externa (BPFO) en ${componente}. Evidencia desalineación y holgura mecánica.`;
-      const campo = document.getElementById('modalInAnalisis');
-      campo.value = diagnosticoExperto; autoExpand(campo);
-      btnAi.innerText = "✨ Redactar con IA Experta";
-      btnAi.disabled = false;
-    }, 900);
-  }
-
-  async function generarRecomendacionIADedicada() {
-    const tag = document.getElementById('modalInNombre').value.trim() || "Equipo sin Tag";
-    const componente = document.getElementById('modalInComponente').value.trim() || "Componente";
-
-    const btnAi = event.target;
-    btnAi.innerText = "⏳ Generando Plan...";
-    btnAi.disabled = true;
-
-    setTimeout(() => {
-      const accionExperta = `Acción Correctiva (${tag}): 1) Programar detención en próxima ventana. 2) Inspección estroboscópica y control de torque en pernos de anclaje de ${componente}. 3) Ejecutar alineación láser.`;
-      const campo = document.getElementById('modalInRecomendacion');
-      campo.value = accionExperta; autoExpand(campo);
-      btnAi.innerText = "✨ Redactar con IA Experta";
-      btnAi.disabled = false;
-    }, 900);
-  }
 
   function abrirModalEstadisticas() {
     const total = equipos.length;
@@ -774,19 +831,29 @@
     document.getElementById('modalInSeveridad').value = eq.severidad || 'Plomo';
     document.getElementById('modalInRazonPlomo').value = eq.razon_plomo || '';
     verificarRazonModalPlomo();
-    document.getElementById('modalInComponente').value = eq.componente || '';
-    document.getElementById('modalInAviso').value = eq.aviso || '';
-    document.getElementById('modalInOm').value = eq.om || '';
     document.getElementById('modalInUltimaMedicion').value = eq.ultima_medicion || '';
     document.getElementById('modalInLat').value = eq.lat || '';
     document.getElementById('modalInLng').value = eq.lng || '';
-    document.getElementById('modalInEstatus').value = eq.estatus || '';
-    
-    const cAn = document.getElementById('modalInAnalisis');
-    cAn.value = eq.analisis || ''; autoExpand(cAn);
-    
-    const cRec = document.getElementById('modalInRecomendacion');
-    cRec.value = eq.recomendacion || ''; autoExpand(cRec);
+
+    // Cargar múltiples avisos o migrar estructura antigua si es necesario
+    const container = document.getElementById('containerAvisosDinamicos');
+    container.innerHTML = '';
+    let listaAvisos = eq.avisos || [];
+    if (listaAvisos.length === 0 && (eq.componente || eq.aviso || eq.analisis)) {
+      listaAvisos.push({
+        componente: eq.componente || '',
+        aviso: eq.aviso || '',
+        om: eq.om || '',
+        estatus: eq.estatus || '',
+        analisis: eq.analisis || '',
+        recomendacion: eq.recomendacion || ''
+      });
+    }
+    if (listaAvisos.length === 0) {
+      agregarNuevoAvisoForm();
+    } else {
+      listaAvisos.forEach(av => agregarNuevoAvisoForm(av));
+    }
 
     document.getElementById('editAssetModal').style.display = 'flex';
   }
@@ -794,6 +861,7 @@
   function abrirModalCrearActivo() {
     currentEditingId = null;
     imagenesBase64Temp = [];
+    localStorage.removeItem('cio_draft_activo');
     document.getElementById('editModalHeaderTitle').innerText = `➕ Crear Nuevo Activo en Sistema`;
     document.getElementById('btnDeleteAssetModal').style.display = 'none';
 
@@ -803,16 +871,12 @@
     document.getElementById('modalInSeveridad').value = 'Rojo';
     document.getElementById('modalInRazonPlomo').value = '';
     verificarRazonModalPlomo();
-    document.getElementById('modalInComponente').value = '';
-    document.getElementById('modalInAviso').value = '';
-    document.getElementById('modalInOm').value = '';
     document.getElementById('modalInUltimaMedicion').value = new Date().toISOString().split('T')[0];
     document.getElementById('modalInLat').value = tempLat !== null ? tempLat : '';
     document.getElementById('modalInLng').value = tempLng !== null ? tempLng : '';
-    document.getElementById('modalInEstatus').value = '';
-    
-    const cAn = document.getElementById('modalInAnalisis'); cAn.value = ''; autoExpand(cAn);
-    const cRec = document.getElementById('modalInRecomendacion'); cRec.value = ''; autoExpand(cRec);
+
+    document.getElementById('containerAvisosDinamicos').innerHTML = '';
+    agregarNuevoAvisoForm();
 
     document.getElementById('editAssetModal').style.display = 'flex';
   }
@@ -852,16 +916,33 @@
     const nombre = document.getElementById('modalInNombre').value.trim().toUpperCase();
     if (!area || !nombre) { alert("⚠️ El Área y el Tag son obligatorios."); return; }
 
+    let avisosList = [];
+    document.querySelectorAll('.aviso-item-box').forEach(box => {
+      avisosList.push({
+        componente: box.querySelector('.aviso-comp').value.trim(),
+        aviso: box.querySelector('.aviso-sap').value.trim(),
+        om: box.querySelector('.aviso-om').value.trim(),
+        estatus: box.querySelector('.aviso-estatus').value.trim(),
+        analisis: box.querySelector('.aviso-analisis').value.trim(),
+        recomendacion: box.querySelector('.aviso-recomendacion').value.trim()
+      });
+    });
+
     let eqId = currentEditingId ? String(currentEditingId).trim() : nombre.replace(/[.#$\[\]\s\/]/g, "_");
     const eqOrig = equipos.find(e => String(e.id).trim() === String(eqId).trim());
 
     let nuevaBitacora = eqOrig && eqOrig.bitacora ? eqOrig.bitacora : [];
-    const nuevoAnalisis = document.getElementById('modalInAnalisis').value.trim();
     const nuevaSev = document.getElementById('modalInSeveridad').value;
     const razonPlomoVal = document.getElementById('modalInRazonPlomo').value.trim();
 
-    if (!eqOrig || eqOrig.analisis !== nuevoAnalisis || eqOrig.severidad !== nuevaSev) {
-      nuevaBitacora.unshift({ fecha: new Date().toLocaleString(), texto: `Estado: [${nuevaSev}] | Ficha actualizada.` });
+    if (!eqOrig || eqOrig.severidad !== nuevaSev) {
+      let motivoCambio = prompt(`⚡ El equipo ${nombre} cambió de condición (${eqOrig ? eqOrig.severidad : 'Nuevo'} ➔ ${nuevaSev}).\n\nPor favor, ingrese el motivo técnico (ej. Cambio de motor, desalineación, overhaul, etc.):`, "Intervención o cambio de estado operacional");
+      if (motivoCambio === null) motivoCambio = "Cambio de severidad sin especificar";
+      
+      nuevaBitacora.unshift({ 
+        fecha: new Date().toLocaleString(), 
+        texto: `Cambio de Condición [${eqOrig ? eqOrig.severidad : 'Nuevo'} ➔ ${nuevaSev}]. Motivo: "${motivoCambio}".` 
+      });
     }
 
     const eqData = {
@@ -869,21 +950,24 @@
       tipo_equipo: document.getElementById('modalInTipo').value.trim(),
       severidad: nuevaSev,
       razon_plomo: (nuevaSev === 'Plomo') ? razonPlomoVal : '',
-      componente: document.getElementById('modalInComponente').value.trim(),
-      aviso: document.getElementById('modalInAviso').value.trim(),
-      om: document.getElementById('modalInOm').value.trim(),
       ultima_medicion: document.getElementById('modalInUltimaMedicion').value || '',
       lat: document.getElementById('modalInLat').value ? parseFloat(document.getElementById('modalInLat').value) : (eqOrig ? eqOrig.lat : null),
       lng: document.getElementById('modalInLng').value ? parseFloat(document.getElementById('modalInLng').value) : (eqOrig ? eqOrig.lng : null),
-      estatus: document.getElementById('modalInEstatus').value.trim(),
-      analisis: nuevoAnalisis,
-      recomendacion: document.getElementById('modalInRecomendacion').value.trim(),
+      avisos: avisosList,
+      // Retrocompatibilidad con campos únicos
+      componente: avisosList.length > 0 ? avisosList[0].componente : '',
+      aviso: avisosList.length > 0 ? avisosList[0].aviso : '',
+      om: avisosList.length > 0 ? avisosList[0].om : '',
+      estatus: avisosList.length > 0 ? avisosList[0].estatus : '',
+      analisis: avisosList.length > 0 ? avisosList[0].analisis : '',
+      recomendacion: avisosList.length > 0 ? avisosList[0].recomendacion : '',
       bitacora: nuevaBitacora,
       imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : [])
     };
 
     equiposRef.child(eqId).set(eqData).then(() => {
-      alert(`✅ ¡ÉXITO! Los cambios para el activo ${nombre} han sido guardados y persistidos correctamente en la base de datos.`);
+      localStorage.removeItem('cio_draft_activo');
+      alert(`✅ ¡ÉXITO! Los cambios para ${nombre} con ${avisosList.length} aviso(s) asociado(s) han sido guardados.`);
       document.getElementById('editAssetModal').style.display = 'none';
     }).catch(err => alert("❌ Error al persistir en Firebase: " + err.message));
   }
@@ -892,6 +976,7 @@
     if (!isAdmin || !currentEditingId) return;
     if (confirm("⚠️ ¿Eliminar permanentemente este activo de la base de datos?")) {
       equiposRef.child(currentEditingId).remove().then(() => {
+        localStorage.removeItem('cio_draft_activo');
         alert("🗑️ Activo eliminado correctamente.");
         document.getElementById('editAssetModal').style.display = 'none';
       });
@@ -923,7 +1008,12 @@
     let textoReporte = `=== REPORTE EJECUTIVO CIO - PLANTA MLC ===\nFecha: ${new Date().toLocaleDateString()}\nTotal Críticos/Alertas: ${criticos.length}\n\n`;
     criticos.forEach(e => {
       textoReporte += `[${e.severidad.toUpperCase()}] Área: ${e.area} | Tag: ${e.nombre}\n`;
-      textoReporte += ` - Análisis: ${e.analisis || 'Sin análisis'}\n - Recomendación: ${e.recomendacion || 'Sin acción'}\n------------------------------------------\n`;
+      if(e.avisos) {
+        e.avisos.forEach((av, i) => {
+          textoReporte += ` - Aviso ${i+1} (${av.componente || 'General'}): ${av.analisis || 'Sin análisis'}\n`;
+        });
+      }
+      textoReporte += `------------------------------------------\n`;
     });
     const blob = new Blob([textoReporte], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -953,9 +1043,13 @@
       doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(47, 129, 247);
       doc.text(`${index + 1}. [${eq.severidad.toUpperCase()}] Área: ${eq.area} | TAG: ${eq.nombre}`, 14, y); y += 6;
       doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(230, 237, 243);
-      doc.text(`   - Componente: ${eq.componente || 'N/D'} | Aviso SAP: ${eq.aviso || 'Sin Aviso'}`, 14, y); y += 5;
-      doc.text(`   - Diagnóstico: ${eq.analisis || 'N/D'}`, 14, y); y += 6;
-      doc.text(`   - Recomendación: ${eq.recomendacion || 'N/D'}`, 14, y); y += 10;
+      if (eq.avisos && eq.avisos.length > 0) {
+        eq.avisos.forEach(av => {
+          doc.text(`   - Componente: ${av.componente || 'N/D'} | Aviso SAP: ${av.aviso || 'Sin Aviso'}`, 14, y); y += 5;
+          doc.text(`     Diagnóstico: ${av.analisis || 'N/D'}`, 14, y); y += 5;
+        });
+      }
+      y += 5;
     });
     doc.save(`Reporte_Directorio_CIO_MLC_${new Date().toISOString().split('T')[0]}.pdf`);
   }
@@ -978,6 +1072,7 @@
       tempLat = e.latlng.lat; tempLng = e.latlng.lng;
       document.getElementById('modalInLat').value = tempLat.toFixed(4);
       document.getElementById('modalInLng').value = tempLng.toFixed(4);
+      guardarBorradorAutomatico();
       
       if (confirm(`📍 Coordenadas capturadas: ${tempLat.toFixed(4)}, ${tempLng.toFixed(4)}\n\n¿Desea volver a la Ficha Técnica para guardar este pin en el activo?`)) {
         document.getElementById('editAssetModal').style.display = 'flex';
@@ -1040,6 +1135,7 @@
       isAdmin = true;
       timeLeft = 15 * 60;
       renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
+      cargarBorradorAutomatico();
     } else { alert("Clave incorrecta."); }
   }
 
@@ -1077,10 +1173,6 @@
     badge.style.backgroundColor = cMap[eq.severidad] || cMap['Plomo'];
 
     document.getElementById('modalTipo').innerText = eq.tipo_equipo || '-';
-    document.getElementById('modalComponente').innerText = eq.componente || '-';
-    document.getElementById('modalAviso').innerText = eq.aviso || '-';
-    document.getElementById('modalOm').innerText = eq.om || '-';
-    document.getElementById('modalFecha').innerText = eq.fecha || '-';
     document.getElementById('modalUltimaMedicion').innerText = eq.ultima_medicion || 'Sin Registrar';
     
     const dias = calcularDias(eq.ultima_medicion);
@@ -1092,9 +1184,28 @@
       razonRow.style.display = 'block';
     } else { razonRow.style.display = 'none'; }
 
-    document.getElementById('modalEstatus').innerText = eq.estatus || 'No definido';
-    document.getElementById('modalAnalisis').innerText = eq.analisis || 'Sin información';
-    document.getElementById('modalRecomendacion').innerText = eq.recomendacion || 'Sin información';
+    // Renderizar múltiples avisos en el modal de usuario
+    const avisosContainer = document.getElementById('modalAvisosContainer');
+    avisosContainer.innerHTML = '';
+    let listaAvisos = eq.avisos || [];
+    if (listaAvisos.length === 0 && (eq.componente || eq.aviso || eq.analisis)) {
+      listaAvisos.push({ componente: eq.componente, aviso: eq.aviso, om: eq.om, estatus: eq.estatus, analisis: eq.analisis, recomendacion: eq.recomendacion });
+    }
+
+    if (listaAvisos.length > 0) {
+      listaAvisos.forEach((av, idx) => {
+        avisosContainer.innerHTML += `
+          <div style="background:var(--bg-main); padding:8px; border-radius:4px; border:1px solid var(--border-card);">
+            <b>#${idx+1} Componente:</b> ${av.componente || 'General'} | <b>Aviso SAP:</b> ${av.aviso || 'S/N'} | <b>OM:</b> ${av.om || 'S/N'}<br>
+            <b>Estatus:</b> ${av.estatus || 'N/D'}<br>
+            <b>Análisis:</b> ${av.analisis || 'Sin análisis'}<br>
+            <b>Recomendación:</b> ${av.recomendacion || 'Sin acción'}
+          </div>
+        `;
+      });
+    } else {
+      avisosContainer.innerHTML = `<span style="color:var(--text-muted);">Sin avisos asociados.</span>`;
+    }
     
     const timeline = document.getElementById('modalBitacoraTimeline');
     timeline.innerHTML = '';
@@ -1102,7 +1213,7 @@
       eq.bitacora.forEach(b => {
         timeline.innerHTML += `<div class="timeline-item"><div class="timeline-date">${b.fecha}</div><div>${b.texto}</div></div>`;
       });
-    } else { timeline.innerHTML = `<span style="color:var(--text-muted);">Sin registros.</span>`; }
+    } else { timeline.innerHTML = `<span style="color:var(--text-muted);">Sin registros históricos de condición.</span>`; }
 
     const gal = document.getElementById('modalGalleryContainer');
     gal.innerHTML = '';
