@@ -178,6 +178,13 @@
   .asset-days { display: none; font-size: 0.45rem; font-weight: 700; margin-top: 2px; padding: 1px 3px; border-radius: 3px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; max-width: 85px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   body.admin-mode .asset-days { display: block; }
 
+  /* Animación de pulso para pines en el mapa */
+  .map-pin-rojo { background-color: #f85149; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; animation: pulseRojo 2s infinite; box-shadow: 0 0 10px #f85149; }
+  .map-pin-naranja { background-color: #db6d28; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; animation: pulseNaranja 3s infinite; box-shadow: 0 0 10px #db6d28; }
+  .map-pin-amarillo { background-color: #d29922; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 8px #d29922; }
+  .map-pin-verde { background-color: #238636; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 8px #238636; }
+  .map-pin-plomo { background-color: #6e7681; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 8px #6e7681; }
+
   @keyframes radarBlink {
     0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.8); }
     70% { transform: scale(1.1); box-shadow: 0 0 0 14px rgba(248, 81, 73, 0); }
@@ -354,7 +361,7 @@
 <div id="dashboard-view"><div id="app-root"></div></div>
 
 <div id="map-view">
-  <div class="map-instruction">📍 <b>Modo Admin:</b> Clic en el mapa para capturar coordenadas geográficas para el activo en edición (Zoom profesional habilitado con alta resolución satelital ESRI).</div>
+  <div class="map-instruction">📍 <b>Modo Admin:</b> Clic en el mapa para capturar coordenadas geográficas para el activo en edición (Zoom satelital estable optimizado).</div>
   <div id="map-container"></div>
 </div>
 
@@ -1062,11 +1069,10 @@
   }
 
   function initMap() {
-    // Mapa mejorado con Esri World Imagery (Permite un zoom ultra profundo y nítido para minería)
-    map = L.map('map-container', { maxZoom: 22 }).setView([-28.2876, -70.8130], 15);
+    // Mapa satelital optimizado y estable con zoom máximo de 19 para evitar pantallas blancas en desierto
+    map = L.map('map-container', { maxZoom: 19 }).setView([-28.2876, -70.8130], 15);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 22,
-      maxNativeZoom: 19,
+      maxZoom: 19,
       attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     }).addTo(map);
 
@@ -1089,15 +1095,23 @@
     if (!map) return;
     markersLayer.clearLayers();
     mapMarkersObj = {}; 
-    const cMap = { 'Rojo':'#f85149', 'Naranja':'#db6d28', 'Amarillo':'#d29922', 'Verde':'#238636', 'Plomo':'#6e7681' };
+    
+    // Mapeo de clases con animación idéntica a las tarjetas de la matriz
+    const classMap = {
+      'Rojo': 'map-pin-rojo',
+      'Naranja': 'map-pin-naranja',
+      'Amarillo': 'map-pin-amarillo',
+      'Verde': 'map-pin-verde',
+      'Plomo': 'map-pin-plomo'
+    };
 
     eqList.forEach(eq => {
       if (eq.lat && eq.lng) {
-        let color = cMap[eq.severidad] || '#6e7681';
+        let pinClass = classMap[eq.severidad] || 'map-pin-plomo';
         const icon = L.divIcon({
           className: 'custom-map-marker',
-          html: `<div style="background-color: ${color}; width:16px; height:16px; border-radius:50%; border:2px solid #fff; box-shadow: 0 0 10px ${color};"></div>`,
-          iconSize: [16, 16]
+          html: `<div class="${pinClass}" title="${eq.nombre}"></div>`,
+          iconSize: [18, 18]
         });
         const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon });
         marker.on('click', () => abrirModal(eq.id));
@@ -1117,7 +1131,7 @@
     if (eq && eq.lat && eq.lng) {
       setTimeout(() => {
         if (map) {
-          map.flyTo([parseFloat(eq.lat), parseFloat(eq.lng)], 19, { duration: 1.5 });
+          map.flyTo([parseFloat(eq.lat), parseFloat(eq.lng)], 18, { duration: 1.5 });
           if (mapMarkersObj[eq.id]) mapMarkersObj[eq.id].openPopup();
         }
       }, 300);
@@ -1325,7 +1339,7 @@
       finalHTML += `<h2 class="area-title"><span>${area}</span> ${badgeCriticoHTML}</h2><div class="critical-grid">${cardsHTML}</div>`;
     });
     
-    document.getElementById('app-root').innerHTML = finalHTML || `<div style="text-align:center; padding:40px; color:var(--text-muted);">No se encontraron activos con el filtro seleccionado.`.replace();
+    document.getElementById('app-root').innerHTML = finalHTML || `<div style="text-align:center; padding:40px; color:var(--text-muted);">No se encontraron activos con el filtro seleccionado.</div>`;
   }
 </script>
 
