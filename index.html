@@ -24,7 +24,7 @@
     --input-bg: #121214;
     --btn-bg: #27272a;
     --btn-hover: #3f3f46;
-    --logo-box-bg: rgba(255, 255, 255, 0.08); /* Fondo más claro y perceptible */
+    --logo-box-bg: rgba(255, 255, 255, 0.08);
   }
 
   body.light-mode {
@@ -44,16 +44,13 @@
   body { background-color: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; padding: 20px; margin: 0; -webkit-font-smoothing: antialiased; transition: background 0.2s, color 0.2s; }
   .code-font { font-family: 'Roboto Mono', monospace; }
   
-  /* Cabecera Principal con Logos Armonizados y Escalados */
+  /* Cabecera Principal */
   .header { border: 1px solid var(--border-card); padding: 12px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
   .header-brand { display: flex; align-items: center; gap: 16px; }
   
   .logos-container { display: flex; align-items: center; gap: 14px; background: var(--logo-box-bg); padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-card); box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
-  
-  /* Escalas independientes para equilibrar visualmente CMP y CPF */
   .logo-cmp { height: 32px; width: auto; object-fit: contain; }
-  .logo-cpf { height: 38px; width: auto; object-fit: contain; transform: scale(1.12); } /* Escala aumentada para compensar */
-  
+  .logo-cpf { height: 38px; width: auto; object-fit: contain; transform: scale(1.12); }
   .logo-divider { width: 1px; height: 28px; background: var(--border-card); }
 
   .header-titles h1 { font-size: 1.15rem; margin: 0 0 2px 0; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; color: var(--text-main); }
@@ -142,7 +139,6 @@
 
 <div class="header">
   <div class="header-brand">
-    <!-- Contenedor Armonizado con Fondo Más Claro -->
     <div class="logos-container">
       <img src="logo-cmp.png" alt="Logo CMP" class="logo-cmp" onerror="this.style.display='none'">
       <div class="logo-divider"></div>
@@ -250,7 +246,7 @@
   </div>
 </div>
 
-<!-- Modal Edición de Equipo -->
+<!-- Modal Edición de Equipo (Con Botón de Georreferenciación en Mapa) -->
 <div id="modalEdicion" class="modal-overlay" onclick="cerrarEdicion(event)">
   <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 700px;">
     <button class="modal-close-btn" onclick="cerrarEdicion()">&times;</button>
@@ -261,8 +257,12 @@
       <div><label>Identificador (Tag)</label><input type="text" id="edTag" class="code-font" style="font-weight: 700;"></div>
       <div><label>Clase de Activo</label><input type="text" id="edTipo"></div>
       <div><label>Sincronización</label><input type="date" id="edFecha"></div>
-      <div style="grid-column: span 2;"><label>Georreferencia (Lat, Lng)</label>
-        <div style="display:flex; gap:8px;"><input type="text" id="edLat" placeholder="Lat"><input type="text" id="edLng" placeholder="Lng"></div>
+      <div style="grid-column: span 2;">
+        <label style="display: flex; justify-content: space-between; align-items: center;">
+          <span>Georreferencia (Lat, Lng)</span>
+          <button type="button" class="btn-base btn-primary" style="padding: 3px 8px; font-size: 0.65rem;" onclick="abrirMapaGeorreferencia()">📍 Marcar en Mapa</button>
+        </label>
+        <div style="display:flex; gap:8px; margin-top: 4px;"><input type="text" id="edLat" placeholder="Lat"><input type="text" id="edLng" placeholder="Lng"></div>
       </div>
     </div>
     
@@ -277,6 +277,20 @@
     <div style="margin-top: 18px; display: flex; gap: 10px; justify-content: flex-end;">
       <button class="btn-base btn-danger" onclick="eliminarEquipo()">🗑️ Eliminar</button>
       <button class="btn-base btn-success" onclick="guardarEquipo()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Selector Georreferencia en Mapa -->
+<div id="modalGeoMapa" class="modal-overlay" style="z-index: 3000;">
+  <div class="modal-content" style="max-width: 800px; height: 600px; display: flex; flex-direction: column;">
+    <button class="modal-close-btn" onclick="cerrarMapaGeorreferencia()">&times;</button>
+    <h3 style="margin-top: 0;">Seleccione la ubicación exacta en la planta</h3>
+    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -8px;">Haga clic sobre el mapa para capturar las coordenadas de este activo.</p>
+    <div id="geoPickerMap" style="flex-grow: 1; border-radius: 8px; border: 1px solid var(--border-card); margin-bottom: 12px;"></div>
+    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+      <button class="btn-base" onclick="cerrarMapaGeorreferencia()">Cancelar</button>
+      <button class="btn-base btn-success" onclick="confirmarGeorreferencia()">✔️ Usar Coordenadas</button>
     </div>
   </div>
 </div>
@@ -300,6 +314,11 @@
   let mapaLeaflet = null;
   let capaMarcadores = null;
   let modoMapaActivo = false;
+  
+  let geoPickerLeaflet = null;
+  let tempGeoMarker = null;
+  let selectedLat = null;
+  let selectedLng = null;
   
   const SEV_PESO = { 'Rojo': 5, 'Naranja': 4, 'Amarillo': 3, 'Verde': 2, 'Plomo': 1 };
   const SEV_COLOR_HEX = { 'Rojo': '#ef4444', 'Naranja': '#f97316', 'Amarillo': '#eab308', 'Verde': '#22c55e', 'Plomo': '#6b7280' };
@@ -326,6 +345,48 @@
       attribution: 'Esri World Imagery'
     }).addTo(mapaLeaflet);
     capaMarcadores = L.layerGroup().addTo(mapaLeaflet);
+  }
+
+  function abrirMapaGeorreferencia() {
+    document.getElementById('modalGeoMapa').style.display = 'flex';
+    const currentLat = parseFloat(document.getElementById('edLat').value) || -28.2876;
+    const currentLng = parseFloat(document.getElementById('edLng').value) || -70.8130;
+    
+    setTimeout(() => {
+      if (!geoPickerLeaflet) {
+        geoPickerLeaflet = L.map('geoPickerMap').setView([currentLat, currentLng], 18);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 20
+        }).addTo(geoPickerLeaflet);
+        
+        geoPickerLeaflet.on('click', function(e) {
+          selectedLat = e.latlng.lat.toFixed(6);
+          selectedLng = e.latlng.lng.toFixed(6);
+          if (tempGeoMarker) geoPickerLeaflet.removeLayer(tempGeoMarker);
+          tempGeoMarker = L.marker([selectedLat, selectedLng]).addTo(geoPickerLeaflet);
+        });
+      } else {
+        geoPickerLeaflet.invalidateSize();
+        geoPickerLeaflet.setView([currentLat, currentLng], 18);
+      }
+      
+      if (tempGeoMarker) geoPickerLeaflet.removeLayer(tempGeoMarker);
+      selectedLat = currentLat;
+      selectedLng = currentLng;
+      tempGeoMarker = L.marker([currentLat, currentLng]).addTo(geoPickerLeaflet);
+    }, 200);
+  }
+
+  function cerrarMapaGeorreferencia() {
+    document.getElementById('modalGeoMapa').style.display = 'none';
+  }
+
+  function confirmarGeorreferencia() {
+    if (selectedLat && selectedLng) {
+      document.getElementById('edLat').value = selectedLat;
+      document.getElementById('edLng').value = selectedLng;
+    }
+    cerrarMapaGeorreferencia();
   }
 
   function alternarVistaMapa() {
