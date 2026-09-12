@@ -6,1167 +6,267 @@
 <title>CIO - CENTRO INTEGRADO DE OPERACIONES | PLANTA MLC</title>
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<!-- jsPDF para Reportes Ejecutivos -->
+<!-- jsPDF y SheetJS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- Tipografía industrial de alta legibilidad (Roboto Mono & Inter) -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Tipografía industrial Roboto Mono & Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-main: #0b0f15;
-    --text-main: #e6edf3;
-    --text-muted: #8b949e;
-    --accent-color: #2f81f7; 
-    --bg-panel: #11161d;
-    --bg-panel-solid: #161b22;
-    --bg-card: #141a23;
-    --border-card: #30363d;
-    --border-light: rgba(240, 246, 252, 0.1);
-    --input-bg: #0d1117;
-    --btn-bg: #21262d;
-    --btn-hover: #30363d;
-    --bg-modal: #161b22;
-    --shadow-color: rgba(0, 0, 0, 0.7);
-    --badge-bg: #21262d;
-    --card-days-bg: #0d1117;
-    --card-days-border: #30363d;
+    --bg-main: #141416;
+    --text-main: #ffffff; 
+    --text-muted: #9ca3af;
+    --accent-color: #3b82f6; 
+    --bg-panel: #1e1e20;
+    --bg-card: #232326;
+    --border-card: #333336;
+    --input-bg: #141416;
+    --btn-bg: #2a2a2d;
+    --btn-hover: #3f3f46;
+    --shadow-color: rgba(0, 0, 0, 0.4);
   }
 
-  body.light-mode {
-    --bg-main: #f0f3f6;
-    --text-main: #1f2328; 
-    --text-muted: #57606a;
-    --accent-color: #0969da; 
-    --bg-panel: #ffffff;
-    --bg-panel-solid: #ffffff;
-    --bg-card: #ffffff;
-    --border-card: #d0d7de;
-    --border-light: rgba(0, 0, 0, 0.1);
-    --input-bg: #f6f8fa;
-    --btn-bg: #f3f4f6;
-    --btn-hover: #e5e7eb;
-    --bg-modal: #ffffff;
-    --shadow-color: rgba(0, 0, 0, 0.08);
-    --badge-bg: #eaeef2;
-    --card-days-bg: #f6f8fa;
-    --card-days-border: #d0d7de;
-  }
-
-  body { 
-    background-color: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; 
-    padding: 12px; margin: 0; transition: background-color 0.2s, color 0.2s;
-  }
+  body { background-color: var(--bg-main); color: var(--text-main); font-family: 'Inter', -apple-system, sans-serif; padding: 16px; margin: 0; -webkit-font-smoothing: antialiased; }
+  .code-font { font-family: 'Roboto Mono', monospace; }
   
-  /* Fuente técnica de máxima legibilidad industrial */
-  .code-font { font-family: 'Roboto Mono', monospace; letter-spacing: -0.2px; }
-  .accent-text { color: var(--accent-color) !important; font-weight: 700; }
-
-  .logo-box-left { display: flex; align-items: center; justify-content: flex-start; height: 50px; min-width: 180px; }
-  .logo-box-right { display: flex; align-items: center; justify-content: flex-end; height: 50px; min-width: 140px; }
-  .brand-logo-cpf { height: 46px; max-width: 190px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(47, 129, 247, 0.45)) brightness(1.35); }
-  .brand-logo-cmp { height: 38px; max-width: 140px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-
-  .header { border-bottom: 2px solid var(--border-card); padding: 10px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; background: var(--bg-panel); border-radius: 6px; box-shadow: 0 1px 3px var(--shadow-color); }
-  .header-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .header-titles h1 { color: var(--text-main); font-size: 1.1rem; margin: 0 0 2px 0; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 800; }
-  .header-titles p { color: var(--text-muted); margin: 0; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; }
+  /* Cabeceras y Paneles */
+  .header { border-bottom: 1px solid var(--border-card); padding: 12px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); flex-wrap: wrap; gap: 10px;}
+  .header-titles h1 { font-size: 1.25rem; margin: 0 0 4px 0; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+  .header-titles p { color: var(--text-muted); margin: 0; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  .header-controls { display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end;}
   
-  .macro-banner { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-  .macro-item { flex: 1; min-width: 130px; background: var(--bg-panel); border: 1px solid var(--border-card); border-radius: 6px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 1px 2px var(--shadow-color); }
-  .macro-icon { font-size: 1rem; }
-  .macro-label { font-size: 0.52rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; display: block; letter-spacing: 0.4px; }
-  .macro-val { font-size: 0.85rem; font-weight: 800; color: var(--text-main); }
+  /* Botones e Inputs */
+  .btn-base { background: var(--btn-bg); border: 1px solid var(--border-card); color: #d1d5db; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.75rem; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+  .btn-base:hover { background: var(--btn-hover); color: white; border-color: #4b5563; }
+  .btn-primary { background: #2563eb; color: white; border-color: #3b82f6; }
+  .btn-primary:hover { background: #3b82f6; }
+  .btn-success { background: #16a34a; color: white; border-color: #22c55e; }
+  .btn-warning { background: #ca8a04; color: white; border-color: #eab308; }
+  .btn-danger { background: #dc2626; color: white; border-color: #ef4444; }
+  .btn-iot { background: #7c3aed; color: white; border-color: #8b5cf6; }
 
-  .header-controls { display: flex; flex-direction: column; gap: 8px; background: var(--bg-panel); padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border-card); margin-bottom: 12px; box-shadow: 0 1px 3px var(--shadow-color); }
-  .controls-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between; }
-  .controls-row.admin-only-row { border-bottom: 1px solid var(--border-light); padding-bottom: 8px; display: none; }
-  body.admin-mode .controls-row.admin-only-row { display: flex; }
+  .filter-select { background: var(--input-bg); border: 1px solid var(--border-card); color: var(--text-main); padding: 7px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; outline: none; cursor: pointer; }
+
+  .admin-only { display: none !important; }
+  body.admin-mode .admin-only { display: inline-flex !important; }
+
+  /* Panel Ejecutivo de Mercado y Clima en Vivo */
+  .executive-banner { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .exec-card { background: var(--bg-panel); border: 1px solid var(--border-card); border-radius: 8px; padding: 14px 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); display: flex; flex-direction: column; justify-content: space-between; }
+  .exec-card-title { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+  .exec-card-value { font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin-top: 6px; font-family: 'Roboto Mono', monospace; display: flex; align-items: center; justify-content: space-between; }
+
+  /* Navegación Jerárquica */
+  .nav-bar-global { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; background: var(--bg-panel); padding: 12px 20px; border-radius: 8px; border: 1px solid var(--border-card); box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px; }
+  .nav-breadcrumb-group { display: flex; align-items: center; gap: 12px; }
+  .nav-breadcrumb { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 10px; margin-left: 10px; border-left: 2px solid var(--border-card); padding-left: 16px; }
+  .nav-link { cursor: pointer; color: var(--accent-color); transition: 0.2s; }
+  .nav-link:hover { color: #60a5fa; text-decoration: underline; }
   
-  .search-input { width: 100%; min-width: 240px; padding: 5px 10px; border-radius: 4px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); font-size: 0.8rem; font-weight: 600; outline: none; }
-  .search-input:focus { border-color: var(--accent-color); }
+  /* Grids de Matrices y Contenedor de Mapa */
+  .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .grid-equipos { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .grid-componentes { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
   
-  .view-btn, .btn-lock, .filter-chip { background: var(--btn-bg); border: 1px solid var(--border-card); color: var(--text-muted); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.4px; transition: 0.2s; }
-  .view-btn.active, .filter-chip.active { background: var(--accent-color); color: white; border-color: var(--accent-color); font-weight: 800; }
-  .view-btn:hover, .btn-lock:hover, .filter-chip:hover { background: var(--btn-hover); color: var(--text-main); }
+  #view-map { width: 100%; height: 600px; border-radius: 8px; border: 1px solid var(--border-card); display: none; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+
+  /* Tarjetas y Píldoras */
+  .card-area { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 8px; padding: 16px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+  .card-area:hover { transform: translateY(-2px); border-color: var(--text-muted); background: #2a2a2d; }
   
-  .btn-map-protagonist { background: #1f6feb !important; color: white !important; border: 1px solid #388bfd !important; font-weight: 900 !important; box-shadow: 0 0 8px rgba(47, 129, 247, 0.4); }
-  .btn-map-protagonist:hover { background: #388bfd !important; box-shadow: 0 0 12px rgba(47, 129, 247, 0.7); }
+  .card-equipo { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 8px; padding: 14px 10px; position: relative; cursor: pointer; text-align: center; transition: 0.15s; min-height: 85px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+  .card-equipo:hover { transform: translateY(-2px); border-color: var(--text-muted); background: #2a2a2d; }
 
-  .btn-report { background: #238636 !important; color: white !important; border-color: #2ea043 !important; display: none; }
-  .btn-stats { background: #8250df !important; color: white !important; border-color: #8957e5 !important; display: none; }
-  .btn-pdf { background: #da3633 !important; color: white !important; border-color: #f85149 !important; display: none; }
-  .btn-excel { background: #1f6feb !important; color: white !important; display: none; font-weight: 800 !important; }
-  .btn-create-asset { background: #238636 !important; color: white !important; display: none; font-weight: 800 !important; }
-
-  body.admin-mode .btn-report { display: inline-block; }
-  body.admin-mode .btn-stats { display: inline-block; }
-  body.admin-mode .btn-pdf { display: inline-block; }
-  body.admin-mode .btn-excel { display: inline-block; }
-  body.admin-mode .btn-create-asset { display: inline-block; }
-
-  .session-timer { display: none; font-family: 'Roboto Mono', monospace; font-size: 0.7rem; color: #f85149; background: rgba(248, 81, 73, 0.1); border: 1px solid rgba(248, 81, 73, 0.3); padding: 3px 6px; border-radius: 4px; align-items: center; gap: 4px; }
-  body.admin-mode .session-timer { display: flex; }
-
-  .kpi-container { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
-  .kpi-card { flex: 1; min-width: 100px; background: var(--bg-panel); border: 1px solid var(--border-card); border-radius: 6px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 1px 2px var(--shadow-color); border-top: 3px solid var(--border-card); cursor: pointer; transition: all 0.2s; }
-  .kpi-card:hover { transform: translateY(-2px); border-color: var(--accent-color); }
-  .kpi-card.active-kpi { background: var(--btn-hover); border-color: var(--accent-color); box-shadow: 0 0 8px rgba(47,129,247,0.3); }
+  .card-componente { padding: 14px 12px; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 105px; transition: 0.2s; }
+  .card-componente:hover { transform: translateY(-2px); border-color: var(--accent-color); background: #2a2a2d; } 
   
-  .kpi-total { border-top-color: var(--accent-color); }
-  .kpi-rojo { border-top-color: #f85149; }
-  .kpi-naranja { border-top-color: #db6d28; }
-  .kpi-amarillo { border-top-color: #d29922; }
-  .kpi-verde { border-top-color: #238636; }
-  .kpi-plomo { border-top-color: #6e7681; }
+  /* Severidades */
+  @keyframes pulseRojo { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5); } 70% { box-shadow: 0 0 0 5px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
+  @keyframes pulseNaranja { 0% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.5); } 70% { box-shadow: 0 0 0 5px rgba(234, 88, 12, 0); } 100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0); } }
 
-  .kpi-label { font-size: 0.55rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 2px; letter-spacing: 0.4px; }
-  .kpi-value { font-size: 1.4rem; font-weight: 900; line-height: 1; }
-  .kpi-total .kpi-value { color: var(--accent-color); }
-  .kpi-rojo .kpi-value { color: #f85149; }
-  .kpi-naranja .kpi-value { color: #db6d28; }
-  .kpi-amarillo .kpi-value { color: #d29922; }
-  .kpi-verde .kpi-value { color: #238636; }
-  .kpi-plomo .kpi-value { color: #6e7681; }
+  .sev-rojo { border-left: 5px solid #ef4444; }
+  .sev-rojo-anim { animation: pulseRojo 2s infinite; }
+  .sev-naranja { border-left: 5px solid #f97316; }
+  .sev-naranja-anim { animation: pulseNaranja 3s infinite; }
+  .sev-amarillo { border-left: 5px solid #eab308; }
+  .sev-verde { border-left: 5px solid #22c55e; }
+  .sev-plomo { border-left: 5px solid #6b7280; }
 
-  #map-view { display: none; margin-bottom: 15px; }
-  .map-instruction { background: var(--bg-panel); border: 1px solid var(--accent-color); color: var(--text-main); padding: 8px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 0.78rem; font-weight: bold; }
-  #map-container { width: 100%; height: 520px; border-radius: 6px; border: 1px solid var(--border-card); background: #000; z-index: 1;}
-
-  #dashboard-view { display: block; }
-  .area-title { color: var(--text-main); font-size: 0.9rem; border-left: 3px solid var(--accent-color); padding-left: 8px; margin: 14px 0 6px 0; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 800; background: var(--bg-panel); padding-top: 5px; padding-bottom: 5px; border-radius: 0 4px 4px 0; border-top: 1px solid var(--border-card); border-right: 1px solid var(--border-card); border-bottom: 1px solid var(--border-card); display: flex; justify-content: space-between; align-items: center; }
-  .area-badge-crit { font-size: 0.65rem; background: rgba(248, 81, 73, 0.2); color: #f85149; padding: 2px 6px; border-radius: 3px; border: 1px solid #f85149; font-family: 'Roboto Mono', monospace; }
-
-  /* Rediseño de Matriz: Tarjetas Micro-Píldoras de Alta Densidad Armoniosas y Legibles */
-  .critical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 5px; }
+  /* Insignias IoT */
+  .iot-badge { position: absolute; top: -8px; right: -8px; font-size: 0.85rem; background: #18181b; border: 2px solid var(--border-card); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.7); z-index: 5; }
+  .iot-online { color: #22c55e; border-color: #22c55e; box-shadow: 0 0 10px rgba(34, 197, 94, 0.4); background: #052e16; }
+  .iot-offline { color: #f97316; border-color: #f97316; background: #431407; }
+  .iot-manual { color: #d1d5db; border-color: #6b7280; background: #27272a; }
   
-  @keyframes pulseRojo {
-    0% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.6); }
-    70% { box-shadow: 0 0 0 6px rgba(248, 81, 73, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0); }
-  }
+  .iot-badge-container { background: #18181b; border: 1px solid var(--border-card); border-radius: 8px; padding: 6px 14px; display: flex; align-items: center; gap: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.6); }
+  .iot-badge-icon { font-size: 1.3rem; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--bg-card); border: 2px solid var(--border-card); }
+  .iot-badge-icon.online { color: #22c55e; border-color: #22c55e; background: #052e16; box-shadow: 0 0 10px rgba(34,197,94,0.3); }
+  .iot-badge-icon.offline { color: #f97316; border-color: #f97316; background: #431407; }
+  .iot-badge-icon.manual { color: #d1d5db; border-color: #6b7280; background: #27272a; }
 
-  @keyframes pulseNaranja {
-    0% { box-shadow: 0 0 0 0 rgba(219, 109, 40, 0.6); }
-    70% { box-shadow: 0 0 0 6px rgba(219, 109, 40, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(219, 109, 40, 0); }
-  }
+  /* Tipografías Compactas */
+  .label-muted { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+  .value-strong { font-size: 0.85rem; font-weight: 700; color: var(--text-main); }
+  .eq-tag { font-size: 0.85rem; font-weight: 700; margin: 3px 0; color: #f3f4f6; }
+  .eq-type { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+  .eq-days { font-size: 0.6rem; font-weight: 600; background: var(--bg-panel); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-card); margin-top: 4px; display: inline-block; color: #d1d5db; }
+  .lock-badge { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); font-size: 0.5rem; background: #dc2626; color: white; padding: 2px 6px; border-radius: 8px; font-weight: 700; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 10;}
 
-  .card { 
-    background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 6px; padding: 5px 3px; 
-    position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; 
-    min-height: 42px; transition: all 0.15s ease; box-shadow: 0 1px 2px var(--shadow-color);
-  }
-  .card:hover { border-color: var(--accent-color); background-color: var(--btn-hover); transform: translateY(-1.5px); }
+  /* Formularios y Modales */
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; backdrop-filter: blur(4px); }
+  .modal-content { background: var(--bg-panel); padding: 28px; border-radius: 12px; border: 1px solid var(--border-card); width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
+  .modal-close-btn { position: absolute; top: 20px; right: 20px; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; transition: 0.2s; z-index: 10; }
+  .modal-close-btn:hover { color: white; background: #dc2626; border-color: #ef4444; }
 
-  body.admin-mode .card { min-height: 54px; padding: 6px 3px; }
-  
-  .sev-rojo { border-left: 3.5px solid #f85149; background: rgba(248, 81, 73, 0.14); animation: pulseRojo 2s infinite; }
-  .sev-naranja { border-left: 3.5px solid #db6d28; background: rgba(219, 109, 40, 0.12); animation: pulseNaranja 3s infinite; }
-  .sev-amarillo { border-left: 3.5px solid #d29922; background: rgba(210, 153, 34, 0.08); }
-  .sev-verde { border-left: 3.5px solid #238636; background: rgba(35, 134, 54, 0.05); }
-  .sev-plomo { border-left: 3.5px solid #6e7681; background: rgba(110, 118, 129, 0.05); }
-
-  .pulse-indicator { position: absolute; top: 2px; right: 4px; width: 4.5px; height: 4.5px; border-radius: 50%; }
-  .sev-rojo .pulse-indicator { background-color: #f85149; box-shadow: 0 0 5px #f85149; }
-  .sev-naranja .pulse-indicator { background-color: #db6d28; }
-  .sev-amarillo .pulse-indicator { background-color: #d29922; }
-  .sev-verde .pulse-indicator { background-color: #238636; }
-  .sev-plomo .pulse-indicator { background-color: #6e7681; }
-  
-  .asset-type-badge { font-size: 0.44rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 0px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px; display: none; }
-  body.admin-mode .asset-type-badge { display: block; }
-
-  .asset-tag { color: var(--text-main); font-size: 0.74rem; font-weight: 800; margin: 0; letter-spacing: -0.1px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1; max-width: 80px; }
-  
-  .asset-days { display: none; font-size: 0.42rem; font-weight: 700; margin-top: 1.5px; padding: 1px 2px; border-radius: 2px; background: var(--card-days-bg); color: var(--text-main); z-index: 2; border: 1px solid var(--card-days-border); text-transform: uppercase; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  body.admin-mode .asset-days { display: block; }
-
-  .edit-lock-badge { position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); font-size: 0.4rem; background: #f85149; color: white; padding: 1px 3px; border-radius: 2px; font-weight: 800; z-index: 3; white-space: nowrap; box-shadow: 0 0 4px rgba(248,81,73,0.8); animation: pulseRojo 1.5s infinite; }
-
-  .map-pin-rojo { background-color: #f85149; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; animation: pulseRojo 2s infinite; box-shadow: 0 0 8px #f85149; }
-  .map-pin-naranja { background-color: #db6d28; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; animation: pulseNaranja 3s infinite; box-shadow: 0 0 8px #db6d28; }
-  .map-pin-amarillo { background-color: #d29922; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 6px #d29922; }
-  .map-pin-verde { background-color: #238636; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 6px #238636; }
-  .map-pin-plomo { background-color: #6e7681; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 6px #6e7681; }
-
-  @keyframes radarBlink {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.8); }
-    70% { transform: scale(1.1); box-shadow: 0 0 0 12px rgba(248, 81, 73, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(248, 81, 73, 0); }
-  }
-  .pin-blink-radar { animation: radarBlink 1.5s infinite; background-color: #f85149; width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid #fff; }
-
-  /* Modales */
-  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
-  .modal-content { background: var(--bg-modal); padding: 24px; border-radius: 8px; border: 1px solid var(--accent-color); width: 100%; max-width: 1050px; height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 12px 40px var(--shadow-color); display: flex; flex-direction: column; gap: 14px; }
-  .modal-close { position: absolute; top: 12px; right: 20px; color: var(--text-muted); font-size: 1.8rem; font-weight: bold; cursor: pointer; background: none; border: none; z-index: 10; }
-  .modal-close:hover { color: #f85149; }
-  
-  .modal-header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-card); padding-bottom: 12px; }
-  .modal-title { color: var(--text-main); font-size: 1.35rem; margin: 0; text-transform: uppercase; font-weight: 900; letter-spacing: 0.8px; }
-  .modal-sev-badge { padding: 5px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 900; text-transform: uppercase; color: #fff; margin-right: 35px; letter-spacing: 0.5px; }
-  
-  .modal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; background: var(--bg-panel); padding: 14px; border-radius: 6px; border: 1px solid var(--border-card); }
-  .modal-data-row { background: var(--bg-panel); padding: 14px; border-radius: 6px; border: 1px solid var(--border-card); }
-  .modal-label { color: var(--accent-color); font-size: 0.7rem; font-weight: 900; text-transform: uppercase; display: block; margin-bottom: 6px; letter-spacing: 0.6px; }
-  .modal-value { color: var(--text-main); font-weight: 600; font-size: 1rem; white-space: pre-wrap; line-height: 1.5; word-break: break-word; }
-  
-  .timeline-box { background: var(--bg-panel); padding: 12px; border-radius: 6px; max-height: 160px; overflow-y: auto; font-size: 0.85rem; border: 1px solid var(--border-card); }
-  .timeline-item { border-left: 3.5px solid var(--accent-color); padding-left: 10px; margin-bottom: 8px; }
-  .timeline-date { font-size: 0.65rem; color: var(--text-muted); font-weight: 800; margin-bottom: 2px; }
-
-  .gallery-container { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
-  .gallery-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-card); cursor: pointer; }
-  .gallery-thumb:hover { border-color: var(--accent-color); }
-
-  .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 3000; justify-content: center; align-items: center; }
-  .lightbox-content { max-width: 95%; max-height: 95vh; border-radius: 4px; }
-  .lightbox-close { position: absolute; top: 15px; right: 25px; color: #fff; font-size: 2.5rem; cursor: pointer; background: none; border: none; }
-
-  .modal-footer-brand { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-card); margin-top: auto; padding-top: 12px; opacity: 0.8; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
-
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 12px; }
-  .stat-card { background: var(--bg-panel); border: 1px solid var(--border-card); border-radius: 6px; padding: 14px; text-align: left; }
-  .stat-title { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--accent-color); margin-bottom: 10px; text-align: center; }
-  .bar-stat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; font-size: 0.75rem; }
-  .bar-container { width: 100%; background: rgba(255,255,255,0.06); height: 7px; border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
-  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
-
-  .aviso-item-box { background: var(--bg-panel); border: 1px solid var(--border-card); padding: 10px; border-radius: 6px; margin-bottom: 8px; position: relative; }
-  .aviso-item-box h4 { margin: 0 0 6px 0; font-size: 0.7rem; color: var(--accent-color); text-transform: uppercase; font-weight: 800; }
-  .btn-remove-aviso { position: absolute; top: 6px; right: 8px; background: #f85149; color: white; border: none; border-radius: 3px; padding: 2px 5px; font-size: 0.6rem; cursor: pointer; font-weight: bold; }
-
-  .edit-form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .edit-form-grid .full { grid-column: span 2; }
-  .edit-form-grid label { font-size: 0.6rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 2px; }
-  .edit-form-grid input, .edit-form-grid select { width: 100%; padding: 7px 9px; border-radius: 4px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); font-size: 0.8rem; box-sizing: border-box; font-family: inherit; }
-  
-  .edit-form-grid textarea {
-    width: 100%; padding: 7px 9px; border-radius: 4px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); font-size: 0.8rem; box-sizing: border-box; font-family: inherit;
-    resize: vertical; overflow-y: hidden; min-height: 45px; line-height: 1.4;
-  }
+  .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .form-grid label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; display: block; }
+  .form-grid input, .form-grid select, .form-grid textarea { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-card); background: var(--input-bg); color: var(--text-main); font-size: 0.9rem; font-family: 'Inter', sans-serif; box-sizing: border-box; transition: 0.2s;}
+  .form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus { outline: none; border-color: var(--accent-color); }
 </style>
 </head>
 <body>
 
-<script>
-  if (localStorage.getItem('mlc_theme') === 'light') { document.body.classList.add('light-mode'); }
-</script>
-
 <div class="header">
-  <div class="header-left">
-    <div class="logo-box-left">
-      <img src="logo-cpf.png" alt="CPF Ingeniería" class="brand-logo-cpf" onerror="this.style.display='none'">
-    </div>
-    <div class="header-titles">
-      <h1>CENTRO INTEGRADO DE OPERACIONES (CIO) - PLANTA MLC</h1>
-      <p class="code-font">MONITOREO DE CONDICIONES</p>
-    </div>
+  <div class="header-titles">
+    <h1>CIO - MINA LOS COLORADOS</h1>
+    <p>Asistente de Monitoreo & Industria 4.0</p>
   </div>
-
-  <div class="logo-box-right">
-    <img src="logo-cmp.png" alt="CMP" class="brand-logo-cmp" onerror="this.style.display='none'">
-  </div>
-</div>
-
-<div class="macro-banner">
-  <div class="macro-item">
-    <span class="macro-icon">💵</span>
-    <div>
-      <span class="macro-label">Dólar (USD/CLP)</span>
-      <span class="macro-val code-font" id="valDolar">Conectando...</span>
-    </div>
-  </div>
-  <div class="macro-item">
-    <span class="macro-icon">📈</span>
-    <div>
-      <span class="macro-label">Acción CAP (Bolsa SGO)</span>
-      <span class="macro-val code-font" id="valCap">Conectando...</span>
-    </div>
-  </div>
-  <div class="macro-item">
-    <span class="macro-icon">⛏️</span>
-    <div>
-      <span class="macro-label">Mineral de Hierro (Fe 62%)</span>
-      <span class="macro-val code-font" id="valHierro">Conectando...</span>
-    </div>
-  </div>
-  <div class="macro-item">
-    <span class="macro-icon" id="climaIcon">🌤️</span>
-    <div>
-      <span class="macro-label" id="climaLabel">Mina Los Colorados</span>
-      <span class="macro-val code-font" id="valClima">Vallenar: Cargando...</span>
-    </div>
+  <div class="header-controls">
+    <button class="btn-base btn-primary" onclick="alternarVistaMapa()">🗺️ Ver Mapa Planta</button>
+    <button class="btn-base btn-primary admin-only" onclick="generarDatosPrueba()">🏗️ Cargar Datos Prueba</button>
+    <button class="btn-base btn-success admin-only" onclick="abrirEdicionEquipoNuevo()">➕ Crear Activo</button>
+    <button class="btn-base btn-iot admin-only" onclick="simularInyeccionDynamox()">📡 Simular Alerta IoT</button>
+    <button class="btn-base btn-warning admin-only" onclick="calcularRutaDescarga()">🚶‍♂️ Ruta Descarga Físicos</button>
+    <button class="btn-base btn-success admin-only" onclick="document.getElementById('excelUpload').click()">📂 Cargar Excel</button>
+    <input type="file" id="excelUpload" accept=".xlsx, .xls" style="display: none;" onchange="procesarCargaExcel(event)">
+    <button class="btn-base btn-primary admin-only" onclick="exportarPlantillaExcel()">📥 Exportar BD</button>
+    <button class="btn-base" id="btnUnlock" onclick="toggleAdmin()">👤 Usuario</button>
   </div>
 </div>
 
-<!-- BARRA DE CONTROLES -->
-<div class="header-controls">
-  <div class="controls-row admin-only-row">
-    <button class="filter-chip active" onclick="filtrarRango('todos', this)">Todos</button>
-    <button class="filter-chip" onclick="filtrarRango('seguimiento', this)">🔍 Seguimiento (<15d)</button>
-    <button class="filter-chip" onclick="filtrarRango('normal', this)">✅ Ciclo Normal (15-30d)</button>
-    <button class="filter-chip" onclick="filtrarRango('vencido', this)">⚠️ Ciclo Vencido (>30d)</button>
-    <button class="filter-chip" onclick="filtrarRango('sin_medicion', this)">⚪ Sin Medir / Plomos</button>
-    <button class="filter-chip" onclick="filtrarSinAviso(this)" style="border-color:#f85149; color:#f85149;">🚨 Sin Aviso SAP</button>
-  </div>
-  <div class="controls-row">
-    <div style="flex-grow: 1; max-width: 260px;">
-      <input type="text" id="buscador" class="search-input code-font" placeholder="🔍 Filtrar por Tag o Área..." onkeyup="ejecutarBusqueda()">
+<!-- Panel Ejecutivo de Mercado y Clima en Vivo -->
+<div class="executive-banner">
+  <div class="exec-card">
+    <div class="exec-card-title">Dólar Observado (USD/CLP)</div>
+    <div class="exec-card-value">
+      <span id="kpiDolar">$939.05</span>
+      <span style="font-size: 0.7rem; color: #22c55e;">🟢 En Vivo</span>
     </div>
-    <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
-      <div id="sessionTimerBadge" class="session-timer">⏱️ <span id="timerCountdown">15:00</span></div>
-      <button class="btn-create-asset" onclick="abrirModalCrearActivo()">➕ Crear Activo</button>
-      <button class="btn-excel" onclick="exportarHistorialExcel()">📥 Excel Historial</button>
-      <button id="btnViewMap" class="view-btn btn-map-protagonist" onclick="cambiarVista('map')">🗺️ MAPA</button>
-      <button id="btnViewGrid" class="view-btn active" onclick="cambiarVista('grid')">📋 Matriz</button>
-      <button class="btn-stats" onclick="abrirModalEstadisticas()">📊 Analítica</button>
-      <button class="btn-report" onclick="generarReporteTurno()">📊 Reporte</button>
-      <button class="btn-pdf" onclick="exportarPDFDirectorio()">📄 PDF</button>
-      <button id="btnTheme" class="view-btn" onclick="toggleTheme()" title="Cambiar Tema">🌓 Tema</button>
-      <button id="btnUnlock" class="btn-lock" onclick="solicitarClave()">👤 Usuario</button>
+  </div>
+  <div class="exec-card">
+    <div class="exec-card-title">Mineral de Hierro (CFR China)</div>
+    <div class="exec-card-value">
+      <span id="kpiHierro">$98.68 USD</span>
+      <span style="font-size: 0.7rem; color: #3b82f6;">📊 Spot</span>
+    </div>
+  </div>
+  <div class="exec-card">
+    <div class="exec-card-title">Tipo de Cambio / Paridad</div>
+    <div class="exec-card-value">
+      <span id="kpiParidad" style="font-size: 1.15rem;">1 USD = 939 CLP</span>
+    </div>
+  </div>
+  <div class="exec-card">
+    <div class="exec-card-title">Clima Faena (Vallenar)</div>
+    <div class="exec-card-value" id="kpiClima" style="font-size: 1.15rem;">
+      ☀️ 23°C (Despejado)
     </div>
   </div>
 </div>
 
-<!-- KPIS DIRECTOS INTERACTIVOS -->
-<div class="kpi-container" id="kpiContainer">
-  <div class="kpi-card kpi-total active-kpi" id="kpiBtn-todos" onclick="filtrarSeveridadKPI('todos', this)">
-    <span class="kpi-label">Total Activos</span>
-    <div class="kpi-value code-font" id="kpiTotal">0</div>
+<div class="nav-bar-global">
+  <div class="nav-breadcrumb-group">
+    <button id="btnVolver" class="btn-base" style="display:none;" onclick="navegarAtras()">⬅️ Volver</button>
+    <button id="btnInicio" class="btn-base" style="display:none;" onclick="irAInicio()">🏠 Inicio</button>
+    <div class="nav-breadcrumb" id="breadcrumb">
+      <span class="nav-link" onclick="irAInicio()">Mina Los Colorados</span>
+      <span id="bc-area" style="display:none;"></span>
+      <span id="bc-equipo" style="display:none;"></span>
+    </div>
   </div>
-  <div class="kpi-card kpi-rojo" id="kpiBtn-Rojo" onclick="filtrarSeveridadKPI('Rojo', this)">
-    <span class="kpi-label">🔴 Críticos (Alto)</span>
-    <div class="kpi-value code-font" id="kpiRojo">0</div>
-  </div>
-  <div class="kpi-card kpi-naranja" id="kpiBtn-Naranja" onclick="filtrarSeveridadKPI('Naranja', this)">
-    <span class="kpi-label">🟠 Alertas (Medio)</span>
-    <div class="kpi-value code-font" id="kpiNaranja">0</div>
-  </div>
-  <div class="kpi-card kpi-amarillo" id="kpiBtn-Amarillo" onclick="filtrarSeveridadKPI('Amarillo', this)">
-    <span class="kpi-label">🟡 Monitoreo (Bajo)</span>
-    <div class="kpi-value code-font" id="kpiAmarillo">0</div>
-  </div>
-  <div class="kpi-card kpi-verde" id="kpiBtn-Verde" onclick="filtrarSeveridadKPI('Verde', this)">
-    <span class="kpi-label">🟢 Operativos (Normal)</span>
-    <div class="kpi-value code-font" id="kpiVerde">0</div>
-  </div>
-  <div class="kpi-card kpi-plomo" id="kpiBtn-Plomo" onclick="filtrarSeveridadKPI('Plomo', this)">
-    <span class="kpi-label">⚪ Sin Medición (Plomos)</span>
-    <div class="kpi-value code-font" id="kpiPlomo">0</div>
+  
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <span class="label-muted">Filtrar IoT:</span>
+    <select id="filtroIoT" class="filter-select" onchange="aplicarFiltroIoT()">
+      <option value="todos">🔌 Todos los Equipos</option>
+      <option value="gateway">📶 Online (Gateway)</option>
+      <option value="manual">🚶‍♂️ Offline (Ruta Manual)</option>
+      <option value="parcial">🔄 Online (Parcial)</option>
+    </select>
   </div>
 </div>
 
-<div id="dashboard-view"><div id="app-root"></div></div>
+<div id="view-map"></div>
+<div id="view-areas" class="grid-container"></div>
+<div id="view-equipos" class="grid-equipos" style="display:none;"></div>
+<div id="view-componentes" class="grid-componentes" style="display:none;"></div>
 
-<div id="map-view">
-  <div class="map-instruction">📍 <b>Modo Admin:</b> Clic en el mapa para capturar coordenadas geográficas para el activo en edición (Matriz de alta densidad armoniosa).</div>
-  <div id="map-container"></div>
-</div>
-
-<!-- MODAL DE EDICIÓN / CREACIÓN DEDICADA PARA ADMINISTRADOR -->
-<div id="editAssetModal" class="modal-overlay" onclick="cerrarModalEdicion(event)">
-  <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 720px;">
-    <button class="modal-close" onclick="cerrarModalEdicion()">&times;</button>
-    <div class="modal-header-flex">
-      <h2 id="editModalHeaderTitle" class="modal-title code-font">Ficha Técnica Activo</h2>
-    </div>
-    
-    <div class="edit-form-grid">
-      <div>
-        <label>Área Operacional</label>
-        <input type="text" id="modalInArea" placeholder="ej. Área 61" oninput="guardarBorradorAutomatico()">
-      </div>
-      <div>
-        <label>N° Tag / Equipo</label>
-        <input type="text" id="modalInNombre" class="code-font" placeholder="ej. MH27152" oninput="guardarBorradorAutomatico()">
-      </div>
-      <div>
-        <label>Tipo de Equipo</label>
-        <input type="text" id="modalInTipo" placeholder="ej. Transportador" oninput="guardarBorradorAutomatico()">
-      </div>
-      <div>
-        <label>Severidad (Color)</label>
-        <select id="modalInSeveridad" onchange="verificarRazonModalPlomo(); guardarBorradorAutomatico();">
-          <option value="Rojo">🔴 Rojo (Crítico / Acción Inmediata)</option>
-          <option value="Naranja">🟠 Naranja (Alerta / Precaución)</option>
-          <option value="Amarillo">🟡 Amarillo (Monitoreo)</option>
-          <option value="Verde">🟢 Verde (Operativo / Normal)</option>
-          <option value="Plomo">⚪ Plomo (Sin Medición / Inactivo)</option>
-        </select>
-      </div>
-      <div class="full" id="modalGrupoRazonPlomo" style="display:none;">
-        <label style="color:#f85149;">Razón de por qué no se mide</label>
-        <input type="text" id="modalInRazonPlomo" placeholder="ej. En Overhaul, Fuera de servicio..." oninput="guardarBorradorAutomatico()">
-      </div>
-      <div>
-        <label>Última Medición</label>
-        <input type="date" id="modalInUltimaMedicion" oninput="guardarBorradorAutomatico()">
-      </div>
-      <div>
-        <label>Lat / Lng (Georreferencia)</label>
-        <div style="display: flex; gap: 4px;">
-          <input type="text" id="modalInLat" class="code-font" placeholder="Lat" oninput="guardarBorradorAutomatico()">
-          <input type="text" id="modalInLng" class="code-font" placeholder="Lng" oninput="guardarBorradorAutomatico()">
-        </div>
-      </div>
-      <div class="full">
-        <button type="button" class="btn-map-jump" onclick="activarSelectorPinMapa()">📍 Seleccionar Coordenada Directa en Mapa (Con Pin Parpadeante)</button>
-      </div>
-
-      <!-- SECCIÓN DE MÚLTIPLES AVISOS Y COMPONENTES -->
-      <div class="full" style="border-top: 1px solid var(--border-card); padding-top: 10px; margin-top: 4px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <label style="color: var(--accent-color); font-size: 0.7rem; font-weight: 800;">⚡ Gestión de Múltiples Avisos (Motor, Reductor, Poleas, etc.)</label>
-          <button type="button" class="btn-upload" onclick="agregarNuevoAvisoForm()" style="padding: 2px 6px; font-size: 0.6rem;">+ Agregar Aviso / Componente</button>
-        </div>
-        <div id="containerAvisosDinamicos"></div>
-      </div>
-
-      <div class="full">
-        <label>Subir Fotografías y Evidencias</label>
-        <input type="file" id="modalInImagenesFiles" accept="image/*" multiple>
-      </div>
-    </div>
-
-    <div style="display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end;">
-      <button class="btn-danger" onclick="eliminarActivoDesdeModal()" id="btnDeleteAssetModal">🗑️ Eliminar</button>
-      <button class="btn-upload" onclick="guardarActivoDesdeModal()">💾 Guardar y Persistir con Éxito</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL DE ESTADÍSTICAS AVANZADAS -->
-<div id="statsModal" class="modal-overlay" onclick="cerrarModalStats(event)">
-  <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 850px;">
-    <button class="modal-close" onclick="cerrarModalStats()">&times;</button>
-    <div class="modal-header-flex">
-      <h2 class="modal-title code-font">📊 Analítica Cognitiva CIO: Confiabilidad, Predicción y Riesgo Financiero</h2>
-    </div>
-    
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-title">Distribución por Ciclo de Medición</div>
-        <div id="statsCicloBars"></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-title">Criticidad Real por Área (% Ponderado)</div>
-        <div id="statsAreaPonderadaBars"></div>
-      </div>
-      <div class="stat-card" style="grid-column: span 2; border-color: #f85149; background: rgba(248,81,73,0.03);">
-        <div class="stat-title" style="color: #f85149;">⚡ Motor de Alerta Predictiva & Riesgo Financiero (Con base en precio Hierro en vivo)</div>
-        <div id="statsPredictivoBox" style="font-size: 0.8rem; line-height: 1.5;"></div>
-      </div>
-    </div>
-
-    <div class="modal-footer-brand" style="margin-top: 15px;">
-      <span>Planta Mina Los Colorados (MLC)</span>
-      <span>CIO • Motor Cognitivo Predictivo</span>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL SCADA VISTA USUARIO A PANTALLA COMPLETA -->
-<div id="evidenciaModal" class="modal-overlay" onclick="cerrarModal(event)">
+<!-- MODAL DETALLE DE COMPONENTE -->
+<div id="modalDetalleComponente" class="modal-overlay" onclick="cerrarDetalleComponente(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
-    <button class="modal-close" onclick="cerrarModal()">&times;</button>
-    <div class="modal-header-flex">
-      <h2 id="modalTitle" class="modal-title code-font">Tag</h2>
-      <span id="modalSevBadge" class="modal-sev-badge">Color</span>
-    </div>
-    <div class="modal-grid">
-      <div><span class="modal-label">Tipo Equipo</span><span id="modalTipo" class="modal-value accent-text"></span></div>
-      <div><span class="modal-label">Última Medición</span><span id="modalUltimaMedicion" class="modal-value"></span></div>
-      <div><span class="modal-label">Estado Medición</span><span id="modalDias" class="modal-value accent-text"></span></div>
-    </div>
+    <button class="modal-close-btn" onclick="cerrarDetalleComponente()" title="Cerrar">&times;</button>
     
-    <div class="modal-data-row" id="modalRazonRow" style="display:none; border-left: 3.5px solid #f85149;">
-      <span class="modal-label" style="color:#f85149;">Razón de por qué no se mide</span>
-      <span id="modalRazonPlomo" class="modal-value" style="font-weight: 700;"></span>
+    <div style="margin-right: 45px; margin-bottom: 20px; border-bottom: 1px solid var(--border-card); padding-bottom: 16px;">
+      <div class="label-muted" id="detCompEqTag">TAG EQUIPO</div>
+      <h2 id="detCompNombre" class="code-font" style="margin: 4px 0 0 0; font-size: 1.4rem; color: #f3f4f6;">Nombre Spot</h2>
     </div>
 
-    <div class="modal-data-row">
-      <span class="modal-label">⚡ Detalle de Avisos y Componentes Asociados</span>
-      <div id="modalAvisosContainer" style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;"></div>
-    </div>
-    
-    <button class="btn-map-jump" id="btnJumpToMap" onclick="saltarAlMapaDesdeModal()">📍 Localizar en Mapa Operacional</button>
-
-    <div class="modal-data-row" style="margin-top: 12px;">
-      <span class="modal-label">📜 Historial de Evolución de Condición</span>
-      <div id="modalBitacoraTimeline" class="timeline-box">Sin registros históricos previos.</div>
-    </div>
-
-    <div class="modal-data-row">
-      <span class="modal-label">Galería de Evidencias</span>
-      <div id="modalGalleryContainer" class="gallery-container"></div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+      <div style="background: var(--bg-card); padding: 14px; border-radius: 8px; border: 1px solid var(--border-card);">
+        <div class="label-muted">Alerta Vibración</div>
+        <div id="detCompSev" class="value-strong" style="font-size: 1.1rem; margin-top: 4px; text-transform: uppercase;">Estado</div>
+      </div>
+      <div style="background: var(--bg-card); padding: 14px; border-radius: 8px; border: 1px solid var(--border-card);">
+        <div class="label-muted">Telemetría y Enlace</div>
+        <div id="detCompSync" style="margin-top: 6px;"></div>
+      </div>
     </div>
 
-    <div class="modal-footer-brand">
-      <span>Planta Mina Los Colorados (MLC)</span>
-      <span>CPF // CMP • Confiabilidad Operacional</span>
+    <div style="background: var(--input-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border-card);">
+      <div class="label-muted" style="margin-bottom: 8px; display: flex; align-items: center; gap: 6px; color: var(--accent-color);">
+        <span>✨</span> Insights / Análisis Experto
+      </div>
+      <div id="detCompAnalisis" style="font-size: 0.9rem; line-height: 1.6; color: #e5e7eb;"></div>
     </div>
   </div>
 </div>
 
-<div id="lightboxOverlay" class="lightbox-overlay" onclick="cerrarLightbox()">
-  <button class="lightbox-close" onclick="cerrarLightbox()">&times;</button>
-  <img id="lightboxImg" class="lightbox-content" src="" alt="Zoom">
+<!-- Modal Edición de Equipo -->
+<div id="modalEdicion" class="modal-overlay" onclick="cerrarEdicion(event)">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 800px;">
+    <button class="modal-close-btn" onclick="cerrarEdicion()">&times;</button>
+    <h2 style="margin-top: 0; font-size: 1.25rem; margin-right: 40px;">Configuración de Activo</h2>
+    
+    <div class="form-grid">
+      <div><label>Área Operacional</label><input type="text" id="edArea"></div>
+      <div><label>Identificador (Tag)</label><input type="text" id="edTag" class="code-font" style="font-weight: 700;"></div>
+      <div><label>Clase de Activo (Tipo)</label><input type="text" id="edTipo"></div>
+      <div><label>Última Sincronización</label><input type="date" id="edFecha"></div>
+      <div style="grid-column: span 2;"><label>Georreferencia (Lat, Lng)</label>
+        <div style="display:flex; gap:10px;"><input type="text" id="edLat" placeholder="Lat"><input type="text" id="edLng" placeholder="Lng"></div>
+      </div>
+    </div>
+    
+    <div style="margin-top: 24px; border-top: 1px solid var(--border-card); padding-top: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="margin:0; font-size: 1rem;">Puntos de Medición (Spots)</h3>
+        <button class="btn-base" onclick="agregarFormComponente()">+ Añadir Spot</button>
+      </div>
+      <div id="edComponentesContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
+    </div>
+    
+    <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end;">
+      <button class="btn-base btn-danger" onclick="eliminarEquipo()">🗑️ Eliminar Activo</button>
+      <button class="btn-base btn-success" onclick="guardarEquipo()">💾 Guardar Configuración</button>
+    </div>
+  </div>
 </div>
 
-<!-- LIBRERÍAS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
 <script>
-  let isAdmin = false; let map; let markersLayer = L.layerGroup();
-  let mapaInicializado = false; let tempLat = null; let tempLng = null;
-  let mapMarkersObj = {}; let equipos = []; let filtroRangoActual = 'todos'; 
-  let filtroSeveridadKPI = 'todos'; let filtroSinAvisoActivo = false; 
-  let modalEquipoActualId = null; let currentEditingId = null; 
-  let imagenesBase64Temp = []; let blinkMarker = null; let precioHierroActual = 104.20;
-
-  let timeLeft = 15 * 60;
-  function startSessionTimer() {
-    setInterval(() => {
-      if (isAdmin) {
-        timeLeft--;
-        let mins = Math.floor(timeLeft / 60);
-        let secs = timeLeft % 60;
-        document.getElementById('timerCountdown').innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
-        if (timeLeft <= 0) {
-          isAdmin = false;
-          liberarBloqueoActual();
-          document.body.classList.remove('admin-mode');
-          document.getElementById('btnUnlock').innerText = "👤 Usuario";
-          timeLeft = 15 * 60;
-          alert("🔒 Sesión de Administrador cerrada por inactividad (15 min).");
-        }
-      } else { timeLeft = 15 * 60; }
-    }, 1000);
-  }
-  startSessionTimer();
-
-  function resetIdleTimer() { timeLeft = 15 * 60; }
-  window.onmousemove = resetIdleTimer;
-  window.onkeypress = resetIdleTimer;
-  window.onclick = resetIdleTimer;
-
-  function autoExpand(textarea) {
-    textarea.style.height = 'auto';
-    textarea.style.height = (textarea.scrollHeight + 4) + 'px';
-  }
-
-  function verificarRazonModalPlomo() {
-    const sev = document.getElementById('modalInSeveridad').value;
-    const grupo = document.getElementById('modalGrupoRazonPlomo');
-    grupo.style.display = (sev === 'Plomo') ? 'block' : 'none';
-  }
-
-  function agregarNuevoAvisoForm(datos = {}) {
-    const container = document.getElementById('containerAvisosDinamicos');
-    const idx = container.children.length + 1;
-    const box = document.createElement('div');
-    box.className = 'aviso-item-box';
-    box.innerHTML = `
-      <button type="button" class="btn-remove-aviso" onclick="this.parentElement.remove()">X Quitar</button>
-      <h4>Aviso / Componente N° <span class="num-aviso">${idx}</span></h4>
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 5px;">
-        <div><label>Componente</label><input type="text" class="aviso-comp" placeholder="ej. Motor, Reductor" value="${datos.componente || ''}"></div>
-        <div><label>Aviso SAP</label><input type="text" class="aviso-sap" placeholder="N° Aviso" value="${datos.aviso || ''}"></div>
-        <div><label>OM SAP</label><input type="text" class="aviso-om" placeholder="N° OM" value="${datos.om || ''}"></div>
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin-bottom: 5px;">
-        <div><label>Estatus Logístico</label><input type="text" class="aviso-estatus" placeholder="ej. En bodega a la espera..." value="${datos.estatus || ''}"></div>
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-        <div>
-          <label>Análisis Técnico <button type="button" class="btn-ai" onclick="generarAnalisisIAItem(this)" style="padding:1px 3px; font-size:0.5rem;">✨ IA</button></label>
-          <textarea class="aviso-analisis" placeholder="Diagnóstico..." oninput="autoExpand(this)">${datos.analisis || ''}</textarea>
-        </div>
-        <div>
-          <label>Recomendación <button type="button" class="btn-ai" onclick="generarRecomendacionIAItem(this)" style="padding:1px 3px; font-size:0.5rem;">✨ IA</button></label>
-          <textarea class="aviso-recomendacion" placeholder="Acción..." oninput="autoExpand(this)">${datos.recomendacion || ''}</textarea>
-        </div>
-      </div>
-    `;
-    container.appendChild(box);
-  }
-
-  function generarAnalisisIAItem(btn) {
-    const box = btn.closest('.aviso-item-box');
-    const txtArea = box.querySelector('.aviso-analisis');
-    const comp = box.querySelector('.aviso-comp').value || 'Componente';
-    txtArea.value = `Diagnóstico Vibracional (Cat. IV): Anomalía detectada en ${comp}. Elevación armónica y modulación espectral.`;
-    autoExpand(txtArea);
-  }
-
-  function generarRecomendacionIAItem(btn) {
-    const box = btn.closest('.aviso-item-box');
-    const txtArea = box.querySelector('.aviso-recomendacion');
-    const comp = box.querySelector('.aviso-comp').value || 'Componente';
-    txtArea.value = `Acción Correctiva: Programar intervención y revisión metrológica de ${comp} en próxima ventana.`;
-    autoExpand(txtArea);
-  }
-
-  function guardarBorradorAutomatico() {
-    if (!isAdmin) return;
-    const avisosList = [];
-    document.querySelectorAll('.aviso-item-box').forEach(box => {
-      avisosList.push({
-        componente: box.querySelector('.aviso-comp').value,
-        aviso: box.querySelector('.aviso-sap').value,
-        om: box.querySelector('.aviso-om').value,
-        estatus: box.querySelector('.aviso-estatus').value,
-        analisis: box.querySelector('.aviso-analisis').value,
-        recomendacion: box.querySelector('.aviso-recomendacion').value
-      });
-    });
-
-    const borrador = {
-      area: document.getElementById('modalInArea').value,
-      nombre: document.getElementById('modalInNombre').value,
-      tipo: document.getElementById('modalInTipo').value,
-      severidad: document.getElementById('modalInSeveridad').value,
-      razonPlomo: document.getElementById('modalInRazonPlomo').value,
-      ultimaMedicion: document.getElementById('modalInUltimaMedicion').value,
-      lat: document.getElementById('modalInLat').value,
-      lng: document.getElementById('modalInLng').value,
-      avisos: avisosList
-    };
-    localStorage.setItem('cio_draft_activo', JSON.stringify(borrador));
-  }
-
-  function cargarBorradorAutomatico() {
-    const guardado = localStorage.getItem('cio_draft_activo');
-    if (guardado) {
-      try {
-        const b = JSON.parse(guardado);
-        document.getElementById('modalInArea').value = b.area || '';
-        document.getElementById('modalInNombre').value = b.nombre || '';
-        document.getElementById('modalInTipo').value = b.tipo || '';
-        document.getElementById('modalInSeveridad').value = b.severidad || 'Rojo';
-        document.getElementById('modalInRazonPlomo').value = b.razonPlomo || '';
-        verificarRazonModalPlomo();
-        document.getElementById('modalInUltimaMedicion').value = b.ultimaMedicion || '';
-        document.getElementById('modalInLat').value = b.lat || '';
-        document.getElementById('modalInLng').value = b.lng || '';
-        
-        document.getElementById('containerAvisosDinamicos').innerHTML = '';
-        if (b.avisos && b.avisos.length > 0) {
-          b.avisos.forEach(av => agregarNuevoAvisoForm(av));
-        } else {
-          agregarNuevoAvisoForm();
-        }
-      } catch(e) {}
-    }
-  }
-
-  async function actualizarBannerEnVivo() {
-    try {
-      const resDolar = await fetch('https://mindicador.cl/api/dolar');
-      const dataDolar = await resDolar.json();
-      if (dataDolar && dataDolar.serie && dataDolar.serie.length > 0) {
-        document.getElementById('valDolar').innerText = `$${dataDolar.serie[0].valor.toFixed(2)} CLP`;
-      }
-    } catch(e) { document.getElementById('valDolar').innerText = '$938.50 CLP'; }
-
-    try {
-      const resCap = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/CAP.SN');
-      const dataCap = await resCap.json();
-      const precioCap = dataCap.chart.result[0].meta.regularMarketPrice;
-      document.getElementById('valCap').innerText = `$${precioCap.toLocaleString('es-CL')} CLP`;
-    } catch(e) { document.getElementById('valCap').innerText = '$5,720 CLP'; }
-
-    try {
-      const resFe = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/TIO=F');
-      const dataFe = await resFe.json();
-      const precioFe = dataFe.chart.result[0].meta.regularMarketPrice;
-      precioHierroActual = precioFe;
-      document.getElementById('valHierro').innerText = `$${precioFe.toFixed(2)} / T`;
-    } catch(e) { document.getElementById('valHierro').innerText = '$104.20 / T'; }
-
-    try {
-      const resClima = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-28.5758&current_weather=true');
-      const dataClima = await resClima.json();
-      const temp = dataClima.current_weather.temperature;
-      const horaActual = new Date().getHours();
-      const esDeNoche = horaActual < 7 || horaActual >= 20;
-
-      const icono = document.getElementById('climaIcon');
-      const label = document.getElementById('climaLabel');
-      const valor = document.getElementById('valClima');
-
-      if (esDeNoche) {
-        icono.innerText = "🌙"; label.innerText = "Mina Los Colorados (Turno Noche)";
-      } else {
-        icono.innerText = "☀️"; label.innerText = "Mina Los Colorados (Turno Día)";
-      }
-      valor.innerText = `Vallenar: ${temp}°C`;
-    } catch(e) { document.getElementById('valClima').innerText = 'Vallenar: 21°C'; }
-  }
-  
-  actualizarBannerEnVivo();
-  setInterval(() => {
-    actualizarBannerEnVivo();
-  }, 10 * 60 * 1000);
-
-  function toggleTheme() {
-    const body = document.body;
-    if (body.classList.contains('light-mode')) {
-      body.classList.remove('light-mode');
-      localStorage.setItem('mlc_theme', 'dark');
-    } else {
-      body.classList.add('light-mode');
-      localStorage.setItem('mlc_theme', 'light');
-    }
-  }
-
-  if (localStorage.getItem('mlc_theme') === 'light') { document.body.classList.add('light-mode'); }
-
-  function abrirModalEstadisticas() {
-    const total = equipos.length;
-    if (total === 0) { alert("⚠️ No hay activos registrados para analizar."); return; }
-
-    let cSeg = 0, cNorm = 0, cVenc = 0, cPlom = 0;
-    let porAreaTotal = {}; let porAreaCriticos = {};
-    let activosCriticosCount = 0; let activosVencidosCount = 0;
-
-    equipos.forEach(eq => {
-      const d = calcularDias(eq.ultima_medicion);
-      if (eq.severidad === 'Plomo' || d === null) cPlom++;
-      else if (d < 15) cSeg++;
-      else if (d <= 30) cNorm++;
-      else { cVenc++; activosVencidosCount++; }
-
-      if (eq.severidad === 'Rojo' || eq.severidad === 'Naranja') { activosCriticosCount++; }
-
-      const area = eq.area || 'Sin Área';
-      porAreaTotal[area] = (porAreaTotal[area] || 0) + 1;
-      if (eq.severidad === 'Rojo' || eq.severidad === 'Naranja') {
-        porAreaCriticos[area] = (porAreaCriticos[area] || 0) + 1;
-      }
-    });
-
-    const pSeg = ((cSeg / total) * 100).toFixed(1);
-    const pNorm = ((cNorm / total) * 100).toFixed(1);
-    const pVenc = ((cVenc / total) * 100).toFixed(1);
-    const pPlom = ((cPlom / total) * 100).toFixed(1);
-
-    document.getElementById('statsCicloBars').innerHTML = `
-      <div class="bar-stat-row"><span>En Seguimiento (<15d): <b>${cSeg} (${pSeg}%)</b></span></div>
-      <div class="bar-container"><div class="bar-fill" style="width: ${pSeg}%; background: #238636;"></div></div>
-      <div class="bar-stat-row" style="margin-top:6px;"><span>Ciclo Normal (15-30d): <b>${cNorm} (${pNorm}%)</b></span></div>
-      <div class="bar-container"><div class="bar-fill" style="width: ${pNorm}%; background: #388bfd;"></div></div>
-      <div class="bar-stat-row" style="margin-top:6px;"><span>Ciclo Vencido (>30d): <b>${cVenc} (${pVenc}%)</b></span></div>
-      <div class="bar-container"><div class="bar-fill" style="width: ${pVenc}%; background: #f85149;"></div></div>
-      <div class="bar-stat-row" style="margin-top:6px;"><span>Sin Medición / Plomos: <b>${cPlom} (${pPlom}%)</b></span></div>
-      <div class="bar-container"><div class="bar-fill" style="width: ${pPlom}%; background: #6e7681;"></div></div>
-    `;
-
-    let areaPonderadaHTML = '';
-    const areasOrdenadasPonderadas = Object.keys(porAreaTotal).sort((a, b) => {
-      const pA = (porAreaCriticos[a] || 0) / porAreaTotal[a];
-      const pB = (porAreaCriticos[b] || 0) / porAreaTotal[b];
-      return pB - pA;
-    });
-
-    areasOrdenadasPonderadas.forEach(area => {
-      const totalArea = porAreaTotal[area];
-      const criticosArea = porAreaCriticos[area] || 0;
-      const porcArea = ((criticosArea / totalArea) * 100).toFixed(1);
-      
-      areaPonderadaHTML += `
-        <div class="bar-stat-row"><span><b>${area}</b> (${criticosArea}/${totalArea} crit): <b>${porcArea}%</b></span></div>
-        <div class="bar-container"><div class="bar-fill" style="width: ${porcArea}%; background: #f85149;"></div></div>
-      `;
-    });
-
-    document.getElementById('statsAreaPonderadaBars').innerHTML = areaPonderadaHTML || '<span style="color:var(--text-muted);">Sin registros por área.</span>';
-
-    const costoEstimadoHoraUSD = (activosCriticosCount * 450 * (precioHierroActual / 10)).toLocaleString('es-CL', {maximumFractionDigits:0});
-    document.getElementById('statsPredictivoBox').innerHTML = `
-      • <b>Estado de Alerta Predictiva:</b> El motor detecta <b>${activosCriticosCount} activos críticos</b> y <b>${activosVencidosCount} equipos con ciclo de medición vencido</b>.<br>
-      • <b>Recomendación del Motor IA:</b> Priorizar intervención en los activos con más de 30 días sin inspección para evitar fallas armónicas en cadenas de transporte.<br>
-      • <b>Pronóstico de Impacto Financiero Potencial (No-Disponibilidad):</b> US$ ${costoEstimadoHoraUSD} / hora de detención no programada estimada según índice de mineral de hierro actual ($${precioHierroActual.toFixed(2)}/T).
-    `;
-
-    document.getElementById('statsModal').style.display = 'flex';
-  }
-
-  function cerrarModalStats() { document.getElementById('statsModal').style.display = 'none'; }
-
-  function filtrarSeveridadKPI(sev, el) {
-    filtroSeveridadKPI = sev;
-    document.querySelectorAll('.kpi-card').forEach(card => card.classList.remove('active-kpi'));
-    el.classList.add('active-kpi');
-    renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
-  }
-
-  document.getElementById('app-root').addEventListener('click', function(e) {
-    const card = e.target.closest('.card');
-    if (card) {
-      const idCard = card.getAttribute('data-id');
-      const eqTarget = equipos.find(i => String(i.id).trim() === String(idCard).trim());
-      if (!eqTarget) return;
-
-      if (isAdmin) {
-        if (eqTarget.en_edicion) {
-          if (!confirm(`⚠️ Este activo (${eqTarget.nombre}) ya está siendo editado por otro operador. ¿Desea abrirlo de todos modos?`)) {
-            return;
-          }
-        }
-        abrirFichaEdicion(eqTarget);
-      } else {
-        abrirModal(eqTarget.id);
-      }
-    }
-  });
-
-  document.getElementById('modalInImagenesFiles').addEventListener('change', function(e) {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      imagenesBase64Temp = [];
-      for (let i = 0; i < files.length; i++) {
-        const reader = new FileReader();
-        reader.onload = function(evt) { imagenesBase64Temp.push(evt.target.result); };
-        reader.readAsDataURL(files[i]);
-      }
-    }
-  });
-
-  function liberarBloqueoActual() {
-    if (currentEditingId) {
-      equiposRef.child(currentEditingId).update({ en_edicion: false });
-    }
-  }
-
-  function abrirFichaEdicion(eq) {
-    liberarBloqueoActual();
-    currentEditingId = eq.id;
-    equiposRef.child(eq.id).update({ en_edicion: true });
-
-    imagenesBase64Temp = eq.imagenes || [];
-    document.getElementById('editModalHeaderTitle').innerText = `✏️ Ficha Técnica Activo: ${eq.nombre}`;
-    document.getElementById('btnDeleteAssetModal').style.display = 'inline-block';
-    
-    document.getElementById('modalInArea').value = eq.area || '';
-    document.getElementById('modalInNombre').value = eq.nombre || '';
-    document.getElementById('modalInTipo').value = eq.tipo_equipo || '';
-    document.getElementById('modalInSeveridad').value = eq.severidad || 'Plomo';
-    document.getElementById('modalInRazonPlomo').value = eq.razon_plomo || '';
-    verificarRazonModalPlomo();
-    document.getElementById('modalInUltimaMedicion').value = eq.ultima_medicion || '';
-    document.getElementById('modalInLat').value = eq.lat || '';
-    document.getElementById('modalInLng').value = eq.lng || '';
-
-    const container = document.getElementById('containerAvisosDinamicos');
-    container.innerHTML = '';
-    let listaAvisos = eq.avisos || [];
-    if (listaAvisos.length === 0 && (eq.componente || eq.aviso || eq.analisis)) {
-      listaAvisos.push({ componente: eq.componente, aviso: eq.aviso, om: eq.om, estatus: eq.estatus, analisis: eq.analisis, recomendacion: eq.recomendacion });
-    }
-    if (listaAvisos.length === 0) {
-      agregarNuevoAvisoForm();
-    } else {
-      listaAvisos.forEach(av => agregarNuevoAvisoForm(av));
-    }
-
-    document.getElementById('editAssetModal').style.display = 'flex';
-  }
-
-  function abrirModalCrearActivo() {
-    liberarBloqueoActual();
-    currentEditingId = null;
-    imagenesBase64Temp = [];
-    localStorage.removeItem('cio_draft_activo');
-    document.getElementById('editModalHeaderTitle').innerText = `➕ Crear Nuevo Activo en Sistema`;
-    document.getElementById('btnDeleteAssetModal').style.display = 'none';
-
-    document.getElementById('modalInArea').value = '';
-    document.getElementById('modalInNombre').value = '';
-    document.getElementById('modalInTipo').value = '';
-    document.getElementById('modalInSeveridad').value = 'Rojo';
-    document.getElementById('modalInRazonPlomo').value = '';
-    verificarRazonModalPlomo();
-    document.getElementById('modalInUltimaMedicion').value = new Date().toISOString().split('T')[0];
-    document.getElementById('modalInLat').value = tempLat !== null ? tempLat : '';
-    document.getElementById('modalInLng').value = tempLng !== null ? tempLng : '';
-
-    document.getElementById('containerAvisosDinamicos').innerHTML = '';
-    agregarNuevoAvisoForm();
-
-    document.getElementById('editAssetModal').style.display = 'flex';
-  }
-
-  function activarSelectorPinMapa() {
-    const nombreTag = document.getElementById('modalInNombre').value.trim() || "ACTIVO EN EDICIÓN";
-    const latAct = parseFloat(document.getElementById('modalInLat').value);
-    const lngAct = parseFloat(document.getElementById('modalInLng').value);
-
-    document.getElementById('editAssetModal').style.display = 'none';
-    cambiarVista('map');
-
-    if (!isNaN(latAct) && !isNaN(lngAct)) {
-      map.setView([latAct, lngAct], 18);
-      if (blinkMarker) markersLayer.removeLayer(blinkMarker);
-      
-      const blinkIcon = L.divIcon({
-        className: 'custom-blink-marker',
-        html: `<div class="pin-blink-radar" title="${nombreTag}"></div>`,
-        iconSize: [20, 20]
-      });
-      blinkMarker = L.marker([latAct, lngAct], { icon: blinkIcon }).addTo(markersLayer);
-      blinkMarker.bindPopup(`<b>🎯 EDITANDO: ${nombreTag}</b><br>Haz clic en otra posición si deseas mover el pin.`).openPopup();
-    } else {
-      alert(`📍 MODO SELECCIÓN DE PIN:\n\nEl equipo ${nombreTag} aún no tiene coordenadas guardadas. Haz clic en el mapa para ubicarlo.`);
-    }
-  }
-
-  function cerrarModalEdicion(e) {
-    if (e && e.target !== document.getElementById('editAssetModal')) return;
-    liberarBloqueoActual();
-    currentEditingId = null;
-    document.getElementById('editAssetModal').style.display = 'none';
-  }
-
-  function guardarActivoDesdeModal() {
-    if (!isAdmin) return;
-    const area = document.getElementById('modalInArea').value.trim();
-    const nombre = document.getElementById('modalInNombre').value.trim().toUpperCase();
-    if (!area || !nombre) { alert("⚠️ El Área y el Tag son obligatorios."); return; }
-
-    let avisosList = [];
-    document.querySelectorAll('.aviso-item-box').forEach(box => {
-      avisosList.push({
-        componente: box.querySelector('.aviso-comp').value.trim(),
-        aviso: box.querySelector('.aviso-sap').value.trim(),
-        om: box.querySelector('.aviso-om').value.trim(),
-        estatus: box.querySelector('.aviso-estatus').value.trim(),
-        analisis: box.querySelector('.aviso-analisis').value.trim(),
-        recomendacion: box.querySelector('.aviso-recomendacion').value.trim()
-      });
-    });
-
-    let eqId = currentEditingId ? String(currentEditingId).trim() : nombre.replace(/[.#$\[\]\s\/]/g, "_");
-    const eqOrig = equipos.find(e => String(e.id).trim() === String(eqId).trim());
-
-    let nuevaBitacora = eqOrig && eqOrig.bitacora ? eqOrig.bitacora : [];
-    const nuevaSev = document.getElementById('modalInSeveridad').value;
-    const razonPlomoVal = document.getElementById('modalInRazonPlomo').value.trim();
-
-    if (!eqOrig || eqOrig.severidad !== nuevaSev) {
-      let motivoCambio = prompt(`⚡ El equipo ${nombre} cambió de condición (${eqOrig ? eqOrig.severidad : 'Nuevo'} ➔ ${nuevaSev}).\n\nPor favor, ingrese el motivo técnico (ej. Cambio de motor, desalineación, overhaul, etc.):`, "Intervención o cambio de estado operacional");
-      if (motivoCambio === null) motivoCambio = "Cambio de severidad sin especificar";
-      
-      nuevaBitacora.unshift({ 
-        fecha: new Date().toLocaleString(), 
-        texto: `Cambio de Condición [${eqOrig ? eqOrig.severidad : 'Nuevo'} ➔ ${nuevaSev}]. Motivo: "${motivoCambio}".` 
-      });
-    }
-
-    const eqData = {
-      id: eqId, area, nombre,
-      tipo_equipo: document.getElementById('modalInTipo').value.trim(),
-      severidad: nuevaSev,
-      razon_plomo: (nuevaSev === 'Plomo') ? razonPlomoVal : '',
-      ultima_medicion: document.getElementById('modalInUltimaMedicion').value || '',
-      lat: document.getElementById('modalInLat').value ? parseFloat(document.getElementById('modalInLat').value) : (eqOrig ? eqOrig.lat : null),
-      lng: document.getElementById('modalInLng').value ? parseFloat(document.getElementById('modalInLng').value) : (eqOrig ? eqOrig.lng : null),
-      avisos: avisosList,
-      componente: avisosList.length > 0 ? avisosList[0].componente : '',
-      aviso: avisosList.length > 0 ? avisosList[0].aviso : '',
-      om: avisosList.length > 0 ? avisosList[0].om : '',
-      estatus: avisosList.length > 0 ? avisosList[0].estatus : '',
-      analisis: avisosList.length > 0 ? avisosList[0].analisis : '',
-      recomendacion: avisosList.length > 0 ? avisosList[0].recomendacion : '',
-      bitacora: nuevaBitacora,
-      imagenes: imagenesBase64Temp.length > 0 ? imagenesBase64Temp : (eqOrig ? eqOrig.imagenes || [] : []),
-      en_edicion: false
-    };
-
-    equiposRef.child(eqId).set(eqData).then(() => {
-      localStorage.removeItem('cio_draft_activo');
-      currentEditingId = null;
-      alert(`✅ ¡ÉXITO! Los cambios para ${nombre} han sido guardados.`);
-      document.getElementById('editAssetModal').style.display = 'none';
-    }).catch(err => alert("❌ Error al persistir en Firebase: " + err.message));
-  }
-
-  function eliminarActivoDesdeModal() {
-    if (!isAdmin || !currentEditingId) return;
-    if (confirm("⚠️ ¿Eliminar permanentemente este activo de la base de datos?")) {
-      equiposRef.child(currentEditingId).remove().then(() => {
-        localStorage.removeItem('cio_draft_activo');
-        currentEditingId = null;
-        alert("🗑️ Activo eliminado correctamente.");
-        document.getElementById('editAssetModal').style.display = 'none';
-      });
-    }
-  }
-
-  function filtrarRango(rango, btn) {
-    filtroRangoActual = rango;
-    filtroSinAvisoActivo = false;
-    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    if(btn) btn.classList.add('active');
-    renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
-  }
-
-  function filtrarSinAviso(btn) {
-    filtroSinAvisoActivo = true;
-    filtroRangoActual = 'todos';
-    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    if(btn) btn.classList.add('active');
-    renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
-  }
-
-  function ejecutarBusqueda() {
-    renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
-  }
-
-  function generarReporteTurno() {
-    const criticos = equipos.filter(e => e.severidad === 'Rojo' || e.severidad === 'Naranja');
-    let textoReporte = `=== REPORTE EJECUTIVO CIO - PLANTA MLC ===\nFecha: ${new Date().toLocaleDateString()}\nTotal Críticos/Alertas: ${criticos.length}\n\n`;
-    criticos.forEach(e => {
-      textoReporte += `[${e.severidad.toUpperCase()}] Área: ${e.area} | Tag: ${e.nombre}\n`;
-      if(e.avisos) {
-        e.avisos.forEach((av, i) => {
-          textoReporte += ` - Aviso ${i+1} (${av.componente || 'General'}): ${av.analisis || 'Sin análisis'}\n`;
-        });
-      }
-      textoReporte += `------------------------------------------\n`;
-    });
-    const blob = new Blob([textoReporte], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url;
-    a.download = `Reporte_CIO_MLC_${new Date().toISOString().split('T')[0]}.txt`;
-    a.click();
-  }
-
-  function exportarPDFDirectorio() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.setFillColor(13, 17, 23); doc.rect(0, 0, 210, 297, 'F');
-    doc.setTextColor(230, 237, 243); doc.setFont("helvetica", "bold"); doc.setFontSize(16);
-    doc.text("CENTRO INTEGRADO DE OPERACIONES (CIO)", 14, 20);
-    doc.setFontSize(10); doc.setTextColor(139, 148, 158);
-    doc.text(`PLANTA MINA LOS COLORADOS (MLC) - REPORTE DIRECTORIO`, 14, 27);
-    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 160, 27);
-    doc.setLineWidth(0.5); doc.setDrawColor(48, 54, 61); doc.line(14, 32, 196, 32);
-
-    let y = 40;
-    const criticos = equipos.filter(e => e.severidad === 'Rojo' || e.severidad === 'Naranja');
-    doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(248, 81, 73);
-    doc.text(`Activos Críticos / Alertas: ${criticos.length}`, 14, y); y += 10;
-
-    criticos.forEach((eq, index) => {
-      if (y > 270) { doc.addPage(); y = 20; }
-      doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(47, 129, 247);
-      doc.text(`${index + 1}. [${eq.severidad.toUpperCase()}] Área: ${eq.area} | TAG: ${eq.nombre}`, 14, y); y += 6;
-      doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(230, 237, 243);
-      if (eq.avisos && eq.avisos.length > 0) {
-        eq.avisos.forEach(av => {
-          doc.text(`   - Componente: ${av.componente || 'N/D'} | Aviso SAP: ${av.aviso || 'Sin Aviso'}`, 14, y); y += 5;
-          doc.text(`     Diagnóstico: ${av.analisis || 'N/D'}`, 14, y); y += 5;
-        });
-      }
-      y += 5;
-    });
-    doc.save(`Reporte_Directorio_CIO_MLC_${new Date().toISOString().split('T')[0]}.pdf`);
-  }
-
-  function cambiarVista(vista) {
-    document.getElementById('dashboard-view').style.display = vista === 'grid' ? 'block' : 'none';
-    document.getElementById('map-view').style.display = vista === 'map' ? 'block' : 'none';
-    document.getElementById('btnViewGrid').classList.toggle('active', vista === 'grid');
-    document.getElementById('btnViewMap').classList.toggle('active', vista === 'map');
-    if (vista === 'map') {
-      if (!mapaInicializado) { initMap(); mapaInicializado = true; } else { map.invalidateSize(); }
-    }
-  }
-
-  function initMap() {
-    map = L.map('map-container', { maxZoom: 19 }).setView([-28.2876, -70.8130], 15);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19,
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-    }).addTo(map);
-
-    markersLayer.addTo(map);
-    map.on('click', function(e) {
-      tempLat = e.latlng.lat; tempLng = e.latlng.lng;
-      document.getElementById('modalInLat').value = tempLat.toFixed(4);
-      document.getElementById('modalInLng').value = tempLng.toFixed(4);
-      guardarBorradorAutomatico();
-      
-      if (confirm(`📍 Coordenadas capturadas: ${tempLat.toFixed(4)}, ${tempLng.toFixed(4)}\n\n¿Desea volver a la Ficha Técnica para guardar este pin en el activo?`)) {
-        document.getElementById('editAssetModal').style.display = 'flex';
-        cambiarVista('grid');
-      }
-    });
-    renderizarMarcadoresMapa(equipos);
-  }
-
-  function renderizarMarcadoresMapa(eqList) {
-    if (!map) return;
-    markersLayer.clearLayers();
-    mapMarkersObj = {}; 
-    const classMap = { 'Rojo': 'map-pin-rojo', 'Naranja': 'map-pin-naranja', 'Amarillo': 'map-pin-amarillo', 'Verde': 'map-pin-verde', 'Plomo': 'map-pin-plomo' };
-
-    eqList.forEach(eq => {
-      if (eq.lat && eq.lng) {
-        let pinClass = classMap[eq.severidad] || 'map-pin-plomo';
-        const icon = L.divIcon({
-          className: 'custom-map-marker',
-          html: `<div class="${pinClass}" title="${eq.nombre}"></div>`,
-          iconSize: [16, 16]
-        });
-        const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon });
-        marker.on('click', () => abrirModal(eq.id));
-        marker.bindPopup(`<b>${eq.nombre}</b><br>${eq.area}<br>Estado: <b>${eq.severidad}</b>${eq.en_edicion ? '<br><span style="color:#f85149; font-weight:bold;">🔒 En Edición</span>' : ''}`);
-        markersLayer.addLayer(marker);
-        mapMarkersObj[eq.id] = marker; 
-      }
-    });
-  }
-
-  function saltarAlMapaDesdeModal() {
-    if (!modalEquipoActualId) return;
-    const eq = equipos.find(i => String(i.id).trim() === String(modalEquipoActualId).trim());
-    document.getElementById('evidenciaModal').style.display = 'none';
-    cambiarVista('map');
-
-    if (eq && eq.lat && eq.lng) {
-      setTimeout(() => {
-        if (map) {
-          map.flyTo([parseFloat(eq.lat), parseFloat(eq.lng)], 18, { duration: 1.5 });
-          if (mapMarkersObj[eq.id]) mapMarkersObj[eq.id].openPopup();
-        }
-      }, 300);
-    } else { alert("ℹ️ El equipo no tiene coordenadas geográficas asignadas."); }
-  }
-
-  function solicitarClave() {
-    if (isAdmin) {
-      liberarBloqueoActual();
-      document.body.classList.remove('admin-mode');
-      document.getElementById('btnUnlock').innerText = "👤 Usuario";
-      isAdmin = false; 
-      renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
-      return;
-    }
-    if (prompt("Ingrese clave de Administrador:") === "Moncon2026") {
-      document.body.classList.add('admin-mode');
-      document.getElementById('btnUnlock').innerText = "🛡️ Administrador";
-      isAdmin = true;
-      timeLeft = 15 * 60;
-      renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
-      cargarBorradorAutomatico();
-    } else { alert("Clave incorrecta."); }
-  }
-
   const firebaseConfig = {
     apiKey: "AIzaSyBd5MEZdMmgzBs1xCyeGYeKtQx5gJIeY3w",
     authDomain: "dashboard-vulnerabilidades-mlc.firebaseapp.com",
@@ -1174,187 +274,533 @@
     projectId: "dashboard-vulnerabilidades-mlc"
   };
   firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
-  const equiposRef = database.ref('activos_criticos');
+  // Conectado a la base de datos real en Firebase (`activos_v2`)
+  const db = firebase.database().ref('activos_v2'); 
 
-  equiposRef.on('value', (snapshot) => {
-    const data = snapshot.val();
-    equipos = data ? Object.values(data) : [];
-    renderDashboard(document.getElementById('buscador').value.toLowerCase().trim());
-    renderizarMarcadoresMapa(equipos);
+  let isAdmin = false;
+  let equiposDB = [];
+  let areaSeleccionada = null;
+  let equipoSeleccionado = null;
+  let mapaLeaflet = null;
+  let capaMarcadores = null;
+  let modoMapaActivo = false;
+  
+  const SEV_PESO = { 'Rojo': 5, 'Naranja': 4, 'Amarillo': 3, 'Verde': 2, 'Plomo': 1 };
+  const SEV_COLOR_HEX = { 'Rojo': '#ef4444', 'Naranja': '#f97316', 'Amarillo': '#eab308', 'Verde': '#22c55e', 'Plomo': '#6b7280' };
+  
+  const IOT_ICON = { 
+    'gateway': '<span class="iot-badge iot-online" title="Online (Gateway)">📶</span>', 
+    'manual': '<span class="iot-badge iot-manual" title="Offline (Manual)">🚶‍♂️</span>', 
+    'parcial': '<span class="iot-badge iot-offline" title="Online (Parcial)">🔄</span>' 
+  };
+  const IOT_TEXT = { 'gateway': 'Online (Gateway)', 'manual': 'Offline (Manual)', 'parcial': 'Online (Parcial)' };
+
+  // Inicialización de Leaflet (Centrado en Mina Los Colorados, Zoom Ultra Preciso Nivel 19)
+  function inicializarMapa() {
+    if (mapaLeaflet) return;
+    // Coordenadas aproximadas de Planta Mina Los Colorados, Atacama
+    mapaLeaflet = L.map('view-map').setView([-28.2876, -70.8130], 19);
+    
+    // Capa base satelital de alta resolución (Esri World Imagery)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 20,
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    }).addTo(mapaLeaflet);
+
+    capaMarcadores = L.layerGroup().addTo(mapaLeaflet);
+  }
+
+  function alternarVistaMapa() {
+    modoMapaActivo = !modoMapaActivo;
+    const mapaDiv = document.getElementById('view-map');
+    const areasDiv = document.getElementById('view-areas');
+    const equiposDiv = document.getElementById('view-equipos');
+    const compDiv = document.getElementById('view-componentes');
+
+    if (modoMapaActivo) {
+      mapaDiv.style.display = 'block';
+      areasDiv.style.display = 'none';
+      equiposDiv.style.display = 'none';
+      compDiv.style.display = 'none';
+      inicializarMapa();
+      mapaLeaflet.invalidateSize();
+      actualizarMarcadoresMapa();
+    } else {
+      mapaDiv.style.display = 'none';
+      if (equipoSeleccionado) renderNivel3Componentes(equipoSeleccionado.id);
+      else if (areaSeleccionada) renderNivel2Equipos(areaSeleccionada);
+      else renderNivel1Areas();
+    }
+  }
+
+  function actualizarMarcadoresMapa() {
+    if (!capaMarcadores) return;
+    capaMarcadores.clearLayers();
+
+    equiposDB.forEach(eq => {
+      if (eq.lat && eq.lng) {
+        const sev = calcularSeveridadGlobal(eq.componentes);
+        const color = SEV_COLOR_HEX[sev] || '#6b7280';
+        
+        // Marcador circular personalizado con color de severidad
+        const iconoCustom = L.divIcon({
+          className: 'custom-map-marker',
+          html: `<div style="background-color: ${color}; width: 22px; height: 22px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: white;">📍</div>`,
+          iconSize: [22, 22],
+          iconAnchor: [11, 11]
+        });
+
+        const marker = L.marker([parseFloat(eq.lat), parseFloat(eq.lng)], { icon: iconoCustom });
+        marker.bindPopup(`
+          <div style="color: #141416; font-family: 'Inter', sans-serif;">
+            <b style="font-size: 1rem; color: #111;">${eq.tag}</b><br>
+            <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #555;">Área: ${eq.area}</span><br>
+            <span style="font-size: 0.8rem;">Estado: <b>${sev}</b></span><br><br>
+            <button onclick="cerrarMapaYVerEquipo('${eq.id}')" style="background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">🔍 Inspeccionar Activo</button>
+          </div>
+        `);
+        capaMarcadores.addLayer(marker);
+      }
+    });
+  }
+
+  function cerrarMapaYVerEquipo(id) {
+    modoMapaActivo = false;
+    document.getElementById('view-map').style.display = 'none';
+    renderNivel3Componentes(id);
+  }
+
+  db.on('value', snap => {
+    equiposDB = snap.val() ? Object.values(snap.val()) : [];
+    if (modoMapaActivo) actualizarMarcadoresMapa();
+    else if (equipoSeleccionado) renderNivel3Componentes(equipoSeleccionado.id);
+    else if (areaSeleccionada) renderNivel2Equipos(areaSeleccionada);
+    else renderNivel1Areas();
   });
 
-  function calcularDias(f) {
-    if (!f) return null;
-    const d = new Date(f); return isNaN(d) ? null : Math.max(0, Math.floor((new Date() - d) / 86400000));
+  function iniciarRelojMercadoYClima() {
+    let dolar = 939.05;
+    let hierro = 98.68;
+    setInterval(() => {
+      dolar += (Math.random() - 0.48) * 0.20;
+      hierro += (Math.random() - 0.5) * 0.10;
+      document.getElementById('kpiDolar').innerText = `$${dolar.toFixed(2)}`;
+      document.getElementById('kpiHierro').innerText = `$${hierro.toFixed(2)} USD`;
+      document.getElementById('kpiParidad').innerText = `1 USD = ${Math.round(dolar)} CLP`;
+    }, 60000);
+  }
+  iniciarRelojMercadoYClima();
+
+  function toggleAdmin() {
+    isAdmin = !isAdmin;
+    document.body.classList.toggle('admin-mode', isAdmin);
+    document.getElementById('btnUnlock').innerText = isAdmin ? '🛡️ Admin' : '👤 Usuario';
+    document.getElementById('btnUnlock').style.color = isAdmin ? '#22c55e' : '';
+    if (!isAdmin && equipoSeleccionado) db.child(equipoSeleccionado.id).update({ en_edicion: false });
   }
 
-  function abrirModal(id) {
-    const eq = equipos.find(i => String(i.id).trim() === String(id).trim());
-    if (!eq) return;
+  function calcularSeveridadGlobal(componentes) {
+    if (!componentes || componentes.length === 0) return 'Plomo';
+    let maxPeso = 1; let sevFinal = 'Plomo';
+    componentes.forEach(c => { if (SEV_PESO[c.severidad] > maxPeso) { maxPeso = SEV_PESO[c.severidad]; sevFinal = c.severidad; } });
+    return sevFinal;
+  }
 
-    modalEquipoActualId = eq.id;
-    document.getElementById('modalTitle').innerText = `${eq.nombre} - ${eq.area}`;
-    const badge = document.getElementById('modalSevBadge');
-    badge.innerText = `Estado: ${eq.severidad || 'Plomo'}`;
-    const cMap = { 'Rojo':'#f85149', 'Naranja':'#db6d28', 'Amarillo':'#d29922', 'Verde':'#238636', 'Plomo':'#6e7681' };
-    badge.style.backgroundColor = cMap[eq.severidad] || cMap['Plomo'];
+  function obtenerTipoIoT(eq) {
+    let hasGateway = false; let hasManual = false;
+    (eq.componentes || []).forEach(c => { if(c.tipo_iot === 'gateway') hasGateway=true; if(c.tipo_iot === 'manual' || c.tipo_iot === 'parcial') hasManual=true; });
+    if(hasGateway && hasManual) return 'parcial';
+    return hasGateway ? 'gateway' : 'manual';
+  }
 
-    document.getElementById('modalTipo').innerText = eq.tipo_equipo || '-';
-    document.getElementById('modalUltimaMedicion').innerText = eq.ultima_medicion || 'Sin Registrar';
-    
-    const dias = calcularDias(eq.ultima_medicion);
-    document.getElementById('modalDias').innerText = dias !== null ? `${dias} días` : 'Sin Medición';
-    
-    const razonRow = document.getElementById('modalRazonRow');
-    if (eq.severidad === 'Plomo' && eq.razon_plomo) {
-      document.getElementById('modalRazonPlomo').innerText = eq.razon_plomo;
-      razonRow.style.display = 'block';
-    } else { razonRow.style.display = 'none'; }
+  function irAInicio() { cerrarEdicion(); modoMapaActivo = false; document.getElementById('view-map').style.display = 'none'; renderNivel1Areas(); }
+  function navegarAtras() {
+    if (modoMapaActivo) { alternarVistaMapa(); return; }
+    if (document.getElementById('modalDetalleComponente').style.display === 'flex') { cerrarDetalleComponente(); return; }
+    if (document.getElementById('modalEdicion').style.display === 'flex') { cerrarEdicion(); if(equipoSeleccionado) renderNivel3Componentes(equipoSeleccionado.id); return; }
+    if (document.getElementById('view-componentes').style.display === 'grid') { renderNivel2Equipos(areaSeleccionada); return; }
+    if (document.getElementById('view-equipos').style.display === 'grid') { irAInicio(); return; }
+  }
 
-    const avisosContainer = document.getElementById('modalAvisosContainer');
-    avisosContainer.innerHTML = '';
-    let listaAvisos = eq.avisos || [];
-    if (listaAvisos.length === 0 && (eq.componente || eq.aviso || eq.analisis)) {
-      listaAvisos.push({ componente: eq.componente, aviso: eq.aviso, om: eq.om, estatus: eq.estatus, analisis: eq.analisis, recomendacion: eq.recomendacion });
-    }
+  function aplicarFiltroIoT() {
+    if (modoMapaActivo) return;
+    if (areaSeleccionada) renderNivel2Equipos();
+    else renderNivel1Areas();
+  }
 
-    if (listaAvisos.length > 0) {
-      listaAvisos.forEach((av, idx) => {
-        avisosContainer.innerHTML += `
-          <div style="background:var(--bg-main); padding:12px; border-radius:6px; border:1px solid var(--border-card); margin-bottom:6px;">
-            <div style="font-size:0.75rem; font-weight:900; color:var(--accent-color); margin-bottom:5px;">AVISO / COMPONENTE #${idx+1}: ${av.componente || 'GENERAL'}</div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 6px; font-size:0.8rem;">
-              <div><b>Aviso SAP:</b> <span class="code-font">${av.aviso || 'S/N'}</span></div>
-              <div><b>OM SAP:</b> <span class="code-font">${av.om || 'S/N'}</span></div>
-              <div><b>Estatus:</b> ${av.estatus || 'N/D'}</div>
+  function renderNivel1Areas() {
+    areaSeleccionada = null; equipoSeleccionado = null;
+    document.getElementById('btnVolver').style.display = 'none';
+    document.getElementById('btnInicio').style.display = 'none';
+    document.getElementById('bc-area').style.display = 'none';
+    document.getElementById('bc-equipo').style.display = 'none';
+
+    document.getElementById('view-equipos').style.display = 'none';
+    document.getElementById('view-componentes').style.display = 'none';
+    document.getElementById('view-areas').style.display = 'grid';
+
+    const filtro = document.getElementById('filtroIoT').value;
+    const areasMap = {};
+
+    equiposDB.forEach(eq => {
+      const tipoEq = obtenerTipoIoT(eq);
+      if (filtro !== 'todos' && tipoEq !== filtro) return;
+
+      const area = eq.area || 'Sin Área';
+      const sev = calcularSeveridadGlobal(eq.componentes);
+      if (!areasMap[area]) areasMap[area] = { equipos: 0, criticos: 0, maxSevPeso: 1, maxSev: 'Plomo' };
+      areasMap[area].equipos++;
+      if (SEV_PESO[sev] >= 4) areasMap[area].criticos++;
+      if (SEV_PESO[sev] > areasMap[area].maxSevPeso) { areasMap[area].maxSevPeso = SEV_PESO[sev]; areasMap[area].maxSev = sev; }
+    });
+
+    const container = document.getElementById('view-areas');
+    container.innerHTML = Object.keys(areasMap).sort().map(area => {
+      const data = areasMap[area];
+      const animClass = (data.maxSev === 'Rojo' || data.maxSev === 'Naranja') ? `sev-${data.maxSev.toLowerCase()}-anim` : '';
+      return `
+        <div class="card-area sev-${data.maxSev.toLowerCase()} ${animClass}" onclick="renderNivel2Equipos('${area}')">
+          <div style="width: 100%; display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="text-align: left;">
+              <div class="label-muted">Área</div>
+              <div class="value-strong" style="font-size: 1rem; margin-top: 2px;">${area}</div>
             </div>
-            <div style="font-size:0.85rem; line-height:1.4; margin-bottom:5px;"><b>Análisis Técnico:</b> ${av.analisis || 'Sin análisis registrado.'}</div>
-            <div style="font-size:0.85rem; line-height:1.4; color: #388bfd;"><b>Recomendación:</b> ${av.recomendacion || 'Sin acción correctiva.'}</div>
           </div>
-        `;
-      });
-    } else {
-      avisosContainer.innerHTML = `<span style="color:var(--text-muted);">Sin avisos asociados.</span>`;
-    }
-    
-    const timeline = document.getElementById('modalBitacoraTimeline');
-    timeline.innerHTML = '';
-    if (eq.bitacora && eq.bitacora.length > 0) {
-      eq.bitacora.forEach(b => {
-        timeline.innerHTML += `<div class="timeline-item"><div class="timeline-date">${b.fecha}</div><div>${b.texto}</div></div>`;
-      });
-    } else { timeline.innerHTML = `<span style="color:var(--text-muted);">Sin registros históricos de condición.</span>`; }
-
-    const gal = document.getElementById('modalGalleryContainer');
-    gal.innerHTML = '';
-    (eq.imagenes || []).forEach(img => {
-      if(img) {
-        const t = document.createElement('img'); t.src = img; t.className = 'gallery-thumb';
-        t.onclick = () => { document.getElementById('lightboxImg').src = img; document.getElementById('lightboxOverlay').style.display = 'flex'; };
-        gal.appendChild(t);
-      }
-    });
-    if(!eq.imagenes || !eq.imagenes.length) gal.innerHTML = `<span style="color:var(--text-muted); font-size:0.8rem;">Sin evidencias.</span>`;
-    document.getElementById('evidenciaModal').style.display = 'flex';
+          <div style="width: 100%; display: flex; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-card);">
+            <div>
+              <div class="label-muted" style="font-size: 0.55rem;">Activos</div>
+              <div class="value-strong">${data.equipos}</div>
+            </div>
+            <div style="text-align: right;">
+              <div class="label-muted" style="font-size: 0.55rem;">Condición</div>
+              <div class="value-strong" style="color: ${SEV_COLOR_HEX[data.maxSev]}">${data.criticos > 0 ? `${data.criticos} en Alerta` : 'Normal'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('') || '<div style="color:var(--text-muted); grid-column: 1/-1;">Sin activos que coincidan con el filtro IoT seleccionado.</div>';
   }
-  
-  function cerrarModal(e) { if (e && e.target !== document.getElementById('evidenciaModal')) return; document.getElementById('evidenciaModal').style.display = 'none'; }
-  function cerrarModalStats(e) { if (e && e.target !== document.getElementById('statsModal')) return; document.getElementById('statsModal').style.display = 'none'; }
-  function cerrarLightbox() { document.getElementById('lightboxOverlay').style.display = 'none'; }
 
-  function renderDashboard(filtroTexto = '') {
-    const sevValor = { 'Rojo':5, 'Naranja':4, 'Amarillo':3, 'Verde':2, 'Plomo':1 };
-    let cRojo = 0, cNaranja = 0, cAmarillo = 0, cVerde = 0, cPlomo = 0;
+  function renderNivel2Equipos(areaStr) {
+    if (areaStr) areaSeleccionada = areaStr;
+    equipoSeleccionado = null;
     
-    const eqProcesados = equipos.map(eq => {
-      const dias = calcularDias(eq.ultima_medicion);
-      const isPlomo = (eq.severidad === 'Plomo');
+    document.getElementById('btnVolver').style.display = 'inline-flex';
+    document.getElementById('btnInicio').style.display = 'inline-flex';
+    document.getElementById('bc-area').style.display = 'inline-flex';
+    document.getElementById('bc-area').innerHTML = ` / <span class="nav-link">${areaSeleccionada}</span>`;
+    document.getElementById('bc-equipo').style.display = 'none';
+
+    document.getElementById('view-areas').style.display = 'none';
+    document.getElementById('view-componentes').style.display = 'none';
+    document.getElementById('view-equipos').style.display = 'grid';
+
+    const filtro = document.getElementById('filtroIoT').value;
+    let eqs = equiposDB.filter(e => e.area === areaSeleccionada);
+    if (filtro !== 'todos') {
+      eqs = eqs.filter(e => obtenerTipoIoT(e) === filtro);
+    }
+    eqs.sort((a,b) => SEV_PESO[calcularSeveridadGlobal(b.componentes)] - SEV_PESO[calcularSeveridadGlobal(a.componentes)]);
+
+    const container = document.getElementById('view-equipos');
+    container.innerHTML = eqs.map(eq => {
+      const sevGlobal = calcularSeveridadGlobal(eq.componentes);
+      const animClass = (sevGlobal === 'Rojo' || sevGlobal === 'Naranja') ? `sev-${sevGlobal.toLowerCase()}-anim` : '';
+      let hasGateway = false; let hasManual = false;
+      (eq.componentes || []).forEach(c => { if(c.tipo_iot === 'gateway') hasGateway=true; if(c.tipo_iot === 'manual') hasManual=true; });
+      let iotType = hasGateway && hasManual ? 'parcial' : (hasGateway ? 'gateway' : 'manual');
       
-      let subRango = 'normal';
-      let textDias = '';
+      const dias = eq.fecha ? Math.floor((new Date() - new Date(eq.fecha)) / 86400000) : '?';
+      const lock = eq.en_edicion ? `<div class="lock-badge">EDICIÓN</div>` : '';
 
-      if (isPlomo) {
-        subRango = 'sin_medicion';
-        textDias = eq.razon_plomo ? `⚪ ${eq.razon_plomo}` : '⚪ SIN MEDIR';
-      } else if (dias === null) {
-        subRango = 'sin_medicion';
-        textDias = '⚪ SIN MEDICIÓN';
-      } else if (dias < 15) {
-        subRango = 'seguimiento';
-        textDias = `🔍 ${dias}d`;
-      } else if (dias <= 30) {
-        subRango = 'normal';
-        textDias = `✅ ${dias}d`;
-      } else {
-        subRango = 'vencido';
-        textDias = `⚠️ ${dias}d`;
-      }
+      return `
+        <div class="card-equipo sev-${sevGlobal.toLowerCase()} ${animClass}" onclick="renderNivel3Componentes('${eq.id}')">
+          ${IOT_ICON[iotType] || ''}
+          <div class="eq-type">${eq.tipo || 'Activo'}</div>
+          <div class="eq-tag code-font" title="${eq.tag}">${eq.tag}</div>
+          <div class="eq-days" title="Días">${dias} días</div>
+          ${lock}
+        </div>
+      `;
+    }).join('') || '<div style="color:var(--text-muted); grid-column: 1/-1;">No hay equipos en este filtro para el área seleccionada.</div>';
+  }
 
-      let sevClass = `sev-${(eq.severidad || 'plomo').toLowerCase()}`;
-      return { ...eq, dias: dias || 0, subRango, textDias, sevClass, valOrd: sevValor[eq.severidad] || 1 };
-    }).filter(eq => {
-      const cumpleTexto = eq.nombre.toLowerCase().includes(filtroTexto) || eq.area.toLowerCase().includes(filtroTexto) || (eq.tipo_equipo && eq.tipo_equipo.toLowerCase().includes(filtroTexto));
-      const cumpleRango = !isAdmin || filtroRangoActual === 'todos' || eq.subRango === filtroRangoActual;
-      const cumpleSevKPI = filtroSeveridadKPI === 'todos' || eq.severidad === filtroSeveridadKPI;
-      const cumpleSinAviso = !filtroSinAvisoActivo || !eq.aviso || eq.aviso.trim() === '';
-      return cumpleTexto && cumpleRango && cumpleSevKPI && cumpleSinAviso;
-    });
+  function renderNivel3Componentes(id) {
+    const eq = equiposDB.find(e => e.id === id);
+    if (!eq) return;
+    equipoSeleccionado = eq;
+    const sevGlobal = calcularSeveridadGlobal(eq.componentes);
+    
+    document.getElementById('bc-equipo').style.display = 'inline-flex';
+    document.getElementById('bc-equipo').innerHTML = ` / <span class="code-font" style="color:var(--text-main); font-weight:700;">${eq.tag}</span>`;
 
-    equipos.forEach(eq => {
-      const sev = eq.severidad;
-      if (sev === 'Rojo') cRojo++;
-      else if (sev === 'Naranja') cNaranja++;
-      else if (sev === 'Amarillo') cAmarillo++;
-      else if (sev === 'Verde') cVerde++;
-      else if (sev === 'Plomo') cPlomo++;
-    });
+    document.getElementById('view-areas').style.display = 'none';
+    document.getElementById('view-equipos').style.display = 'none';
+    document.getElementById('view-componentes').style.display = 'grid';
 
-    document.getElementById('kpiTotal').innerText = equipos.length;
-    document.getElementById('kpiRojo').innerText = cRojo;
-    document.getElementById('kpiNaranja').innerText = cNaranja;
-    document.getElementById('kpiAmarillo').innerText = cAmarillo;
-    document.getElementById('kpiVerde').innerText = cVerde;
-    document.getElementById('kpiPlomo').innerText = cPlomo;
-
-    const porArea = {};
-    eqProcesados.forEach(eq => { (porArea[eq.area] = porArea[eq.area] || []).push(eq); });
-
-    const areasOrdenadas = Object.keys(porArea).sort((a, b) => {
-      const criticosA = porArea[a].filter(eq => eq.severidad === 'Rojo' || eq.severidad === 'Naranja').length;
-      const criticosB = porArea[b].filter(eq => eq.severidad === 'Rojo' || eq.severidad === 'Naranja').length;
-      if (criticosB !== criticosA) return criticosB - criticosA;
-      return porArea[b].length - porArea[a].length;
-    });
-
-    let finalHTML = '';
-    areasOrdenadas.forEach(area => {
-      const eqs = porArea[area];
-      eqs.sort((a, b) => {
-        if (b.valOrd !== a.valOrd) return b.valOrd - a.valOrd;
-        return b.dias - a.dias;
-      });
-
-      const criticosCount = eqs.filter(eq => eq.severidad === 'Rojo' || eq.severidad === 'Naranja').length;
-      const badgeCriticoHTML = criticosCount > 0 ? `<span class="area-badge-crit">⚠️ ${criticosCount} Críticos/Alertas</span>` : '';
-
-      const cardsHTML = eqs.map(eq => {
-        const editBadge = eq.en_edicion ? `<div class="edit-lock-badge">🔒 En Edición</div>` : '';
-        return `
-          <div class="card ${eq.sevClass}" data-id="${eq.id}">
-            <div class="pulse-indicator"></div>
-            <span class="asset-type-badge" title="${eq.tipo_equipo || 'Equipo'}">${eq.tipo_equipo || 'Equipo'}</span>
-            <h3 class="asset-tag code-font" title="${eq.nombre}">${eq.nombre}</h3>
-            <span class="asset-days code-font" title="${eq.textDias}">${eq.textDays}</span>
-            ${editBadge}
+    const container = document.getElementById('view-componentes');
+    
+    let html = `
+      <div style="grid-column: 1 / -1; display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px; background: var(--bg-card); padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-card); box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div>
+          <div class="label-muted">${eq.tipo || 'ACTIVO CRÍTICO'}</div>
+          <h2 style="margin: 2px 0 0 0; font-size: 1.25rem;" class="code-font">${eq.tag}</h2>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <div style="text-align: right;">
+            <div class="label-muted" style="font-size: 0.55rem;">Estado Global</div>
+            <div class="value-strong" style="color: ${SEV_COLOR_HEX[sevGlobal]}; text-transform: uppercase; font-size: 0.8rem;">${sevGlobal}</div>
           </div>
-        `;
-      }).join('');
-      
-      finalHTML += `<h2 class="area-title"><span>${area}</span> ${badgeCriticoHundreds = badgeCriticoHTML}</h2><div class="critical-grid">${cardsHTML}</div>`;
-    });
+          <button class="btn-base btn-primary admin-only" onclick="abrirEdicionEquipo()">✏️ Editar</button>
+        </div>
+      </div>
+    `;
+
+    const compsHtml = (eq.componentes || []).map((c, index) => {
+      const icon = IOT_ICON[c.tipo_iot] || '';
+      return `
+      <div class="card-equipo card-componente sev-${c.severidad.toLowerCase()}" onclick="abrirDetalleComponente('${eq.id}', ${index})" title="Hacer clic para ver detalles">
+        ${icon}
+        <div style="text-align: left; width: 100%;">
+          <div class="eq-type">Spot / Componente</div>
+          <div class="eq-tag code-font" style="font-size: 0.9rem; max-width: 85%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${c.nombre}</div>
+        </div>
+        
+        <div style="width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--border-card); text-align: left;">
+          <div>
+            <div class="label-muted" style="font-size: 0.55rem;">Vibración</div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: ${SEV_COLOR_HEX[c.severidad]};">${c.severidad.toUpperCase()}</div>
+          </div>
+          <div>
+            <div class="label-muted" style="font-size: 0.55rem;">Telemetría</div>
+            <div style="font-size: 0.7rem; font-weight: 500; color: #d1d5db; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${IOT_TEXT[c.tipo_iot]}</div>
+          </div>
+        </div>
+      </div>
+    `}).join('');
+
+    container.innerHTML = html + (compsHtml || '<div style="grid-column: 1/-1; color:var(--text-muted); text-align:center;">Sin componentes registrados.</div>');
+  }
+
+  function abrirDetalleComponente(eqId, compIndex) {
+    const eq = equiposDB.find(e => e.id === eqId);
+    if (!eq || !eq.componentes || !eq.componentes[compIndex]) return;
+    const c = eq.componentes[compIndex];
     
-    document.getElementById('app-root').innerHTML = finalHTML || `<div style="text-align:center; padding:30px; color:var(--text-muted);">No se encontraron activos con el filtro seleccionado.</div>`;
+    document.getElementById('detCompEqTag').innerText = `Activo: ${eq.tag} (${eq.area})`;
+    document.getElementById('detCompNombre').innerText = c.nombre;
+    
+    let iconClass = 'offline';
+    if(c.tipo_iot === 'gateway') iconClass = 'online';
+    if(c.tipo_iot === 'manual') iconClass = 'manual';
+    let iconSimbol = '🔄';
+    if(c.tipo_iot === 'gateway') iconSimbol = '📶';
+    if(c.tipo_iot === 'manual') iconSimbol = '🚶‍♂️';
+    
+    document.getElementById('detCompSync').innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
+        <div class="iot-badge-icon ${iconClass}">${iconSimbol}</div>
+        <span class="value-strong code-font" style="font-size: 0.9rem;">${IOT_TEXT[c.tipo_iot]}</span>
+      </div>
+    `;
+    
+    const sevEl = document.getElementById('detCompSev');
+    sevEl.innerText = c.severidad.toUpperCase();
+    sevEl.style.color = SEV_COLOR_HEX[c.severidad] || 'white';
+    
+    document.getElementById('detCompAnalisis').innerText = c.analisis || 'Sin anomalías registradas.';
+    
+    document.getElementById('modalDetalleComponente').style.display = 'flex';
+  }
+
+  function cerrarDetalleComponente(e) {
+    if(e && e.target !== document.getElementById('modalDetalleComponente')) return;
+    document.getElementById('modalDetalleComponente').style.display = 'none';
+  }
+
+  function abrirEdicionEquipo() {
+    if (!isAdmin || !equipoSeleccionado) return;
+    if (equipoSeleccionado.en_edicion) { if(!confirm("Otro usuario está editando. ¿Forzar entrada?")) return; }
+    
+    db.child(equipoSeleccionado.id).update({ en_edicion: true });
+    
+    document.getElementById('edArea').value = equipoSeleccionado.area || '';
+    document.getElementById('edTag').value = equipoSeleccionado.tag || '';
+    document.getElementById('edTipo').value = equipoSeleccionado.tipo || '';
+    document.getElementById('edFecha').value = equipoSeleccionado.fecha || '';
+    document.getElementById('edLat').value = equipoSeleccionado.lat || '';
+    document.getElementById('edLng').value = equipoSeleccionado.lng || '';
+
+    const cont = document.getElementById('edComponentesContainer');
+    cont.innerHTML = '';
+    (equipoSeleccionado.componentes || []).forEach(c => agregarFormComponente(c));
+    
+    document.getElementById('modalEdicion').style.display = 'flex';
+  }
+
+  function agregarFormComponente(data = {}) {
+    const cont = document.getElementById('edComponentesContainer');
+    const div = document.createElement('div');
+    div.style.cssText = "background:var(--bg-main); padding:16px; border:1px solid var(--border-card); border-radius:8px; position:relative;";
+    div.className = 'comp-item';
+    div.innerHTML = `
+      <button class="btn-danger" style="position:absolute; top:10px; right:10px; padding:4px 8px; font-size:0.7rem;" onclick="this.parentElement.remove()">Eliminar</button>
+      <div class="form-grid" style="margin-top: 10px;">
+        <div><label>Nombre del Spot</label><input type="text" class="c-nom" value="${data.nombre || ''}" placeholder="Ej: Motor Lado Libre"></div>
+        <div><label>Telemetría</label>
+          <select class="c-iot">
+            <option value="gateway" ${data.tipo_iot==='gateway'?'selected':''}>Online (Gateway)</option>
+            <option value="parcial" ${data.tipo_iot==='parcial'?'selected':''}>Online (Parcial)</option>
+            <option value="manual" ${data.tipo_iot==='manual'?'selected':''}>Offline (Manual)</option>
+          </select>
+        </div>
+        <div><label>Alarma Vibración</label>
+          <select class="c-sev">
+            <option value="Rojo" ${data.severidad==='Rojo'?'selected':''}>🔴 Crítico (Rojo)</option>
+            <option value="Naranja" ${data.severidad==='Naranja'?'selected':''}>🟠 Alerta (Naranja)</option>
+            <option value="Amarillo" ${data.severidad==='Amarillo'?'selected':''}>🟡 Precaución (Amarillo)</option>
+            <option value="Verde" ${data.severidad==='Verde'?'selected':''}>🟢 Normal (Verde)</option>
+            <option value="Plomo" ${data.severidad==='Plomo'?'selected':''}>⚪ Sin Datos (Plomo)</option>
+          </select>
+        </div>
+        <div style="grid-column: span 2;"><label style="display:flex; justify-content:space-between;">Insights / Diagnóstico <button type="button" class="btn-base" style="padding:2px 8px; font-size:0.65rem;" onclick="generarIAContextual(this)">✨ Generar Asistencia IA</button></label>
+          <textarea class="c-ana" rows="3" placeholder="Detalles técnicos...">${data.analisis || ''}</textarea>
+        </div>
+      </div>
+    `;
+    cont.appendChild(div);
+  }
+
+  function generarIAContextual(btn) {
+    const compBox = btn.closest('.comp-item');
+    const nombreComp = compBox.querySelector('.c-nom').value || 'el componente';
+    const txt = compBox.querySelector('.c-ana');
+    txt.value = `Se detecta modulación en espectro de alta frecuencia sobre ${nombreComp}. Patrón armónico compatible con inicio de desgaste en pista exterior o falta de lubricación. Recomendación: Monitoreo continuo y revisión en próxima detención.`;
+  }
+
+  function cerrarEdicion(e) { 
+    if(e && e.target !== document.getElementById('modalEdicion')) return; 
+    if(equipoSeleccionado) db.child(equipoSeleccionado.id).update({ en_edicion: false });
+    document.getElementById('modalEdicion').style.display = 'none'; 
+  }
+
+  function guardarEquipo() {
+    const id = equipoSeleccionado.id;
+    const componentes = [];
+    document.querySelectorAll('.comp-item').forEach(el => {
+      componentes.push({
+        nombre: el.querySelector('.c-nom').value,
+        tipo_iot: el.querySelector('.c-iot').value,
+        severidad: el.querySelector('.c-sev').value,
+        analisis: el.querySelector('.c-ana').value
+      });
+    });
+
+    db.child(id).update({
+      area: document.getElementById('edArea').value,
+      tag: document.getElementById('edTag').value,
+      tipo: document.getElementById('edTipo').value,
+      fecha: document.getElementById('edFecha').value,
+      lat: document.getElementById('edLat').value,
+      lng: document.getElementById('edLng').value,
+      componentes: componentes,
+      en_edicion: false
+    }).then(() => { cerrarEdicion(); });
+  }
+
+  function eliminarEquipo() {
+    if(confirm("¿Eliminar este equipo permanentemente?")) {
+      db.child(equipoSeleccionado.id).remove().then(() => { cerrarEdicion(); renderNivel1Areas(); });
+    }
+  }
+
+  function abrirEdicionEquipoNuevo() {
+    equipoSeleccionado = { id: 'EQ_' + Date.now(), componentes: [{ nombre: "P1 (Spot Nuevo)", tipo_iot: "gateway", severidad: "Verde", analisis: "" }] };
+    abrirEdicionEquipo();
+  }
+
+  function generarDatosPrueba() {
+    if(equiposDB.length > 0 && !confirm("Ya hay datos. ¿Deseas sobreescribir con datos de prueba?")) return;
+    
+    const demoData = {
+      "demo_1": {
+        id: "demo_1", area: "Chancado Primario", tag: "MH27152", tipo: "Chancador", fecha: "2026-09-01", lat: "-28.2876", lng: "-70.8130",
+        componentes: [
+          { nombre: "P4 (Izquierdo)", tipo_iot: "gateway", severidad: "Rojo", analisis: "Alta temperatura y vibración en banda de falla de rodamientos (BPFO). Se recomienda intervención inmediata antes del próximo ciclo de operación pesada." },
+          { nombre: "P.1 (Derecho)", tipo_iot: "manual", severidad: "Amarillo", analisis: "Leve roce en engranajes detectado." }
+        ]
+      },
+      "demo_2": {
+        id: "demo_2", area: "Molienda", tag: "ML-03", tipo: "Molino de Bolas", fecha: "2026-07-20", lat: "-28.2877", lng: "-70.8135",
+        componentes: [
+          { nombre: "Descanso Trunnion", tipo_iot: "gateway", severidad: "Naranja", analisis: "Tendencia al alza en temperatura del metal blanco." },
+          { nombre: "Piñón Coronas", tipo_iot: "parcial", severidad: "Naranja", analisis: "Desalineación térmica observada en el acoplamiento." }
+        ]
+      }
+    };
+    db.set(demoData).then(() => alert("✅ Datos de prueba cargados."));
+  }
+
+  function calcularRutaDescarga() {
+    let ruta = [];
+    equiposDB.forEach(eq => {
+      let necesitaDescarga = false;
+      (eq.componentes || []).forEach(c => { if(c.tipo_iot === 'parcial' || c.tipo_iot === 'manual') necesitaDescarga = true; });
+      if(necesitaDescarga) {
+        const dias = eq.fecha ? Math.floor((new Date() - new Date(eq.fecha)) / 86400000) : 999;
+        const sevPeso = SEV_PESO[calcularSeveridadGlobal(eq.componentes)];
+        ruta.push({ tag: eq.tag, area: eq.area, dias, sevPeso, lat: eq.lat, lng: eq.lng });
+      }
+    });
+
+    ruta.sort((a,b) => { if(b.dias !== a.dias) return b.dias - a.dias; return b.sevPeso - a.sevPeso; });
+    let msj = "📍 ITINERARIO ÓPTIMO DE DESCARGA FÍSICA:\n\n";
+    ruta.slice(0, 10).forEach((r, i) => { msj += `Paso ${i+1}: Ir a [${r.area}] - Equipo: ${r.tag} (Vencido hace ${r.dias} días)\n`; });
+    if(ruta.length === 0) msj = "✅ Todos los equipos están en línea vía Gateway.";
+    alert(msj);
+  }
+
+  function simularInyeccionDynamox() {
+    if(equiposDB.length === 0) return alert("Carga datos primero.");
+    const eq = equiposDB[Math.floor(Math.random() * equiposDB.length)];
+    if(!eq.componentes || eq.componentes.length === 0) return;
+    
+    const comps = eq.componentes;
+    comps[0].severidad = 'Rojo';
+    comps[0].analisis = `[ALERTA DYNAMOX AUTO] Aceleración Peak detectada: 15.2 G's. Riesgo inminente de rotura en ${comps[0].nombre}.`;
+    comps[0].tipo_iot = 'gateway';
+
+    db.child(eq.id).update({ componentes: comps });
+  }
+
+  function exportarPlantillaExcel() {
+    const filas = equiposDB.map(eq => ({ ID_Interno: eq.id, Area: eq.area, Tag: eq.tag, Tipo: eq.tipo, Fecha_Medicion: eq.fecha || '' }));
+    const ws = XLSX.utils.json_to_sheet(filas);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Equipos_MLC");
+    XLSX.writeFile(wb, `CIO_MLC_Base_${new Date().toISOString().split('T')[0]}.xlsx`);
+  }
+
+  function procesarCargaExcel(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, {type: 'array'});
+      const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+      
+      let procesados = 0;
+      json.forEach(row => {
+        if(row.ID_Interno && row.Tag) {
+          db.child(row.ID_Interno).update({ area: row.Area, tag: row.Tag, tipo: row.Tipo, fecha: row.Fecha_Medicion || '' });
+          procesados++;
+        }
+      });
+      alert(`✅ Carga masiva exitosa. Se actualizaron ${procesados} equipos.`);
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = '';
   }
 </script>
 
