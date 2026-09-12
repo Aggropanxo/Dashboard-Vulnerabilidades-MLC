@@ -426,7 +426,8 @@
     if (!capaMarcadores) return;
     capaMarcadores.clearLayers();
     equiposDB.forEach(eq => {
-      if (eq.lat && eq.lng) {
+      // VALIDACIÓN ESTRICTA: Solo dibuja el pin si el equipo tiene coordenadas lat y lng reales y no vacías
+      if (eq.lat && eq.lng && eq.lat.trim() !== "" && eq.lng.trim() !== "") {
         const sev = calcularSeveridadGlobal(eq.componentes);
         const color = SEV_COLOR_HEX[sev] || '#6b7280';
         const iconoCustom = L.divIcon({
@@ -466,8 +467,8 @@
           tag: item.tag || item.nombre || item.identificador || item.codigo || 'S/N',
           tipo: item.tipo || item.clase || 'Activo',
           fecha: item.fecha || item.ultima_sincronizacion || '',
-          lat: item.lat || '-28.2876',
-          lng: item.lng || '-70.8130',
+          lat: item.lat || '',
+          lng: item.lng || '',
           componentes: item.componentes || [],
           en_edicion: item.en_edicion || false
         };
@@ -787,7 +788,7 @@
         <div style="grid-column: span 2;">
           <label style="display:flex; justify-content:space-between; align-items:center;">
             <span>Análisis Técnico del Hallazgo</span>
-            <button type="button" class="btn-base" style="padding:2px 8px; font-size:0.65rem;" onclick="sugerirIAAnalisis(this)">✨ Asistencia IA (Redacción & Sugerencia)</button>
+            <button type="button" class="btn-base" style="padding:2px 8px; font-size:0.65rem;" onclick="sugerirIAAnalisis(this)">✨ Asistencia IA</button>
           </label>
           <textarea class="c-ana" rows="3" placeholder="Redacte el diagnóstico técnico...">${data.analisis || ''}</textarea>
         </div>
@@ -795,7 +796,7 @@
         <div style="grid-column: span 2;">
           <label style="display:flex; justify-content:space-between; align-items:center;">
             <span>Recomendación Operativa / Correctiva</span>
-            <button type="button" class="btn-base" style="padding:2px 8px; font-size:0.65rem;" onclick="sugerirIARecomendacion(this)">✨ Asistencia IA (Mejora Operativa)</button>
+            <button type="button" class="btn-base" style="padding:2px 8px; font-size:0.65rem;" onclick="sugerirIARecomendacion(this)">✨ Asistencia IA</button>
           </label>
           <textarea class="c-rec" rows="3" placeholder="Redacte la recomendación de intervención...">${data.recomendacion || ''}</textarea>
         </div>
@@ -807,7 +808,6 @@
     cont.appendChild(div);
   }
 
-  // Lógica de Trazabilidad: Registra automáticamente cuando cambia la severidad de color
   function verificarCambioSeveridad(selectEl, severidadAnterior) {
     const nuevaSev = selectEl.value;
     if (nuevaSev !== severidadAnterior) {
@@ -832,13 +832,13 @@
     const compBox = btn.closest('.comp-item');
     const nom = compBox.querySelector('.c-nom').value || 'el componente';
     const txt = compBox.querySelector('.c-ana');
-    txt.value = `[IA Sugerencia Mejorada]: Se identifica modulación espectral en alta frecuencia en ${nom}. El patrón armónico sugiere inicio de desgaste subsuperficial en pistas o condiciones de lubricación marginales que aceleran la fatiga del material.`;
+    txt.value = `Se detecta modulación en espectro de alta frecuencia sobre ${nom}. Patrón armónico compatible con inicio de desgaste en pista exterior o falta de lubricación.`;
   }
 
   function sugerirIARecomendacion(btn) {
     const compBox = btn.closest('.comp-item');
     const txt = compBox.querySelector('.c-rec');
-    txt.value = `[IA Sugerencia Operativa]: Intensificar frecuencia de monitoreo predictivo a ciclo semanal. Programar inspección boroscópica en próxima ventana operacional y reengrasar según pauta de lubricación de planta.`;
+    txt.value = `Intensificar frecuencia de monitoreo predictivo y programar inspección en próxima ventana operacional.`;
   }
 
   function cerrarEdicion(e) { 
