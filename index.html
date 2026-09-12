@@ -68,7 +68,7 @@
   /* Grids de Matrices y Contenedor de Mapa */
   .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
   .grid-equipos { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-  .grid-componentes { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .grid-componentes { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
   
   #view-map { width: 100%; height: 600px; border-radius: 8px; border: 1px solid var(--border-card); display: none; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
 
@@ -135,7 +135,6 @@
   </div>
   <div class="header-controls">
     <button class="btn-base btn-primary" onclick="alternarVistaMapa()">🗺️ Ver Mapa Planta</button>
-    <button class="btn-base btn-primary admin-only" onclick="generarDatosPrueba()">🏗️ Cargar Datos Prueba</button>
     <button class="btn-base btn-success admin-only" onclick="abrirEdicionEquipoNuevo()">➕ Crear Activo</button>
     <button class="btn-base btn-iot admin-only" onclick="simularInyeccionDynamox()">📡 Simular Alerta IoT</button>
     <button class="btn-base btn-warning admin-only" onclick="calcularRutaDescarga()">🚶‍♂️ Ruta Descarga Físicos</button>
@@ -274,8 +273,9 @@
     projectId: "dashboard-vulnerabilidades-mlc"
   };
   firebase.initializeApp(firebaseConfig);
-  // Conectado a la base de datos real en Firebase (`activos_v2`)
-  const db = firebase.database().ref('activos_v2'); 
+  
+  // ¡Conectado al nodo real en Firebase: activos_criticos!
+  const db = firebase.database().ref('activos_criticos'); 
 
   let isAdmin = false;
   let equiposDB = [];
@@ -295,16 +295,13 @@
   };
   const IOT_TEXT = { 'gateway': 'Online (Gateway)', 'manual': 'Offline (Manual)', 'parcial': 'Online (Parcial)' };
 
-  // Inicialización de Leaflet (Centrado en Mina Los Colorados, Zoom Ultra Preciso Nivel 19)
   function inicializarMapa() {
     if (mapaLeaflet) return;
-    // Coordenadas aproximadas de Planta Mina Los Colorados, Atacama
     mapaLeaflet = L.map('view-map').setView([-28.2876, -70.8130], 19);
     
-    // Capa base satelital de alta resolución (Esri World Imagery)
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 20,
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USGS, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     }).addTo(mapaLeaflet);
 
     capaMarcadores = L.layerGroup().addTo(mapaLeaflet);
@@ -342,7 +339,6 @@
         const sev = calcularSeveridadGlobal(eq.componentes);
         const color = SEV_COLOR_HEX[sev] || '#6b7280';
         
-        // Marcador circular personalizado con color de severidad
         const iconoCustom = L.divIcon({
           className: 'custom-map-marker',
           html: `<div style="background-color: ${color}; width: 22px; height: 22px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: white;">📍</div>`,
@@ -478,7 +474,7 @@
           </div>
         </div>
       `;
-    }).join('') || '<div style="color:var(--text-muted); grid-column: 1/-1;">Sin activos que coincidan con el filtro IoT seleccionado.</div>';
+    }).join('') || '<div style="color:var(--text-muted); grid-column: 1/-1;">Sin activos registrados en este nodo de Firebase.</div>';
   }
 
   function renderNivel2Equipos(areaStr) {
@@ -717,28 +713,6 @@
   function abrirEdicionEquipoNuevo() {
     equipoSeleccionado = { id: 'EQ_' + Date.now(), componentes: [{ nombre: "P1 (Spot Nuevo)", tipo_iot: "gateway", severidad: "Verde", analisis: "" }] };
     abrirEdicionEquipo();
-  }
-
-  function generarDatosPrueba() {
-    if(equiposDB.length > 0 && !confirm("Ya hay datos. ¿Deseas sobreescribir con datos de prueba?")) return;
-    
-    const demoData = {
-      "demo_1": {
-        id: "demo_1", area: "Chancado Primario", tag: "MH27152", tipo: "Chancador", fecha: "2026-09-01", lat: "-28.2876", lng: "-70.8130",
-        componentes: [
-          { nombre: "P4 (Izquierdo)", tipo_iot: "gateway", severidad: "Rojo", analisis: "Alta temperatura y vibración en banda de falla de rodamientos (BPFO). Se recomienda intervención inmediata antes del próximo ciclo de operación pesada." },
-          { nombre: "P.1 (Derecho)", tipo_iot: "manual", severidad: "Amarillo", analisis: "Leve roce en engranajes detectado." }
-        ]
-      },
-      "demo_2": {
-        id: "demo_2", area: "Molienda", tag: "ML-03", tipo: "Molino de Bolas", fecha: "2026-07-20", lat: "-28.2877", lng: "-70.8135",
-        componentes: [
-          { nombre: "Descanso Trunnion", tipo_iot: "gateway", severidad: "Naranja", analisis: "Tendencia al alza en temperatura del metal blanco." },
-          { nombre: "Piñón Coronas", tipo_iot: "parcial", severidad: "Naranja", analisis: "Desalineación térmica observada en el acoplamiento." }
-        ]
-      }
-    };
-    db.set(demoData).then(() => alert("✅ Datos de prueba cargados."));
   }
 
   function calcularRutaDescarga() {
